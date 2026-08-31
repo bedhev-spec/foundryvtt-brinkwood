@@ -1,3 +1,5 @@
+import { BladesHelpers, capitalize } from "./blades-helpers.js";
+
 /**
  * Roll Dice.
  * @param {int} dice_amount
@@ -31,9 +33,9 @@ export async function bladesRoll(dice_amount, attribute_label = "", position = "
 async function showChatRollMessage(r, zeromode, attribute_label = "", position = "", effect = "", note = "") {
 
   const speaker = foundry.documents.ChatMessage.getSpeaker();
-  const rolls = (r.terms)[0].results;
-	const position_localize = `BITD.Position${position.capitalize()}`;
-	const effect_localize = `BITD.Effect${effect.capitalize()}`;
+  const rolls = r.dice[0].results;
+	const position_localize = `BITD.Position${capitalize(position)}`;
+	const effect_localize = `BITD.Effect${capitalize(effect)}`;
 
   const roll_status = getBladesRollStatus(rolls, zeromode);
 

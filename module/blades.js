@@ -29,8 +29,6 @@ import {
   PactData, AssociatesData, MaskItemData, MootDecisionData
 } from "./data/item-data-models.js";
 
-window.BladesHelpers = BladesHelpers;
-
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
 /* -------------------------------------------- */
