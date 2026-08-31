@@ -29,7 +29,7 @@ export class BladesRebelionSheet extends BladesSheet {
       // Bug fix: use proper comparator instead of invalid .sort(d => d.rank)
       a.moot_decisions = decision_list
         .filter(d => d.system.aspect === a.name)
-        .sort((a, b) => a.rank - b.rank);
+        .sort((a, b) => a.system.rank - b.system.rank);
     });
 
     return context;
