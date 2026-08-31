@@ -1,5 +1,13 @@
 # This is a WIP for a Brinkwood games system for Foundry VTT
 
+## Compatibility
+
+Version 0.6.0 supports Foundry VTT v13, verified through build 13.351. The existing sheets use Foundry's supported `foundry.appv1` compatibility layer; migration to ApplicationV2 and typed data models is planned separately.
+
+The `tech/foundry-v13-compatibility` branch can be installed for testing with this manifest URL:
+
+`https://raw.githubusercontent.com/bedhev-spec/foundryvtt-brinkwood/tech/foundry-v13-compatibility/system-test.json`
+
 ## v0.5 - first "public" release
 This a barebones implementation of Brinkwood its still heavily based on megastrukturs Blades in The Dark and has *waaay* too much leftover/unused logic.
 Be warned, this is not stable and is susceptible to massive overhauls, I will try to implement all changes in a non-game-breaking manner but YOU HAVE BEEN WARNED.
