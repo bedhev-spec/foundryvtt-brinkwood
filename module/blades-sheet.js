@@ -3,7 +3,7 @@
  * @extends {ActorSheet}
  */
 
-export class BladesSheet extends ActorSheet {
+export class BladesSheet extends foundry.appv1.sheets.ActorSheet {
 
   /* -------------------------------------------- */
 
@@ -76,7 +76,7 @@ export class BladesSheet extends ActorSheet {
       // width: "500"
     }
 
-    let dialog = new Dialog({
+    let dialog = new foundry.appv1.api.Dialog({
       title: `${game.i18n.localize('Add')} ${item_type}`,
       content: html,
       buttons: {
@@ -108,7 +108,7 @@ export class BladesSheet extends ActorSheet {
       items_to_add.push(items.find(e => e._id === $(this).val()));
     });
 
-    await Item.create(items_to_add, {parent: this.document});
+    await CONFIG.Item.documentClass.create(items_to_add, {parent: this.document});
   }
   /* -------------------------------------------- */
 
@@ -146,7 +146,6 @@ export class BladesSheet extends ActorSheet {
     else if (update_type == "hold") {
       update = {_id: item_id, system:{hold:{value: update_value}}};
     } else {
-      console.log("update attempted for type undefined in blades-sheet.js onUpdateBoxClick function");
       return;
     };
 

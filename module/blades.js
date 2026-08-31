@@ -28,8 +28,6 @@ window.BladesHelpers = BladesHelpers;
 /*  Foundry VTT Initialization                  */
 /* -------------------------------------------- */
 Hooks.once("init", async function() {
-  console.log(`Initializing Blades In the Dark System`);
-
   game.blades = {
     dice: bladesRoll
   };
@@ -45,17 +43,16 @@ Hooks.once("init", async function() {
   registerSystemSettings();
 
   // Register sheet application classes
-  Actors.unregisterSheet("core", ActorSheet);
-  Actors.registerSheet("blades", BladesActorSheet, { types: ["character"], makeDefault: true });
-  Actors.registerSheet("blades", BladesClockSheet, { types: ["\uD83D\uDD5B clock"], makeDefault: true });
-  Actors.registerSheet("blades", BladesNPCSheet, { types: ["npc"], makeDefault: true });
-  Actors.registerSheet("blades", BladesMaskSheet, { types: ["mask"], makeDefault: true });
-  Actors.registerSheet("blades", BladesRebelionSheet, { types: ["rebelion"], makeDefault: true });
-  Items.unregisterSheet("core", ItemSheet);
-  Items.registerSheet("blades", BladesItemSheet, {makeDefault: true});
+  const { DocumentSheetConfig } = foundry.applications.apps;
+  DocumentSheetConfig.unregisterSheet(foundry.documents.Actor, "core", foundry.appv1.sheets.ActorSheet);
+  DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesActorSheet, { types: ["character"], makeDefault: true });
+  DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesClockSheet, { types: ["\uD83D\uDD5B clock"], makeDefault: true });
+  DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesNPCSheet, { types: ["npc"], makeDefault: true });
+  DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesMaskSheet, { types: ["mask"], makeDefault: true });
+  DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesRebelionSheet, { types: ["rebelion"], makeDefault: true });
+  DocumentSheetConfig.unregisterSheet(foundry.documents.Item, "core", foundry.appv1.sheets.ItemSheet);
+  DocumentSheetConfig.registerSheet(foundry.documents.Item, "brinkwood", BladesItemSheet, {makeDefault: true});
   await preloadHandlebarsTemplates();
-
-  Actors.registeredSheets.forEach(element => console.log(element.Actor.name));
 
 
   // Multiboxes.
@@ -211,17 +208,12 @@ Hooks.once("init", async function() {
 /**
  * Once the entire VTT framework is initialized, check to see if we should perform a data migration
  */
-Hooks.once("ready", function() {
+Hooks.once("ready", async function() {
+  const currentVersion = game.settings.get("brinkwood", "systemMigrationVersion") || "0";
+  const needsMigration = foundry.utils.isNewerVersion(game.system.version, currentVersion);
 
-  // Determine whether a system migration is required
-  const currentVersion = game.settings.get("brinkwood", "systemMigrationVersion").toString();
-  const NEEDS_MIGRATION_VERSION = "0.5.4";
-
-  let needMigration = (currentVersion < NEEDS_MIGRATION_VERSION) || (currentVersion === null);
-
-  // Perform the migration
-  if ( needMigration && game.user.isGM ) {
-    migrations.migrateWorld();
+  if (needsMigration && game.user.isGM) {
+    await migrations.migrateWorld();
   }
 });
 
@@ -229,28 +221,22 @@ Hooks.once("ready", function() {
  * Hooks
  */
 
-// getSceneControlButtons
-Hooks.on("renderSceneControls", async (app, html) => {
-  let dice_roller = $('<li class="scene-control" title="Dice Roll"><i class="fas fa-dice"></i></li>');
-  dice_roller.click( async function() {
-    await simpleRollPopup();
-  });
-  html.children().first().append( dice_roller );
+Hooks.on("getSceneControlButtons", controls => {
+  const tokenControls = controls.find(control => control.name === "token");
+  if (!tokenControls) return;
 
+  const tool = {
+    name: "brinkwood-roll",
+    title: "Dice Roll",
+    icon: "fas fa-dice",
+    button: true,
+    onChange: () => simpleRollPopup()
+  };
+
+  if (Array.isArray(tokenControls.tools)) tokenControls.tools.push(tool);
+  else tokenControls.tools[tool.name] = tool;
 });
-
-Hooks.on('init', () => {
-  class BrinkwoodTooltipManager extends TooltipManager { 
-		activate(element, {text, direction, cssClass}={}) {
-  		cssClass = element.dataset.cssClass || cssClass;
-			super.activate(element, {text, direction, cssClass});
-		}
-	}
-  game.tooltip = new BrinkwoodTooltipManager();
-})
 
 /*
  * Functions
  */
-
-

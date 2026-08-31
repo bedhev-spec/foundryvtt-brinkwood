@@ -58,7 +58,7 @@ export class BladesClockSheet extends BladesSheet {
         )
       );
     });
-    await TokenDocument.updateDocuments( data, { parent: game.scenes.current } )
+    await foundry.documents.TokenDocument.updateDocuments(data, {parent: game.scenes.current});
 
     // Update the Actor
     return this.object.update(formData);

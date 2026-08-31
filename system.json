@@ -2,14 +2,15 @@
   "id": "brinkwood",
   "title": "Brinkwood",
   "description": "Brinkwood game system.",
-  "version": "0.5.4",
+  "version": "0.6.0",
   "compatibility": {
-    "minimum": "10",
-    "verified": "11.300"
+    "minimum": "13",
+    "verified": "13.351",
+    "maximum": "13"
   },
-  "url": "https://github.com/quadur/foundryvtt-brinkwood",
-  "manifest": "https://raw.githubusercontent.com/quadur/foundryvtt-brinkwood/master/system.json",
-  "download": "https://github.com/quadur/foundryvtt-brinkwood/archive/refs/tags/v0.5.4.zip",
+  "url": "https://github.com/bedhev-spec/foundryvtt-brinkwood",
+  "manifest": "https://raw.githubusercontent.com/bedhev-spec/foundryvtt-brinkwood/master/system.json",
+  "download": "https://github.com/bedhev-spec/foundryvtt-brinkwood/archive/refs/tags/v0.6.0.zip",
   "authors": [
     {
       "name": "quad",
@@ -36,7 +37,7 @@
       "name": "class",
       "label": "Classes",
       "system": "brinkwood",
-      "path": "packs/classes.db",
+      "path": "packs/classes",
       "type": "Item",
       "private": false,
       "flags": {}
@@ -45,7 +46,7 @@
       "name": "upbringing",
       "label": "Upbringings",
       "system": "brinkwood",
-      "path": "packs/upbringings.db",
+      "path": "packs/upbringings",
       "type": "Item",
       "private": false,
       "flags": {}
@@ -54,7 +55,7 @@
       "name": "mask",
       "label": "Masks",
       "system": "brinkwood",
-      "path": "packs/masks.db",
+      "path": "packs/masks",
       "type": "Item",
       "private": false,
       "flags": {}
@@ -63,7 +64,7 @@
       "name": "profession",
       "label": "Professions",
       "system": "brinkwood",
-      "path": "packs/professions.db",
+      "path": "packs/professions",
       "type": "Item",
       "private": false,
       "flags": {}
@@ -72,7 +73,7 @@
       "name": "item",
       "label": "Items",
       "system": "brinkwood",
-      "path": "packs/items.db",
+      "path": "packs/items",
       "type": "Item",
       "private": false,
       "flags": {}
@@ -81,7 +82,7 @@
       "name": "trait",
       "label": "Traits",
       "system": "brinkwood",
-      "path": "packs/traits.db",
+      "path": "packs/traits",
       "type": "Item",
       "private": false,
       "flags": {}
@@ -90,7 +91,7 @@
       "name": "pact",
       "label": "Pacts",
       "system": "brinkwood",
-      "path": "packs/pacts.db",
+      "path": "packs/pacts",
       "type": "Item",
       "private": false,
       "flags": {}
@@ -99,7 +100,7 @@
       "name": "moot-decisions",
       "label": "Moot decisions",
       "system": "brinkwood",
-      "path": "packs/moot-decisions.db",
+      "path": "packs/moot-decisions",
       "type": "Item",
       "private": false,
       "flags": {}

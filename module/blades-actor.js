@@ -5,7 +5,7 @@ import { BladesHelpers } from "./blades-helpers.js";
  * Extend the basic Actor
  * @extends {Actor}
  */
-export class BladesActor extends Actor {
+export class BladesActor extends foundry.documents.Actor {
 
   /** @override */
   static async create(data, options={}) {
@@ -20,7 +20,7 @@ export class BladesActor extends Actor {
   }
 
   async _onCreate( data, options, userId ) {
-    super._onCreate( data, options, userId );
+    await super._onCreate(data, options, userId);
     
     //load basic items for characters
     if ( data.type == "character" ) {
@@ -75,7 +75,7 @@ export class BladesActor extends Actor {
         </form>
       `;
 
-    new Dialog({
+    new foundry.appv1.api.Dialog({
       title: `${game.i18n.localize('BITD.Roll')} ${game.i18n.localize(attribute_label)}`,
       content: content,
       buttons: {
@@ -185,7 +185,7 @@ export class BladesActor extends Actor {
   /* -------------------------------------------- */
 
   async _onCreateEmbeddedDocuments( name, ...args ) {
-     super._onCreateEmbeddedDocuments ( name, ...args );
+    await super._onCreateEmbeddedDocuments(name, ...args);
      const newItem = args[0][0];
 
      switch ( newItem.type ) {
@@ -201,7 +201,7 @@ export class BladesActor extends Actor {
   }
 
   async _onDeleteEmbeddedDocuments( name, ...args ) {
-    super._onDeleteEmbeddedDocuments (name, ...args);
+    await super._onDeleteEmbeddedDocuments(name, ...args);
     const removedItem = args[0][0];
 
     switch ( removedItem.type ){
@@ -226,17 +226,15 @@ export class BladesActor extends Actor {
 			let value = parseInt(foundry.utils.getProperty(this, key)) + mod*bonus_value;
       value = (value > max_value) ? max_value : value;
 			value = (value < 0 ? 0 : value);
-			console.log(value);
       foundry.utils.setProperty(system, key, value);
    	});
-		console.log(system);
 		await this.update(system);
 		this.render();
 	}
 
   async _addTraits(data) {
     const traits = await game.packs.get("brinkwood.trait").getDocuments({'system.class': data.name});
-    this.createEmbeddedDocuments( "Item", traits );
+      await this.createEmbeddedDocuments("Item", traits.map(item => item.toObject()));
   }
 
   _deleteTraits(data) {
@@ -247,10 +245,10 @@ export class BladesActor extends Actor {
   async _loadBasicItems() {
     // Load and create basic items from compendium
     const basicItems = await game.packs.get("brinkwood.item").getDocuments({'system.class': ""});
-    this.createEmbeddedDocuments( "Item", basicItems);
+      await this.createEmbeddedDocuments("Item", basicItems.map(item => item.toObject()));
     
     // Load and create custom basic items
     const customBasicItems = await game.items.filter(i => i.type == "item" && i.system.class == "");
-    this.createEmbeddedDocuments( "Item", customBasicItems );
+      await this.createEmbeddedDocuments("Item", customBasicItems);
   }
 }

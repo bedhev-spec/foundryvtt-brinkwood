@@ -7,16 +7,15 @@
  */
 export async function bladesRoll(dice_amount, attribute_label = "", position = "risky", effect = "standard", note = "") {
 
-  // ChatMessage.getSpeaker(controlledToken)
   let zeromode = false;
 
   if ( dice_amount < 0 ) { dice_amount = 0; }
   if ( dice_amount === 0 ) { zeromode = true; dice_amount = 2; }
 
-  let r = new Roll( `${dice_amount}d6`, {} );
+  let r = new foundry.dice.Roll(`${dice_amount}d6`, {});
 
   // show 3d Dice so Nice if enabled
-  r.evaluate({async:true});
+  await r.evaluate();
   await showChatRollMessage(r, zeromode, attribute_label, position, effect, note);
 }
 
@@ -31,7 +30,7 @@ export async function bladesRoll(dice_amount, attribute_label = "", position = "
  */
 async function showChatRollMessage(r, zeromode, attribute_label = "", position = "", effect = "", note = "") {
 
-  const speaker = ChatMessage.getSpeaker();
+  const speaker = foundry.documents.ChatMessage.getSpeaker();
   const rolls = (r.terms)[0].results;
 	const position_localize = `BITD.Position${position.capitalize()}`;
 	const effect_localize = `BITD.Effect${effect.capitalize()}`;
@@ -43,25 +42,25 @@ async function showChatRollMessage(r, zeromode, attribute_label = "", position =
 	switch ( BladesHelpers.rollType(attribute_label) ) {
  		case 'resist':
       const stress = getBladesRollStress(rolls, zeromode);
-      result = await renderTemplate("systems/brinkwood/templates/chat/resistance-roll.html", {rolls: rolls, roll_status: roll_status, attribute_label: attribute_label, stress: stress, note: note});
+      result = await foundry.applications.handlebars.renderTemplate("systems/brinkwood/templates/chat/resistance-roll.html", {rolls: rolls, roll_status: roll_status, attribute_label: attribute_label, stress: stress, note: note});
     	break;
 		case 'essence':
       const essence = getBladesRollEssence(rolls, zeromode);
-			result = await renderTemplate('systems/brinkwood/templates/chat/essence-roll.html', {rolls: rolls, roll_status: roll_status, attribute_label: attribute_label, essence: essence, note: note})
+      result = await foundry.applications.handlebars.renderTemplate('systems/brinkwood/templates/chat/essence-roll.html', {rolls: rolls, roll_status: roll_status, attribute_label: attribute_label, essence: essence, note: note});
 			break;
   	default:
-      result = await renderTemplate("systems/brinkwood/templates/chat/action-roll.html", {rolls: rolls, roll_status: roll_status, attribute_label: attribute_label, position: position, position_localize: position_localize, effect: effect, effect_localize: effect_localize, note: note});
+      result = await foundry.applications.handlebars.renderTemplate("systems/brinkwood/templates/chat/action-roll.html", {rolls: rolls, roll_status: roll_status, attribute_label: attribute_label, position: position, position_localize: position_localize, effect: effect, effect_localize: effect_localize, note: note});
  
 	}
 
   let messageData = {
     speaker: speaker,
     content: result,
-    type: CONST.CHAT_MESSAGE_TYPES.ROLL,
-    roll: r
+    style: CONST.CHAT_MESSAGE_STYLES.ROLL,
+    rolls: [r]
   }
 
-  CONFIG.ChatMessage.documentClass.create(messageData, {})
+  await CONFIG.ChatMessage.documentClass.create(messageData, {});
 }
 
 /**
@@ -196,7 +195,7 @@ export function getBladesRollEssence(rolls, zeromode = false) {
  */
 export async function simpleRollPopup() {
 
-  new Dialog({
+  new foundry.appv1.api.Dialog({
     title: `Simple Roll`,
     content: `
       <h2>${game.i18n.localize("BITD.RollSomeDice")}</h2>

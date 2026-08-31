@@ -47,7 +47,7 @@ export class BladesHelpers {
     const item_type = a.dataset.itemType;
 
     let data = {
-      name: randomID(),
+      name: foundry.utils.randomID(),
       type: item_type
     };
     return actor.createEmbeddedDocuments("Item", [data]);

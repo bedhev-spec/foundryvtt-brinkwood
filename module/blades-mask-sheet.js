@@ -95,7 +95,11 @@ export class BladesMaskSheet extends BladesSheet {
 
     sheetData.system.load_levels = {"BITD.Light":"BITD.Light", "BITD.Normal":"BITD.Normal", "BITD.Heavy":"BITD.Heavy"};
 
-    sheetData.system.description = await TextEditor.enrichHTML(sheetData.system.description, {secrets: sheetData.owner, async: true});
+    sheetData.system.description = await foundry.applications.ux.TextEditor.implementation.enrichHTML(sheetData.system.description, {
+      async: true,
+      relativeTo: this.document,
+      secrets: this.document.isOwner
+    });
 
 
     return sheetData;
@@ -137,7 +141,7 @@ export class BladesMaskSheet extends BladesSheet {
     const element = event.currentTarget;
     const dataset = element.dataset;
 
-    const actor_data = duplicate(this.actor);
+    const actor_data = foundry.utils.deepClone(this.actor.toObject());
    
     let new_value = parseInt(dataset.value);
     let max_value = parseInt(dataset.max_value);

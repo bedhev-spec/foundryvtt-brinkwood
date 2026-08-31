@@ -1,37 +1,51 @@
 /**
- * Perform a system migration for the entire World, applying migrations for Actors, Items, and Compendium packs
- * @return {Promise}      A Promise which resolves once the migration is completed
+ * Perform the legacy 0.5.4 actor migration for the entire World.
+ * @return {Promise<void>} A Promise which resolves once the migration is complete.
  */
 export const migrateWorld = async function() {
-  ui.notifications.info(`Applying Brinkwood Actors migration for version ${game.data.version}. Please be patient and do not close your game or shut down your server.`, {permanent: true});
+  ui.notifications.info(`Applying Brinkwood Actors migration for version ${game.version}. Please be patient and do not close your game or shut down your server.`, {permanent: true});
 
-	let current_version = game.settings.get("brinkwood", "systemMigrationVersion").toString();
+  const currentVersion = game.settings.get("brinkwood", "systemMigrationVersion").toString();
 
-	if (current_version < '0.5.4') {
-    // remove old bonus action point system
-		game.actors.forEach(async actor => {
-			let backup = await actor.system.attributes;
-			let old_class = actor.getEmbeddedCollection("Item").filter(i => i.type == 'class')[0];
-			let old_profession = actor.getEmbeddedCollection("Item").filter(i => i.type == 'profession')[0];
-			actor.getEmbeddedCollection("ActiveEffect").forEach(async eff => await eff.delete());
-			if (old_class) {
-				let new_class = await game.packs.get("brinkwood.class").index.find(x => x.name == old_class.name)
-				await old_class.delete();
-				await actor.createEmbeddedDocuments('Item', [new_class])
-			}
-		
-			if (old_profession) {
-				let new_profession = await game.packs.get("brinkwood.profession").index.find(x => x.name == old_profession.name)
-				await old_profession.delete();
-				await actor.createEmbeddedDocuments('Item', [new_profession])
-			}
-			await actor.update({'system.attributes': backup});
-		});	
-	}
+  if (foundry.utils.isNewerVersion("0.5.4", currentVersion)) {
+    const classPack = game.packs.get("brinkwood.class");
+    const professionPack = game.packs.get("brinkwood.profession");
+    const [classIndex, professionIndex] = await Promise.all([
+      classPack.getIndex({fields: ["name"]}),
+      professionPack.getIndex({fields: ["name"]})
+    ]);
 
-	game.settings.set("brinkwood", "systemMigrationVersion", game.system.version);
-  ui.notifications.info(`Brinkwood System Migration to version ${game.system.version} completed!`, {permanent: true});
+    for (const actor of game.actors) {
+      const attributes = foundry.utils.deepClone(actor.system.attributes);
+      const oldClass = actor.items.find(item => item.type === "class");
+      const oldProfession = actor.items.find(item => item.type === "profession");
 
-}
+      if (actor.effects.size) {
+        await actor.deleteEmbeddedDocuments("ActiveEffect", actor.effects.map(effect => effect.id));
+      }
 
-/* -------------------------------------------- */
+      if (oldClass) {
+        const entry = classIndex.find(item => item.name === oldClass.name);
+        const replacement = entry ? await classPack.getDocument(entry._id) : null;
+        if (replacement) {
+          await oldClass.delete();
+          await actor.createEmbeddedDocuments("Item", [replacement.toObject()]);
+        }
+      }
+
+      if (oldProfession) {
+        const entry = professionIndex.find(item => item.name === oldProfession.name);
+        const replacement = entry ? await professionPack.getDocument(entry._id) : null;
+        if (replacement) {
+          await oldProfession.delete();
+          await actor.createEmbeddedDocuments("Item", [replacement.toObject()]);
+        }
+      }
+
+      await actor.update({"system.attributes": attributes});
+    }
+  }
+
+  await game.settings.set("brinkwood", "systemMigrationVersion", game.system.version);
+  ui.notifications.info(`Brinkwood System Migration version ${game.system.version} completed!`, {permanent: true});
+};

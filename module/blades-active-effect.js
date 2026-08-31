@@ -1,11 +1,9 @@
-import { BladesHelpers } from "./blades-helpers.js";
-
 /**
  * Extend the base ActiveEffect class to implement system-specific logic.
  * @extends {ActiveEffect}
  */
 
-export class BladesActiveEffect extends ActiveEffect {
+export class BladesActiveEffect extends foundry.documents.ActiveEffect {
   /**
    * Is this active effect currently suppressed?
    * @type {boolean}
@@ -18,9 +16,9 @@ export class BladesActiveEffect extends ActiveEffect {
     if ( this.isSuppressed ) return null;
     //this allows for math and actor data references in the change values. Probably not necessary for
     // blades, but it was simple, and you never know what users will do. Probably ruin everything.
-    change.value = Roll.replaceFormulaData(change.value, actor.system);
+    change.value = foundry.dice.Roll.replaceFormulaData(change.value, actor.system);
     try {
-      change.value = Roll.safeEval(change.value).toString();
+      change.value = foundry.dice.Roll.safeEval(change.value).toString();
     } catch (e) {
       // this is a valid case, e.g., if the effect change simply is a string
     }
@@ -59,8 +57,8 @@ export class BladesActiveEffect extends ActiveEffect {
     switch ( a.dataset.action ) {
       case "create":
         return owner.createEmbeddedDocuments("ActiveEffect", [{
-          label: "New Effect",
-          icon: "systems/brinkwood/styles/assets/icons/Icon.3_13.png",
+          name: "New Effect",
+          img: "systems/brinkwood/styles/assets/icons/Icon.3_13.png",
           origin: owner.uuid,
           "duration.rounds": selector.dataset.effectType === "temporary" ? 1 : undefined,
           disabled: selector.dataset.effectType === "inactive"
@@ -68,7 +66,6 @@ export class BladesActiveEffect extends ActiveEffect {
       case "edit":
         return effect.sheet.render(true);
       case "delete":
-        console.log("delete effect");
         return effect.delete();
       case "toggle":
         return effect.update({disabled: !effect.disabled});
@@ -110,7 +107,6 @@ export class BladesActiveEffect extends ActiveEffect {
 
     // Iterate over active effects, classifying them into categories
     for ( let e of effects ) {
-      e._getSourceName(); // Trigger a lookup for the source name
       if ( e.isSuppressed ) categories.suppressed.effects.push(e);
       else if ( e.disabled ) categories.inactive.effects.push(e);
       else if ( e.isTemporary ) categories.temporary.effects.push(e);

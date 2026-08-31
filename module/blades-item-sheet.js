@@ -2,10 +2,9 @@
  * Extend the basic ItemSheet
  * @extends {ItemSheet}
  */
-import {onManageActiveEffect, prepareActiveEffectCategories} from "./effects.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
 
-export class BladesItemSheet extends ItemSheet {
+export class BladesItemSheet extends foundry.appv1.sheets.ItemSheet {
 
   /** @override */
 	static get defaultOptions() {
@@ -43,7 +42,7 @@ export class BladesItemSheet extends ItemSheet {
     if (!this.options.editable) return;
 
     html.find(".effect-control").click(ev => {
-      if ( this.item.isOwned ) return ui.notifications.warn(game.i18n.localize("BITD.EffectWarning"))
+      if ( this.item.isEmbedded ) return ui.notifications.warn(game.i18n.localize("BITD.EffectWarning"))
       BladesActiveEffect.onManageActiveEffect(ev, this.item)
     });
   }
@@ -60,10 +59,8 @@ export class BladesItemSheet extends ItemSheet {
     sheetData.editable = superData.editable;
 
     // Prepare Active Effects
-    sheetData.effects = prepareActiveEffectCategories(this.document.effects);
+    sheetData.effects = BladesActiveEffect.prepareActiveEffectCategories(this.document.effects);
 
-//    sheetData.system.description = await TextEditor.enrichHTML(sheetData.system.description, {secrets: sheetData.owner, async: true});
-    //    
     return sheetData;
   }
 }

@@ -31,9 +31,7 @@ export class BladesRebelionSheet extends BladesSheet {
 		const decision_list	= await game.packs.get('brinkwood.moot-decisions').getDocuments();
 		sheetData.system.aspects.forEach(a => a.moot_decisions = decision_list.filter(d => d.system.aspect == a.name).sort(d => d.rank));
 
-		console.log(sheetData);
-    
-		return sheetData;
+    return sheetData;
   }
 
   /* -------------------------------------------- */
@@ -56,7 +54,7 @@ export class BladesRebelionSheet extends BladesSheet {
     const element = event.currentTarget;
     const dataset = element.dataset;
 
-    const actor_data = duplicate(this.actor);
+    const actor_data = foundry.utils.deepClone(this.actor.toObject());
    
     let new_value = parseInt(dataset.value);
     let max_value = parseInt(dataset.max_value);

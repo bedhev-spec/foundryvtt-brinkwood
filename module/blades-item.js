@@ -4,7 +4,7 @@ import { BladesHelpers } from "./blades-helpers.js";
  * Extend the basic Item
  * @extends {Item}
  */
-export class BladesItem extends Item {
+export class BladesItem extends foundry.documents.Item {
   
   /** @override */
   async _preCreate( data, options, user ) {
@@ -22,7 +22,7 @@ export class BladesItem extends Item {
   }
 
   async _onCreate(data, options, user) {
-    super._onCreate(data, options, user);
+    await super._onCreate(data, options, user);
     let item = this;
     //Append new items automaticaly to the characters item list
     if ( data.type == "item" && data.system.class == "" && !this.isEmbedded ) {
@@ -35,7 +35,7 @@ export class BladesItem extends Item {
 
 
   async _onDelete(options, user) {
-    super._onDelete(options, user);
+    await super._onDelete(options, user);
     let item = this;
     //Remove deleted basic items from characters item list
     if ( item.type == "item" && item.system.class == "" && !item.isEmbedded ) {
