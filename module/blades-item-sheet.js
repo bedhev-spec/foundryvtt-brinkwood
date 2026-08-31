@@ -4,7 +4,9 @@
  */
 import { BladesActiveEffect } from "./blades-active-effect.js";
 
-export class BladesItemSheet extends foundry.applications.sheets.ItemSheetV2 {
+export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicationMixin(
+  foundry.applications.sheets.ItemSheetV2
+) {
 
   /**
    * Supported item-type → template mapping.

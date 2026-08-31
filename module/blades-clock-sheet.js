@@ -21,7 +21,10 @@ export class BladesClockSheet extends BladesSheet {
 
   /** @override */
   async _prepareContext(options) {
-    return super._prepareContext(options);
+    const context = await super._prepareContext(options);
+    // v13: {{#select}} block helper removed — feed selectOptions a value map.
+    context.clockSizes = { "4": "4", "6": "6", "8": "8" };
+    return context;
   }
 
   /* -------------------------------------------- */

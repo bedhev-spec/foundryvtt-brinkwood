@@ -6,7 +6,9 @@
 
 import { BladesHelpers } from "./blades-helpers.js";
 
-export class BladesSheet extends foundry.applications.sheets.ActorSheetV2 {
+export class BladesSheet extends foundry.applications.api.HandlebarsApplicationMixin(
+  foundry.applications.sheets.ActorSheetV2
+) {
 
   static DEFAULT_OPTIONS = {
     classes: ["brinkwood", "sheet", "actor"],
