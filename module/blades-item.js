@@ -26,10 +26,10 @@ export class BladesItem extends foundry.documents.Item {
     let item = this;
     //Append new items automaticaly to the characters item list
     if ( data.type == "item" && data.system.class == "" && !this.isEmbedded ) {
-      item.setFlag("brinkwood", "parentItem_id", item._id);
-      game.actors.filter(a => a.type == "character").forEach(actor =>  
-        actor.createEmbeddedDocuments("Item", [item])
-      );
+      await item.setFlag("brinkwood", "parentItem_id", item._id);
+      for (const actor of game.actors.filter(a => a.type == "character")) {
+        await actor.createEmbeddedDocuments("Item", [item.toObject()]);
+      }
     }
   }
 
@@ -39,12 +39,12 @@ export class BladesItem extends foundry.documents.Item {
     let item = this;
     //Remove deleted basic items from characters item list
     if ( item.type == "item" && item.system.class == "" && !item.isEmbedded ) {
-      game.actors.filter(a => a.type == "character").forEach(async function(actor) {
-        let itemsForDeletion = actor.items.
-		                     filter(i => i.getFlag("brinkwood", "parentItem_id") == item._id).
-		                     map(i => i._id);
-       	actor.deleteEmbeddedDocuments("Item", itemsForDeletion );
-      });
+      for (const actor of game.actors.filter(a => a.type == "character")) {
+        let itemsForDeletion = actor.items
+          .filter(i => i.getFlag("brinkwood", "parentItem_id") == item._id)
+          .map(i => i._id);
+        await actor.deleteEmbeddedDocuments("Item", itemsForDeletion);
+      }
     }
   }
 
