@@ -2,7 +2,7 @@
 
   <section id="character-{{_id}}-name-alias" class="flex-horizontal name-alias">
     <div class="grow-two">
-    	<img src="{{img}}" data-edit="img" title="{{name}}" class="portrait">
+      <img src="{{img}}" {{#if editable}}data-action="editImage" data-edit="img"{{/if}} title="{{name}}" class="portrait">
     </div>
 
     <div class="grow-two">
@@ -191,16 +191,16 @@
     <div class="tab-content flex-vertical grow-two">
 
       {{!-- Nav menu --}}
-      <nav class="tabs flex-horizontal">
-        <a class="item" data-tab="traits">{{localize "BITD.Traits"}} & {{localize "BITD.Loadout"}}</a>
-        <a class="item" data-tab="character-notes">{{localize "BITD.Notes"}}</a>
-        <a class="item" data-tab="downtime">{{localize "BITD.Downtime"}}</a>
+      <nav class="tabs flex-horizontal" data-group="primary">
+        <a class="item {{#if (eq tabs.primary "traits")}}active{{/if}}" data-action="tab" data-group="primary" data-tab="traits">{{localize "BITD.Traits"}} & {{localize "BITD.Loadout"}}</a>
+        <a class="item {{#if (eq tabs.primary "character-notes")}}active{{/if}}" data-action="tab" data-group="primary" data-tab="character-notes">{{localize "BITD.Notes"}}</a>
+        <a class="item {{#if (eq tabs.primary "downtime")}}active{{/if}}" data-action="tab" data-group="primary" data-tab="downtime">{{localize "BITD.Downtime"}}</a>
        {{#if isGM}}
-          <a class="item" data-tab="effects">{{localize "BITD.Effects"}}</a>
+          <a class="item {{#if (eq tabs.primary "effects")}}active{{/if}}" data-action="tab" data-group="primary" data-tab="effects">{{localize "BITD.Effects"}}</a>
         {{/if}}
       </nav>
 
-      <div id="character-{{_id}}-traits" class="tab flex-vertical traits" data-tab="traits">
+      <div id="character-{{_id}}-traits" class="tab flex-vertical traits {{#if (eq tabs.primary "traits")}}active{{/if}}" data-group="primary" data-tab="traits">
         <div class="label-stripe">
           <p><label for="character-{{_id}}-experience-0">{{localize "BITD.Traits"}}</label></p>
         </div>
@@ -254,7 +254,7 @@
       </div>
 
       {{!-- Owned Items Tab --}}
-      <div id="character-{{_id}}-loadout" class="tab flex-vertical loadout" data-tab="loadout">
+      <div id="character-{{_id}}-loadout" class="tab flex-vertical loadout {{#if (eq tabs.primary "loadout")}}active{{/if}}" data-group="primary" data-tab="loadout">
         <div class="label-stripe flex-horizontal">
            <p>{{localize "BITD.Loadout"}} <a class="item-add-popup" data-item-type="item"><i class="fas fa-plus-square"></i></a></p>
            <p>{{system.loadout}}/{{localize system.load_level}} </p>
@@ -278,7 +278,7 @@
         </div>
       </div>
 
-      <div class="tab flex-vertical" data-tab="character-notes">
+      <div class="tab flex-vertical {{#if (eq tabs.primary "character-notes")}}active{{/if}}" data-group="primary" data-tab="character-notes">
         <div class="label-stripe">
           <p>{{localize "BITD.Notes"}}</p>
         </div>
@@ -286,7 +286,7 @@
       </div>
 
       {{!-- Active Effects --}}
-      <div id="character-{{_id}}-effects" class="tab effects flex-vertical" data-tab="effects">
+      <div id="character-{{_id}}-effects" class="tab effects flex-vertical {{#if (eq tabs.primary "effects")}}active{{/if}}" data-group="primary" data-tab="effects">
         <div class="label-stripe">
           <p>{{localize "BITD.Effects"}}</p>
         </div>
@@ -294,7 +294,7 @@
       </div>
 
 			{{!-- Downtime actions --}}
-			<div id="character-{{_id}}-downtime" class="tab downtime flex-vertical" data-tab="downtime">
+			<div id="character-{{_id}}-downtime" class="tab downtime flex-vertical {{#if (eq tabs.primary "downtime")}}active{{/if}}" data-group="primary" data-tab="downtime">
 				<div class="label-stripe">
 					<p>{{localize "BITD.Downtime"}}</p>
 				</div>

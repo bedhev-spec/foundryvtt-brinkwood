@@ -1,5 +1,25 @@
 {
-	"Actor": {
+  "TYPES": {
+    "Actor": {
+      "🕛 clock": "Clock",
+      "npc": "NPC",
+      "character": "Character",
+      "mask": "Mask",
+      "rebelion": "Rebellion"
+    },
+    "Item": {
+      "item": "Item",
+      "class": "Class",
+      "trait": "Trait",
+      "upbringing": "Upbringing",
+      "profession": "Profession",
+      "pact": "Pact",
+      "associates": "Associates",
+      "mask": "Mask",
+      "moot_decision": "Moot Decision"
+    }
+  },
+  "Actor": {
 		"Upbringings": {
 			"Apprentice": "Your parents were able to scrape together enough blood, silver, or connections to have you apprenticed to a master craftsman or merchant. You worked long hours learning your master’s craft or going over their books, enduring harsh punishments for simple mistakes, and working your fingers to the bone. But by the end of it, you knew a trade or how to balance a ledger. Valuable skills… until they devise a machine to replace you.",
 			"Cogscamper": "When the blood rent came due, you were sold or seized by a landlord and put to work in a mine or factory as a “cogscamper,” a small child laborer who can squeeze between the billowing machines, scamper down tight tunnels, or sweep the soot-stained chimneys. It was arduous, dangerous work, and many of your fellows were taken by a black cough or maimed by an errant loom. But you survived, “graduating” when you grew too tall to scamper and sweep, a crust of bread and a dram or two of blood sterling your only severance.",

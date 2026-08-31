@@ -25,6 +25,8 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
   async _prepareContext(options) {
     const doc = this.document;
     const context = doc.toObject();                          // _id, name, img, type, system, …
+    context.actor = this.actor;
+    context.tabs = { primary: this.tabGroups.primary };
     context.items    = doc.items.map(i => i.toObject());    // plain-object items for templates
     context.isGM     = game.user.isGM;
     context.owner    = doc.isOwner;
@@ -41,20 +43,27 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
    * Replaces the v1 activateListeners(html) pattern.
    * @override
    */
-  _onRender(context, options) {
-    const html = this.element;
+  async _onRender(context, options) {
+    await super._onRender(context, options);
 
-    html.querySelectorAll(".item-add-popup").forEach(el =>
-      el.addEventListener("click", this._onItemAddClick.bind(this))
-    );
-    html.querySelectorAll(".update-box").forEach(el =>
-      el.addEventListener("click", this._onUpdateBoxClick.bind(this))
-    );
+    const html = this.element;
+    this._brinkwoodListenerController?.abort();
+    this._brinkwoodListenerController = new AbortController();
+    const listenerOptions = { signal: this._brinkwoodListenerController.signal };
+
+    if (this.isEditable) {
+      html.querySelectorAll(".item-add-popup").forEach(el =>
+        el.addEventListener("click", this._onItemAddClick.bind(this), listenerOptions)
+      );
+      html.querySelectorAll(".update-box").forEach(el =>
+        el.addEventListener("click", this._onUpdateBoxClick.bind(this), listenerOptions)
+      );
+      html.querySelectorAll(".item-select").forEach(el =>
+        el.addEventListener("click", this._onItemSelect.bind(this), listenerOptions)
+      );
+    }
     html.querySelectorAll(".roll-die-attribute").forEach(el =>
-      el.addEventListener("click", this._onRollAttributeDieClick.bind(this))
-    );
-    html.querySelectorAll(".item-select").forEach(el =>
-      el.addEventListener("click", this._onItemSelect.bind(this))
+      el.addEventListener("click", this._onRollAttributeDieClick.bind(this), listenerOptions)
     );
   }
 
@@ -62,6 +71,7 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
 
   async _onItemAddClick(event) {
     event.preventDefault();
+    if (!this.isEditable) return;
     const el        = event.currentTarget;
     const item_type = el.dataset.itemType;
     const distinct  = el.dataset.distinct;
@@ -92,20 +102,27 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
       content: htmlContent,
       ok: {
         label: game.i18n.localize("Add"),
-        callback: (_event, _button, dialog) =>
-          Array.from(dialog.querySelectorAll(".items-to-add input:checked")).map(i => i.value),
+        callback: (_event, button) =>
+          Array.from(button.form?.querySelectorAll(".items-to-add input:checked") ?? []).map(input => input.value),
       },
       rejectClose: false,
     });
 
     if (!selectedIds?.length) return;
-    const itemsToAdd = items.filter(e => selectedIds.includes(e._id)).map(e => e.toObject());
-    await CONFIG.Item.documentClass.create(itemsToAdd, { parent: this.document });
+    const itemsToAdd = items
+      .filter(item => selectedIds.includes(item._id))
+      .map(item => {
+        const data = foundry.utils.deepClone(item);
+        delete data._id;
+        return data;
+      });
+    await this.document.createEmbeddedDocuments("Item", itemsToAdd);
   }
 
   /* -------------------------------------------- */
 
   async _onItemSelect(event) {
+    if (!this.isEditable) return;
     const dataset  = event.currentTarget.dataset;
     const item     = this.actor.getEmbeddedDocument("Item", dataset.itemId);
     let update_data = {};
@@ -134,6 +151,7 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
 
   async _onUpdateBoxClick(event) {
     event.preventDefault();
+    if (!this.isEditable) return;
     const el          = event.currentTarget;
     const item_id     = el.dataset.item;
     let   update_value = el.dataset.value;

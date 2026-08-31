@@ -9,10 +9,10 @@ import { BladesActiveEffect } from "./blades-active-effect.js";
 export class BladesActorSheet extends BladesSheet {
 
   static DEFAULT_OPTIONS = {
-    classes: ["brinkwood", "sheet", "actor", "pc"],
+    classes: ["brinkwood", "sheet", "actor", "pc", "character"],
     position: { width: 700, height: 970 },
     form: { submitOnChange: true },
-    tabs: [{ navSelector: ".tabs", contentSelector: ".tab-content", initial: "abilities" }],
+    tabGroups: { primary: "traits" },
   };
 
   static PARTS = {
@@ -72,18 +72,21 @@ export class BladesActorSheet extends BladesSheet {
   /* -------------------------------------------- */
 
   /** @override */
-  _onRender(context, options) {
-    super._onRender(context, options);
+  async _onRender(context, options) {
+    await super._onRender(context, options);
     const html = this.element;
 
+    this._characterSheetListenerController?.abort();
     if (!this.isEditable) return;
+    this._characterSheetListenerController = new AbortController();
+    const listenerOptions = { signal: this._characterSheetListenerController.signal };
 
     // Open Inventory Item sheet
     html.querySelectorAll(".item-body").forEach(el =>
       el.addEventListener("click", ev => {
         const item = this.actor.items.get(ev.currentTarget.closest(".item").dataset.itemId);
         item.sheet.render(true);
-      })
+      }, listenerOptions)
     );
 
     // Delete Inventory Item
@@ -92,17 +95,21 @@ export class BladesActorSheet extends BladesSheet {
         const element = ev.currentTarget.closest(".item");
         await this.actor.deleteEmbeddedDocuments("Item", [element.dataset.itemId]);
         element.remove();
-      })
+      }, listenerOptions)
     );
 
     // Dot rating controls
     html.querySelectorAll(".dot-value").forEach(el =>
-      el.addEventListener("click", this._onDotChange.bind(this))
+      el.addEventListener("click", this._onDotChange.bind(this), listenerOptions)
+    );
+
+    html.querySelectorAll('input[name="system.scars"], input[name="system.oath"]').forEach(el =>
+      el.addEventListener("change", this._onClockChange.bind(this), listenerOptions)
     );
 
     // Active effect controls – use data-effect-action to avoid AppV2 action dispatch
     html.querySelectorAll(".effect-control").forEach(el =>
-      el.addEventListener("click", ev => BladesActiveEffect.onManageActiveEffect(ev, this.actor))
+      el.addEventListener("click", ev => BladesActiveEffect.onManageActiveEffect(ev, this.actor), listenerOptions)
     );
   }
 
@@ -112,15 +119,25 @@ export class BladesActorSheet extends BladesSheet {
     event.preventDefault();
     const element  = event.currentTarget;
     const dataset  = element.dataset;
+    if (!this.isEditable || !dataset.path) return;
 
-    let new_value  = parseInt(dataset.value);
-    const max_value = parseInt(dataset.max_value);
-    const old_value = foundry.utils.getProperty(this.actor, dataset.path);
+    let new_value  = Number(dataset.value);
+    const max_value = Number(dataset.max_value);
+    const old_value = foundry.utils.getProperty(this.document, dataset.path);
 
     if (new_value === old_value && new_value === 1) new_value = 0;
-    if (new_value > max_value) new_value = max_value;
+    if (Number.isFinite(max_value) && new_value > max_value) new_value = max_value;
 
-    await this.actor.update({ [dataset.path]: new_value });
+    await this.document.update({ [dataset.path]: new_value });
+  }
+
+  async _onClockChange(event) {
+    const { name, value } = event.currentTarget;
+    const clockValue = Number(value);
+    if (!this.isEditable || !["system.scars", "system.oath"].includes(name) || !Number.isInteger(clockValue)) return;
+
+    event.stopPropagation();
+    await this.document.update({ [name]: Math.min(4, Math.max(0, clockValue)) });
   }
 
   /* -------------------------------------------- */
