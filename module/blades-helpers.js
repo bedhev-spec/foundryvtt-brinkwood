@@ -1,3 +1,5 @@
+import { CharacterData, MaskActorData } from "./data/actor-data-models.js";
+
 export class BladesHelpers {
 
   /**
@@ -91,7 +93,7 @@ export class BladesHelpers {
    */
   static getAttributeLabel(attribute_name) {
     let attribute_labels = {};
-    const attributes = {...game.system.model.Actor.mask.attributes, ...game.system.model.Actor.character.attributes};
+    const attributes = { ...MaskActorData.ATTRIBUTES, ...CharacterData.ATTRIBUTES };
 
     for (const att_name in attributes) {
       attribute_labels[att_name] = attributes[att_name].label;
@@ -109,13 +111,13 @@ export class BladesHelpers {
    * @returns {Boolean}
    */
   static isAttributeAction(attribute_name) {
-		const model_attributes = game.system.model.Actor.character.attributes;
+    const model_attributes = CharacterData.ATTRIBUTES;
 
-		return !Object.keys(model_attributes).some(attr => attribute_name.toLowerCase().includes(attr));
+    return !Object.keys(model_attributes).some(attr => attribute_name.toLowerCase().includes(attr));
   }
 
-	static rollType(attribute_name) {
-    const model_attributes = game.system.model.Actor.character.attributes;
+  static rollType(attribute_name) {
+    const model_attributes = CharacterData.ATTRIBUTES;
 		let type = '';
     if ( Object.keys(model_attributes).some(attr => attribute_name.toLowerCase().includes(attr)) ) {
 			type = 'resist';

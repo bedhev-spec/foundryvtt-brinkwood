@@ -21,6 +21,13 @@ import { BladesRebelionSheet } from "./blades-rebelion-sheet.js";
 
 
 import * as migrations from "./migration.js";
+import {
+  CharacterData, NpcData, MaskActorData, ClockActorData, RebelionData
+} from "./data/actor-data-models.js";
+import {
+  ItemData, ClassData, TraitData, UpbringingData, ProfessionData,
+  PactData, AssociatesData, MaskItemData, MootDecisionData
+} from "./data/item-data-models.js";
 
 window.BladesHelpers = BladesHelpers;
 
@@ -38,6 +45,28 @@ Hooks.once("init", async function() {
   CONFIG.Item.documentClass = BladesItem;
   CONFIG.Actor.documentClass = BladesActor;
   CONFIG.ActiveEffect.documentClass = BladesActiveEffect;
+
+  // Register typed data models (v13) — each Actor/Item type gets a TypeDataModel
+  // that provides a validated schema.  These replace the legacy template.json model
+  // access pattern (`game.system.model`) for type-specific data.
+  CONFIG.Actor.dataModels = {
+    "character":  CharacterData,
+    "npc":        NpcData,
+    "mask":       MaskActorData,
+    "🕛 clock": ClockActorData,
+    "rebelion":   RebelionData
+  };
+  CONFIG.Item.dataModels = {
+    "item":         ItemData,
+    "class":        ClassData,
+    "trait":        TraitData,
+    "upbringing":   UpbringingData,
+    "profession":   ProfessionData,
+    "pact":         PactData,
+    "associates":   AssociatesData,
+    "mask":         MaskItemData,
+    "moot_decision": MootDecisionData
+  };
 
   // Register System Settings
   registerSystemSettings();
