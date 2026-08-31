@@ -297,3 +297,173 @@
     margin-left: 10px;
   }
 }
+
+// Character-sheet redesign layer: keep tokens local to the ApplicationV2 sheet
+// so Foundry's light/dark theme cannot wash out the parchment UI.
+& {
+  --bw-paper: #eeeae0;
+  --bw-paper-deep: #e0d7c5;
+  --bw-ink: #211b1d;
+  --bw-ink-soft: #51464a;
+  --bw-rule: #8d625d;
+  --bw-accent: #8f2f35;
+  --bw-focus: #b6772e;
+
+  color: var(--bw-ink);
+
+  .window-content,
+  form.actor-sheet {
+    background-color: var(--bw-paper);
+    color: var(--bw-ink);
+  }
+
+  form.actor-sheet {
+    display: grid;
+    gap: 14px;
+    overflow: auto;
+    scrollbar-color: var(--bw-rule) transparent;
+  }
+
+  input[type="text"],
+  select,
+  textarea {
+    border-color: var(--bw-rule);
+    background: rgba(255, 255, 255, 0.48);
+    color: var(--bw-ink);
+    box-shadow: inset 0 -2px 0 rgba(33, 27, 29, 0.08);
+
+    &:focus-visible {
+      outline: 3px solid var(--bw-focus);
+      outline-offset: 2px;
+    }
+  }
+
+  .name-alias {
+    display: grid;
+    grid-template-columns: minmax(150px, 200px) minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 14px 20px;
+  }
+
+  .name-alias > .grow-two:first-child {
+    grid-row: span 2;
+  }
+
+  img.portrait {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border: 2px solid var(--bw-ink);
+    box-shadow: 6px 6px 0 var(--bw-paper-deep);
+  }
+
+  .big-teeth-section,
+  .bans-armor,
+  nav.tabs,
+  .label-stripe,
+  .stripe {
+    border-color: var(--bw-rule);
+  }
+
+  .black-label,
+  .label-stripe,
+  .stripe,
+  .bans-armor th {
+    background: var(--bw-ink);
+    color: var(--bw-paper);
+  }
+
+  nav.tabs {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: var(--bw-paper-deep);
+
+    .item {
+      min-height: 40px;
+      padding: 10px 12px;
+      color: var(--bw-ink-soft);
+      border-bottom: 3px solid transparent;
+      text-align: center;
+
+      &:hover,
+      &:focus-visible,
+      &.active {
+        color: var(--bw-ink);
+        border-bottom-color: var(--bw-accent);
+      }
+
+      &:focus-visible {
+        outline: 3px solid var(--bw-focus);
+        outline-offset: -3px;
+      }
+    }
+  }
+
+  .locked {
+    input,
+    select,
+    textarea {
+      cursor: not-allowed;
+    }
+  }
+
+  @media (max-width: 900px) {
+    min-width: 0;
+
+    form.actor-sheet {
+      min-height: 0;
+      padding: 14px;
+    }
+
+    .name-alias {
+      grid-template-columns: minmax(110px, 150px) minmax(0, 1fr);
+    }
+
+    .name-alias > .grow-two:first-child {
+      grid-row: span 3;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .name-alias {
+      grid-template-columns: 96px minmax(0, 1fr);
+    }
+
+    img.portrait {
+      box-shadow: 3px 3px 0 var(--bw-paper-deep);
+    }
+
+    nav.tabs {
+      overflow-x: auto;
+      justify-content: start;
+
+      .item {
+        flex: 0 0 auto;
+        white-space: nowrap;
+      }
+    }
+
+    > .window-content > form.actor-sheet > .flex-horizontal:last-child {
+      flex-direction: column;
+    }
+
+    .attributes {
+      width: 100%;
+      flex: 1 1 auto;
+      columns: 2;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+}

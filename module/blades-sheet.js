@@ -47,6 +47,16 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
     await super._onRender(context, options);
 
     const html = this.element;
+    if (!this.isEditable) {
+      html.querySelectorAll('input[type="text"], textarea').forEach((control) => {
+        control.readOnly = true;
+        control.setAttribute("aria-readonly", "true");
+      });
+      html.querySelectorAll('input[type="checkbox"], select').forEach((control) => {
+        control.disabled = true;
+        control.setAttribute("aria-disabled", "true");
+      });
+    }
     this._brinkwoodListenerController?.abort();
     this._brinkwoodListenerController = new AbortController();
     const listenerOptions = { signal: this._brinkwoodListenerController.signal };
