@@ -22,8 +22,6 @@ import { BladesRebelionSheet } from "./blades-rebelion-sheet.js";
 
 import * as migrations from "./migration.js";
 
-window.BladesHelpers = BladesHelpers;
-
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
 /* -------------------------------------------- */

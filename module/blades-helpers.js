@@ -1,3 +1,14 @@
+/**
+ * Capitalise the first character of a string.
+ * Replaces the former String.prototype.capitalize extension.
+ * @param {string} str
+ * @returns {string}
+ */
+export function capitalize(str) {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 export class BladesHelpers {
 
   /**

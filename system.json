@@ -18,8 +18,7 @@
     }
   ],
   "esmodules": [
-    "module/blades.js",
-		"module/extensions.js"
+    "module/blades.js"
   ],
   "styles": [
     "styles/blades.css"

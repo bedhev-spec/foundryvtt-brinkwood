@@ -115,15 +115,19 @@ export class BladesActiveEffect extends foundry.documents.ActiveEffect {
     return categories;
   }
 
-  _applyCustom(actor, change, current, delta, changes) {
-		super._applyCustom(actor, change, current, delta, changes);
-		const preHook = foundry.utils.getProperty(actor, change.key);
-		const newValue = (preHook + delta > 4) ? 4 : preHook + delta;
-		changes[change.key] = newValue;
-		Hooks.call("applyActiveEffect", actor, change, current, delta, changes);
-	}
-
 }
+
+/**
+ * Cap numeric "custom" active-effect changes at 4.
+ * Replaces the former private _applyCustom override with the public v13 hook.
+ * The base ActiveEffect._applyCustom fires this hook; we intercept it here to
+ * apply the system-specific cap without subclassing private API.
+ */
+Hooks.on("applyActiveEffect", (actor, change, current, delta, changes) => {
+  if (change.mode !== CONST.ACTIVE_EFFECT_MODES.CUSTOM) return;
+  const newValue = (current + delta > 4) ? 4 : current + delta;
+  changes[change.key] = newValue;
+});
 
 // Portions of this code are copyright 2021 Andrew Clayton
 //

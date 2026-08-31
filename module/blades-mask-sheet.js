@@ -1,6 +1,7 @@
 
 import { BladesSheet } from "./blades-sheet.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
+import { capitalize } from "./blades-helpers.js";
 
 /**
  * Extend the basic MaskSheet with some very simple modifications
@@ -71,9 +72,9 @@ export class BladesMaskSheet extends BladesSheet {
     sheetData.system.type = sheetData.items.find((i) => i.type == 'mask')?.name.toLowerCase();
     sheetData.system.mask_attributes = Array.new;
     if (sheetData.system.type) {
-      sheetData.system.type_lang = `BITD.${sheetData.system.type.capitalize()}`;
+      sheetData.system.type_lang = `BITD.${capitalize(sheetData.system.type)}`;
       sheetData.system.mask_attributes = sheetData.system.attributes[sheetData.system.type];
-  		sheetData.system.xp_tooltip = game.i18n.localize('Mask.XP.Tooltip') + game.i18n.localize(`Mask.XP.${sheetData.system.type.capitalize()}`)
+      sheetData.system.xp_tooltip = game.i18n.localize('Mask.XP.Tooltip') + game.i18n.localize(`Mask.XP.${capitalize(sheetData.system.type)}`)
     }
 
     //look for Mule ability
