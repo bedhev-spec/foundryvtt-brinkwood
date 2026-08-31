@@ -2,78 +2,72 @@
 import { BladesSheet } from "./blades-sheet.js";
 
 /**
- * Extend the basic MaskSheet with some very simple modifications
+ * Extend the basic BladesSheet for the Rebelion actor type.
  * @extends {BladesSheet}
  */
 export class BladesRebelionSheet extends BladesSheet {
 
+  static DEFAULT_OPTIONS = {
+    classes: ["brinkwood", "sheet", "actor", "pc", "rebelion"],
+    position: { width: 500, height: 870 },
+    form: { submitOnChange: true },
+    tabs: [{ navSelector: ".tabs", contentSelector: ".content", initial: "overview" }],
+  };
+
+  static PARTS = {
+    sheet: { template: "systems/brinkwood/templates/rebelion-sheet.html" },
+  };
+
+  /* -------------------------------------------- */
+
   /** @override */
-   static get defaultOptions() {
-	  return foundry.utils.mergeObject(super.defaultOptions, {
-  	  classes: ["brinkwood", "sheet", "actor", "pc", "rebelion"],
-  	  template: "systems/brinkwood/templates/rebelion-sheet.html",
-      width: 500,
-      height: 870,
-      tabs: [{navSelector: ".tabs", contentSelector: ".content", initial: "overview"}]
+  async _prepareContext(options) {
+    const context = await super._prepareContext(options);
+
+    const decision_list = await game.packs.get("brinkwood.moot-decisions").getDocuments();
+    context.system.aspects.forEach(a => {
+      // Bug fix: use proper comparator instead of invalid .sort(d => d.rank)
+      a.moot_decisions = decision_list
+        .filter(d => d.system.aspect === a.name)
+        .sort((a, b) => a.rank - b.rank);
     });
+
+    return context;
   }
-
-  /* -------------------------------------------- */
-  /* -------------------------------------------- */
-
-  /** @override */
-  async getData(options) {
-    const superData = super.getData( options );
-    const sheetData = superData.data;
-    sheetData.owner = superData.owner;
-    sheetData.editable = superData.editable;
-    sheetData.isGM = game.user.isGM;
-		const decision_list	= await game.packs.get('brinkwood.moot-decisions').getDocuments();
-		sheetData.system.aspects.forEach(a => a.moot_decisions = decision_list.filter(d => d.system.aspect == a.name).sort(d => d.rank));
-
-    return sheetData;
-  }
-
-  /* -------------------------------------------- */
 
   /* -------------------------------------------- */
 
   /** @override */
-  activateListeners(html) {
-    super.activateListeners(html);
+  _onRender(context, options) {
+    super._onRender(context, options);
+    const html = this.element;
 
-    // Everything below here is only needed if the sheet is editable
-    if (!this.options.editable) return;
+    if (!this.isEditable) return;
 
-    // Update Inventory Item
-    html.find(".dot-value").click(this._onDotChange.bind(this)); 
+    html.querySelectorAll(".dot-value").forEach(el =>
+      el.addEventListener("click", this._onDotChange.bind(this))
+    );
   }
+
+  /* -------------------------------------------- */
 
   async _onDotChange(event) {
     event.preventDefault();
-    const element = event.currentTarget;
-    const dataset = element.dataset;
+    const element   = event.currentTarget;
+    const dataset   = element.dataset;
 
     const actor_data = foundry.utils.deepClone(this.actor.toObject());
-   
-    let new_value = parseInt(dataset.value);
-    let max_value = parseInt(dataset.max_value);
+    let new_value    = parseInt(dataset.value);
+    const max_value  = parseInt(dataset.max_value);
+    const old_value  = foundry.utils.getProperty(actor_data, dataset.path);
 
-    let old_value = foundry.utils.getProperty(actor_data, dataset.path);
-
-    if (new_value == old_value && new_value == 1) {
-      new_value = 0;
-    }
-    
-    if (new_value > max_value) { new_value = max_value }
+    if (new_value === old_value && new_value === 1) new_value = 0;
+    if (new_value > max_value) new_value = max_value;
 
     foundry.utils.setProperty(actor_data, dataset.path, new_value);
-
     await this.actor.update(actor_data);
-    this.render();
   }
 
   /* -------------------------------------------- */
-
 
 }

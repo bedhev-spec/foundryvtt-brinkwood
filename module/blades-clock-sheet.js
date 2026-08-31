@@ -2,66 +2,59 @@
 import { BladesSheet } from "./blades-sheet.js";
 
 /**
- * Extend the basic ActorSheet with some very simple modifications
+ * Extend the basic BladesSheet for the Clock actor type.
  * @extends {BladesSheet}
  */
 export class BladesClockSheet extends BladesSheet {
 
-  /** @override */
-	static get defaultOptions() {
-	  return foundry.utils.mergeObject(super.defaultOptions, {
-  	  classes: ["brinkwood", "sheet", "actor", "clock"],
-  	  template: "systems/brinkwood/templates/actors/clock-sheet.html",
-      width: 700,
-      height: 970,
-    });
-  }
+  static DEFAULT_OPTIONS = {
+    classes: ["brinkwood", "sheet", "actor", "clock"],
+    position: { width: 700, height: 970 },
+    form: { submitOnChange: true },
+  };
+
+  static PARTS = {
+    sheet: { template: "systems/brinkwood/templates/actors/clock-sheet.html" },
+  };
 
   /* -------------------------------------------- */
 
   /** @override */
-  getData(options) {
-    const superData = super.getData( options );
-    const sheetData = superData.data;
-    sheetData.owner = superData.owner;
-    sheetData.editable = superData.editable;
-    sheetData.isGM = game.user.isGM;
-
-    return sheetData;
+  async _prepareContext(options) {
+    return super._prepareContext(options);
   }
 
-    /* -------------------------------------------- */
+  /* -------------------------------------------- */
 
-  /** @override */
-  async _updateObject(event, formData) {
-    let image_path = `systems/brinkwood/styles/assets/progressclocks-svg/Progress Clock ${formData['system.type']}-${formData['system.value']}.svg`;
-    formData['img'] = image_path;
-    formData['prototypeToken.texture.src'] = image_path;
-    let data = [];
-    let update = {
-      img: image_path,
-      width: 1,
+  /**
+   * Override form submission to also update the prototype token texture and
+   * any active scene tokens.  Fixes v13 texture field names
+   * (texture.src / texture.scaleX / texture.scaleY / texture.tint, not the
+   * old img / scale / mirrorX / mirrorY / tint / displayName).
+   * @override
+   */
+  async _processSubmitData(event, form, submitData) {
+    const image_path = `systems/brinkwood/styles/assets/progressclocks-svg/Progress Clock ${submitData["system.type"]}-${submitData["system.value"]}.svg`;
+    submitData["img"] = image_path;
+
+    // Build token update payload using v13 texture field names
+    const tokenUpdate = {
+      "texture.src":    image_path,
+      "texture.scaleX": 1,
+      "texture.scaleY": 1,
+      "texture.tint":   "",
+      width:  1,
       height: 1,
-      scale: 1,
-      mirrorX: false,
-      mirrorY: false,
-      tint: "",
-      displayName: 50
     };
 
-    let tokens = this.actor.getActiveTokens();
-    tokens.forEach( function( token ) {
-      data.push(
-        foundry.utils.mergeObject(
-          { _id: token.id },
-          update
-        )
-      );
-    });
-    await foundry.documents.TokenDocument.updateDocuments(data, {parent: game.scenes.current});
+    const tokens = this.actor.getActiveTokens();
+    if (tokens.length) {
+      const updates = tokens.map(token => foundry.utils.mergeObject({ _id: token.id }, tokenUpdate));
+      await foundry.documents.TokenDocument.updateDocuments(updates, { parent: game.scenes.current });
+    }
 
-    // Update the Actor
-    return this.object.update(formData);
+    // Delegate the actor update to the base class
+    return this.document.update(submitData);
   }
 
   /* -------------------------------------------- */

@@ -6,59 +6,40 @@ import { BladesSheet } from "./blades-sheet.js";
  */
 export class BladesNPCSheet extends BladesSheet {
 
+  static DEFAULT_OPTIONS = {
+    classes: ["brinkwood", "sheet", "actor"],
+    position: { width: 900 },
+    form: { submitOnChange: true },
+    window: { resizable: true },
+    tabs: [{ navSelector: ".tabs", contentSelector: ".tab-content" }],
+  };
+
+  static PARTS = {
+    sheet: { template: "systems/brinkwood/templates/npc-sheet.html" },
+  };
+
+  /* -------------------------------------------- */
+
   /** @override */
-	static get defaultOptions() {
-	  return foundry.utils.mergeObject(super.defaultOptions, {
-  	  classes: ["brinkwood", "sheet", "actor"],
-  	  template: "systems/brinkwood/templates/npc-sheet.html",
-      width: 900,
-      height: 'auto',
-      tabs: [{navSelector: ".tabs", contentSelector: ".tab-content"}]
-    });
+  async _prepareContext(options) {
+    const context = await super._prepareContext(options);
+
+    context.system.description = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+      context.system.description,
+      { async: true, relativeTo: this.document, secrets: this.document.isOwner }
+    );
+
+    return context;
   }
 
   /* -------------------------------------------- */
 
   /** @override */
-  async getData(options) {
-    const superData = super.getData( options );
-    const sheetData = superData.data;
-
-    sheetData.isGM = game.user.isGM;
-    sheetData.owner = superData.owner;
-    sheetData.editable = superData.editable;
-
-    sheetData.system.description = await foundry.applications.ux.TextEditor.implementation.enrichHTML(sheetData.system.description, {
-      async: true,
-      relativeTo: this.document,
-      secrets: this.document.isOwner
-    });
-
-    return sheetData;
+  _onRender(context, options) {
+    super._onRender(context, options);
+    // Editable-only listeners can be added here as needed.
   }
 
   /* -------------------------------------------- */
 
-    /** @override */
-	activateListeners(html) {
-    super.activateListeners(html);
-
-    // Everything below here is only needed if the sheet is editable
-    if (!this.options.editable) return;
-
-    // Update Inventory Item
-    // html.find('.item-body').click(ev => {
-    //   const element = $(ev.currentTarget).parents(".item");
-    //   const item = this.actor.items.get(element.data("itemId"));
-    //   item.sheet.render(true);
-    // });
-
-    // // Delete Inventory Item
-    // html.find('.item-delete').click(ev => {
-    //   const element = $(ev.currentTarget).parents(".item");
-    //   this.actor.deleteEmbeddedDocuments("Item", [element.data("itemId")]);
-    //   element.slideUp(200, () => this.render(false));
-    // });
-
-	}
 }

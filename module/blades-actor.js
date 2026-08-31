@@ -13,7 +13,7 @@ export class BladesActor extends foundry.documents.Actor {
     data.prototypeToken = data.prototypeToken || {};
 
     // For Crew and Character set the Token to sync with charsheet.
-    if ( ['character', '\uD83D\uDD5B clock'].includes(data.type) ) {
+    if ( ['character', '🕛 clock'].includes(data.type) ) {
       data.prototypeToken.actorLink = true;
     }
     return super.create(data, options);
@@ -21,7 +21,7 @@ export class BladesActor extends foundry.documents.Actor {
 
   async _onCreate( data, options, userId ) {
     await super._onCreate(data, options, userId);
-    
+
     //load basic items for characters
     if ( data.type == "character" ) {
       await this._loadBasicItems();
@@ -64,39 +64,34 @@ export class BladesActor extends foundry.documents.Actor {
             </div>`;
     } else {
         content += `
-            <input  id="pos" name="pos" type="hidden" value="">
+            <input id="pos" name="pos" type="hidden" value="">
             <input id="fx" name="fx" type="hidden" value="">`;
     }
     content += `
-        <div className="form-group">
+        <div class="form-group">
           <label>${game.i18n.localize('BITD.Notes')}:</label>
           <input id="note" name="note" type="text" value="">
         </div><br/>
         </form>
       `;
 
-    new foundry.appv1.api.Dialog({
-      title: `${game.i18n.localize('BITD.Roll')} ${game.i18n.localize(attribute_label)}`,
+    // Replace legacy Dialog with DialogV2
+    foundry.applications.api.DialogV2.prompt({
+      window: { title: `${game.i18n.localize('BITD.Roll')} ${game.i18n.localize(attribute_label)}` },
       content: content,
-      buttons: {
-        yes: {
-          icon: "<i class='fas fa-check'></i>",
-          label: game.i18n.localize('BITD.Roll'),
-          callback: async (html) => {
-            let modifier = parseInt(html.find('[name="mod"]')[0].value);
-            let position = html.find('[name="pos"]')[0].value;
-            let effect = html.find('[name="fx"]')[0].value;
-            let note = html.find('[name="note"]')[0].value;
-            await this.rollAttribute(attribute_label, modifier, attribute_value, position, effect, note);
-          }
-        },
-        no: {
-          icon: "<i class='fas fa-times'></i>",
-          label: game.i18n.localize('Close'),
+      ok: {
+        icon: "<i class='fas fa-check'></i>",
+        label: game.i18n.localize('BITD.Roll'),
+        callback: async (_event, _button, dialog) => {
+          const modifier  = parseInt(dialog.querySelector('[name="mod"]').value);
+          const position  = dialog.querySelector('[name="pos"]').value;
+          const effect    = dialog.querySelector('[name="fx"]').value;
+          const note      = dialog.querySelector('[name="note"]').value;
+          await this.rollAttribute(attribute_label, modifier, attribute_value, position, effect, note);
         },
       },
-      default: "yes",
-    }).render(true);
+      rejectClose: false,
+    });
 
   }
 
@@ -197,7 +192,7 @@ export class BladesActor extends foundry.documents.Actor {
 				await this._modActionPoints( newItem );
       break;
     }
-      
+
   }
 
   async _onDeleteEmbeddedDocuments( name, ...args ) {
@@ -229,12 +224,11 @@ export class BladesActor extends foundry.documents.Actor {
       foundry.utils.setProperty(system, key, value);
    	});
 		await this.update(system);
-		this.render();
 	}
 
   async _addTraits(data) {
     const traits = await game.packs.get("brinkwood.trait").getDocuments({'system.class': data.name});
-      await this.createEmbeddedDocuments("Item", traits.map(item => item.toObject()));
+    await this.createEmbeddedDocuments("Item", traits.map(item => item.toObject()));
   }
 
   async _deleteTraits(data) {
@@ -245,10 +239,10 @@ export class BladesActor extends foundry.documents.Actor {
   async _loadBasicItems() {
     // Load and create basic items from compendium
     const basicItems = await game.packs.get("brinkwood.item").getDocuments({'system.class': ""});
-      await this.createEmbeddedDocuments("Item", basicItems.map(item => item.toObject()));
-    
-    // Load and create custom basic items
-    const customBasicItems = await game.items.filter(i => i.type == "item" && i.system.class == "");
-      await this.createEmbeddedDocuments("Item", customBasicItems.map(i => i.toObject()));
+    await this.createEmbeddedDocuments("Item", basicItems.map(item => item.toObject()));
+
+    // Load and create custom basic items (convert to plain objects to avoid duplication issues)
+    const customBasicItems = game.items.filter(i => i.type == "item" && i.system.class == "");
+    await this.createEmbeddedDocuments("Item", customBasicItems.map(item => item.toObject()));
   }
 }
