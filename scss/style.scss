@@ -29,7 +29,7 @@ $hover-brightness: 0.8;
   @import 'import/general-styles.scss';
   @import 'import/clocks.scss';
 
-  &.actor.pc{
+  &.actor.pc.character{
     @import 'import/character-sheet.scss';
   }
 
@@ -49,4 +49,3 @@ $hover-brightness: 0.8;
 @import 'import/chat.scss';
 @import 'import/dialogs.scss';
 @import 'import/tooltip.scss';
-

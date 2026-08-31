@@ -1,280 +1,299 @@
-// Colors
-$lightgray: #CCC;
-$gray: #999;
-$red: red;
-$almost_black: #191813;
-$almost_white: #EEEFFF;
-$gold: #DAA520;
-$green: #008000;
-$light_green: #12a012;
-$blue: #04578f;
-
-// Transition period for sheet parts that hint what they can do
-$transition-period: 0.2s;
-$hover-opacity: 0.9;
-$hover-brightness: 0.8;
-
-// Imports
-@import 'mixin.scss';
-
 /*
- * General Styles
- * Cleaned out things that don't appear to apply to the character sheet, and exist in other, separated SCSS files.
- * Some things *might* be missing, but at a glance, everything looks to be in order.
+ * Player character sheet (Actor type: character)
+ *
+ * ApplicationV2 adds its own application and form wrappers.  Keep all rules
+ * rooted at the PC sheet so they never leak into Mask, NPC, or rebellion
+ * sheets, and avoid the former `& *` selector which skipped those wrappers.
  */
 
-& * {
+& {
+  min-width: 700px;
+  color: $almost_black;
+
+  .window-content {
+    padding: 0;
+    background: #eeeee8;
+    color: $almost_black;
+  }
+
+  form.actor-sheet {
+    box-sizing: border-box;
+    min-height: 970px;
+    padding: 20px;
+    color: $almost_black;
+    background: transparent;
+
+    // Foundry v13 form controls inherit application-theme tokens.  The sheet
+    // needs its light parchment treatment in both Foundry light and dark UI.
+    input[type="text"],
+    select,
+    textarea {
+      box-sizing: border-box;
+      border: 1px solid $almost_black;
+      border-radius: 0;
+      background: rgba(255, 255, 255, 0.72);
+      color: $almost_black;
+      font-family: inherit;
+      text-shadow: none;
+
+      &::placeholder {
+        color: rgba($almost_black, 0.62);
+      }
+
+      &:focus {
+        border-color: $almost_black;
+        box-shadow: 0 0 0 1px rgba($almost_black, 0.25);
+      }
+    }
+
+    input[type="checkbox"] {
+      accent-color: $almost_black;
+    }
+  }
+
   img.big-teeth {
     height: 30px;
-    border: none;
-   	margin-left: 5px;
+    border: 0;
+    margin-left: 5px;
   }
 
-  .name-alias{
-    img.portrait{
+  .name-alias {
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 4px;
+
+    > .grow-two {
+      min-width: 0;
+    }
+
+    img.portrait {
+      display: block;
+      width: 200px;
+      height: 200px;
       max-width: 200px;
       max-height: 200px;
-      width: auto;
-      height: auto;
+      flex: 0 0 200px;
+      object-fit: cover;
+      border: 1px solid $almost_black;
+      cursor: pointer;
+    }
+
+    input.name,
+    input.alias {
+      width: 100%;
+      margin-bottom: 10px;
     }
   }
 
-  .tab[data-tab]{
-    display: none;
-    &.active{
-      display: block;
-    }
-  }
+  .item-block {
+    align-items: baseline;
+    width: 100%;
+    min-height: 1.5em;
+    margin-bottom: 0.3em;
 
-  form {
-    &.actor-sheet {
-      padding: 20px;
-    }
-  }
-
-  // Stress and Trauma
-
-  .big-teeth-section {
-    border-top: 3px solid $almost_black;
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 3px;
-    margin-top: 0;
-
-    > * {
-      &:last-child {
-        margin-right: 0px;
-      }
+    .item-class-label {
+      flex: 0 0 33%;
     }
 
-    &:last-child {
-      margin-right: 0px;
+    .item {
+      min-width: 0;
+      margin-left: 1em;
     }
 
-    // Stress
-    .big-teeth {
-      display: flex;
-    }
-
-    /* Trauma */
-    .small-teeth-container {
-
-      .small-teeth-wrap {
-        flex-direction: column;
-
-        .small-teeth {
-          display: flex;
-          flex-direction: row;
-        }
-      }
-    }
-
-    .trauma-list {
-      @include check_underscore();
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-
-  }
-
-  .character-stress {
-    label {
-      &[for$="-0"] {
-        margin-right: 0px;
-      }
-    }
-  }
-
-  //Abilitiers and loadout
-  .abilities, .loadout {
-    .item-name {
-      width: 100px;
-    }
     .item-body {
       width: auto;
     }
-    .item-description {
-      width: 260px;
+  }
+
+  .item-add-popup {
+    color: inherit;
+  }
+
+  .big-teeth-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0 0 3px;
+    border-top: 3px solid $almost_black;
+
+    > *:last-child {
+      margin-right: 0;
+    }
+
+    .big-teeth {
+      display: flex;
+      align-items: center;
     }
   }
 
-  // Abilities
-  .abilities {
-    .label-stripe {
-      p:first-child {
-        margin-right: 10px;
-      }
-    }
-  }
-
-  // Loadout
-  .loadout {
-    .item-add-popup {
-      margin-left: 10px;
-    }
-  }
-
-  // Experience teeth
-  .teeth-experience {
-    @include toothradio(10px, 30px, "assets/teeth/stresstooth-halfgrey.png", "assets/teeth/stresstooth-red.png");
-    position: absolute;
-    top: 0px;
-    right: 10px;
+  .character-stress label[for$="-0"] {
+    margin-right: 0;
   }
 
   .bans-armor {
-
     display: flex;
+    width: 100%;
+    margin: 6px 0 8px;
 
-    // Harm
     .character-bans {
-
       width: 100%;
 
       table {
         width: 100%;
-	background: none;
+        margin: 0;
+        border: 0;
+        background: transparent;
+        color: $almost_black;
 
-	tr:nth-child(even) {
-  	  background: none;
-	}
+        tr,
+        tr:nth-child(even) {
+          background: transparent;
+        }
 
         th {
-          background-color: $almost_black;
+          background: $almost_black;
           color: $almost_white;
+          font-family: Kirsty, serif;
+        }
+
+        td {
+          padding: 5px;
         }
 
         input[type="text"] {
           width: 100%;
+          min-width: 0;
+          height: 1.8em;
         }
       }
     }
 
-    // Clock
-    .character-scars-clock, .character-oath-clock {
+    .character-scars-clock,
+    .character-oath-clock {
+      width: 88px;
       margin: 0 auto;
+      text-align: left;
       @include clock(4, 44);
 
       span.clock-label {
+        margin-left: 5px;
+        font-weight: bold;
         text-transform: capitalize;
-	      font-weight: bold;
-      	margin-left: 5px;
       }
     }
 
-    .character-armor-uses {
+    .character-armor-uses div {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 8px;
+    }
+  }
 
-      div {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
+  > .window-content > form.actor-sheet > .flex-horizontal:last-child {
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .tab-content {
+    min-width: 0;
+  }
+
+  nav.tabs {
+    min-height: 28px;
+    margin-bottom: 0;
+    border-top: 1px solid rgba($almost_black, 0.6);
+    border-bottom: 1px solid rgba($almost_black, 0.6);
+
+    .item {
+      flex: 1 1 0;
+      padding: 4px 0;
+      color: $almost_black;
+      text-align: left;
+      text-shadow: none;
+      white-space: nowrap;
+
+      &.active {
+        color: $almost_black;
+        font-weight: bold;
+        text-decoration: none;
       }
     }
   }
 
+  .tab[data-tab] {
+    display: none;
+    min-height: 0;
+    padding-top: 8px;
+
+    &.active {
+      display: block;
+    }
+  }
 
   .attributes {
-
-    display: flex;
-    flex-direction: column;
     width: 200px;
+    flex: 0 0 200px;
+    color: $almost_black;
+
+    .attribute {
+      margin-bottom: 10px;
+    }
 
     .stripe {
-      background-color: $almost_black;
+      padding-left: 5px;
+      background: $almost_black;
       color: $almost_white;
       font-size: 17px;
-      padding-left: 5px;
     }
 
     .attribute-label,
     .attribute-skill-label {
+      color: inherit;
       font-weight: bold;
       text-transform: uppercase;
+      text-shadow: none;
     }
+
     .attribute-skill-label {
       margin-top: 0.3em;
     }
+
     .attributes-exp {
-
-  		margin-top: 1em;
-
-      .stripe-tooth-body {
-        @include toothradio(10px, 30px, "assets/teeth/xptooth-white.png", "assets/teeth/xptooth-red.png");
-        position: absolute;
-        top: 0px;
-        right: 0px;
-      }
+      position: relative;
+      margin-top: 1em;
     }
 
     .attributes-container {
       display: flex;
-      margin: 3px 0px;
-      @include custom_radio(15px, 15px);
+      align-items: center;
+      margin: 3px 0;
 
-      * {
+      .dot-value {
+        display: inline-block;
         margin-right: 5px;
+        color: $almost_black;
+        line-height: 1;
       }
     }
   }
 
-	.item-block {
-		justify-content: normal;
-		margin-bottom: 0.3em;
-		align-items: baseline;
-		height: 1.2em;
-		width: 100%;
-		.item {
-			margin-left: 1em;
-
-			.item-body {
-				width: auto;
-			}
-		}
-  	.item-class-label {
-	  	min-width: 33%;
-		}
-	}
-
-  // ITEM
-  .item {
-   
-    justify-content: space-between;
-
-
-    div {
-      flex-grow: 2;
+  .traits,
+  .loadout {
+    .label-stripe p:first-child {
+      margin-right: 10px;
     }
+
+    .item-name {
+      width: auto;
+    }
+
     .item-body {
-      width: 100px;
-      .item-name { 
-        font-weight: bold;
-      }
+      width: auto;
     }
   }
 
-  .name,
-  .lair,
-  .alias {
-    margin-bottom: 10px;
+  .loadout .item-add-popup {
+    margin-left: 10px;
   }
 }

@@ -87,33 +87,6 @@
 }
 .brinkwood {
   font-family: "Crimson Text", serif;
-  /*
-  .item-list input[type="checkbox"] {
-    appearance: none;
-    background-color: #fff;
-    margin: 0;
-    font: inherit;
-    color: #000;
-    width: 1.15em;
-    height: 1.15em;
-    border: 0.15em solid #000;
-    border-radius: 50%;
-    transform: translateY(0.15em);
-  }
-
-  .item-list input[type="checkbox"]::before {
-    content: "";
-    width: 0.65em;
-    height: 0.65em;
-    transform: scale(0);
-    transition: 120ms transform ease-in-out;
-    box-shadow: inset 1em 1em black;
-  }
-
-  .item-list input[type="checkbox"]:checked::before {
-    transform: scale(1);
-  }
-  */
 }
 .brinkwood .window-content {
   background-color: #FFF;
@@ -170,6 +143,35 @@
 }
 .brinkwood .flex-horizontal.trait input[type=checkbox] {
   margin-right: 1em;
+}
+.brinkwood {
+  /*
+  .item-list input[type="checkbox"] {
+    appearance: none;
+    background-color: #fff;
+    margin: 0;
+    font: inherit;
+    color: #000;
+    width: 1.15em;
+    height: 1.15em;
+    border: 0.15em solid #000;
+    border-radius: 50%;
+    transform: translateY(0.15em);
+  }
+
+  .item-list input[type="checkbox"]::before {
+    content: "";
+    width: 0.65em;
+    height: 0.65em;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    box-shadow: inset 1em 1em black;
+  }
+
+  .item-list input[type="checkbox"]:checked::before {
+    transform: scale(1);
+  }
+  */
 }
 .brinkwood .flex-vertical {
   display: flex;
@@ -456,201 +458,162 @@
 .brinkwood .blades-clock-name-type .blades-clock {
   margin: 10px auto;
 }
-.brinkwood.actor.pc {
+.brinkwood.actor.pc.character {
   /*
-  *  Elements that can be changed will hint this by dimming and fading a little on hover
-  */
-  /*
-   * Toothradio. Some (eg trauma) are not changeable, hence the option.
-   */
-  /*
-   * Custom Radio
-   */
-  /*
-   * Custom Radio Squared
-   */
-  /*
-   * Checkboxes underscored.
-   */
-  /*
-   * Create Clock
-   */
-  /*
-   * Turf Block
-   */
-  /*
-   * Toothradio single elements
-   */
-  /*
-   * Custom Radio Round
-   */
-  /*
-   * General Styles
-   * Cleaned out things that don't appear to apply to the character sheet, and exist in other, separated SCSS files.
-   * Some things *might* be missing, but at a glance, everything looks to be in order.
+   * Player character sheet (Actor type: character)
+   *
+   * ApplicationV2 adds its own application and form wrappers.  Keep all rules
+   * rooted at the PC sheet so they never leak into Mask, NPC, or rebellion
+   * sheets, and avoid the former `& *` selector which skipped those wrappers.
    */
 }
-.brinkwood.actor.pc * img.big-teeth {
+.brinkwood.actor.pc.character {
+  min-width: 700px;
+  color: #191813;
+}
+.brinkwood.actor.pc.character .window-content {
+  padding: 0;
+  background: #eeeee8;
+  color: #191813;
+}
+.brinkwood.actor.pc.character form.actor-sheet {
+  box-sizing: border-box;
+  min-height: 970px;
+  padding: 20px;
+  color: #191813;
+  background: transparent;
+}
+.brinkwood.actor.pc.character form.actor-sheet input[type=text],
+.brinkwood.actor.pc.character form.actor-sheet select,
+.brinkwood.actor.pc.character form.actor-sheet textarea {
+  box-sizing: border-box;
+  border: 1px solid #191813;
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.72);
+  color: #191813;
+  font-family: inherit;
+  text-shadow: none;
+}
+.brinkwood.actor.pc.character form.actor-sheet input[type=text]::placeholder,
+.brinkwood.actor.pc.character form.actor-sheet select::placeholder,
+.brinkwood.actor.pc.character form.actor-sheet textarea::placeholder {
+  color: rgba(25, 24, 19, 0.62);
+}
+.brinkwood.actor.pc.character form.actor-sheet input[type=text]:focus,
+.brinkwood.actor.pc.character form.actor-sheet select:focus,
+.brinkwood.actor.pc.character form.actor-sheet textarea:focus {
+  border-color: #191813;
+  box-shadow: 0 0 0 1px rgba(25, 24, 19, 0.25);
+}
+.brinkwood.actor.pc.character form.actor-sheet input[type=checkbox] {
+  accent-color: #191813;
+}
+.brinkwood.actor.pc.character img.big-teeth {
   height: 30px;
-  border: none;
+  border: 0;
   margin-left: 5px;
 }
-.brinkwood.actor.pc * .name-alias img.portrait {
+.brinkwood.actor.pc.character .name-alias {
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 4px;
+}
+.brinkwood.actor.pc.character .name-alias > .grow-two {
+  min-width: 0;
+}
+.brinkwood.actor.pc.character .name-alias img.portrait {
+  display: block;
+  width: 200px;
+  height: 200px;
   max-width: 200px;
   max-height: 200px;
+  flex: 0 0 200px;
+  object-fit: cover;
+  border: 1px solid #191813;
+  cursor: pointer;
+}
+.brinkwood.actor.pc.character .name-alias input.name,
+.brinkwood.actor.pc.character .name-alias input.alias {
+  width: 100%;
+  margin-bottom: 10px;
+}
+.brinkwood.actor.pc.character .item-block {
+  align-items: baseline;
+  width: 100%;
+  min-height: 1.5em;
+  margin-bottom: 0.3em;
+}
+.brinkwood.actor.pc.character .item-block .item-class-label {
+  flex: 0 0 33%;
+}
+.brinkwood.actor.pc.character .item-block .item {
+  min-width: 0;
+  margin-left: 1em;
+}
+.brinkwood.actor.pc.character .item-block .item-body {
   width: auto;
-  height: auto;
 }
-.brinkwood.actor.pc * .tab[data-tab] {
-  display: none;
+.brinkwood.actor.pc.character .item-add-popup {
+  color: inherit;
 }
-.brinkwood.actor.pc * .tab[data-tab].active {
-  display: block;
-}
-.brinkwood.actor.pc * form.actor-sheet {
-  padding: 20px;
-}
-.brinkwood.actor.pc * .big-teeth-section {
+.brinkwood.actor.pc.character .big-teeth-section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 0 3px;
   border-top: 3px solid #191813;
+}
+.brinkwood.actor.pc.character .big-teeth-section > *:last-child {
+  margin-right: 0;
+}
+.brinkwood.actor.pc.character .big-teeth-section .big-teeth {
   display: flex;
-  flex-direction: row;
-  margin-bottom: 3px;
-  margin-top: 0;
-  /* Trauma */
+  align-items: center;
 }
-.brinkwood.actor.pc * .big-teeth-section > *:last-child {
-  margin-right: 0px;
+.brinkwood.actor.pc.character .character-stress label[for$="-0"] {
+  margin-right: 0;
 }
-.brinkwood.actor.pc * .big-teeth-section:last-child {
-  margin-right: 0px;
-}
-.brinkwood.actor.pc * .big-teeth-section .big-teeth {
+.brinkwood.actor.pc.character .bans-armor {
   display: flex;
+  width: 100%;
+  margin: 6px 0 8px;
 }
-.brinkwood.actor.pc * .big-teeth-section .small-teeth-container .small-teeth-wrap {
-  flex-direction: column;
+.brinkwood.actor.pc.character .bans-armor .character-bans {
+  width: 100%;
 }
-.brinkwood.actor.pc * .big-teeth-section .small-teeth-container .small-teeth-wrap .small-teeth {
-  display: flex;
-  flex-direction: row;
+.brinkwood.actor.pc.character .bans-armor .character-bans table {
+  width: 100%;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: #191813;
 }
-.brinkwood.actor.pc * .big-teeth-section .trauma-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: flex-start;
+.brinkwood.actor.pc.character .bans-armor .character-bans table tr,
+.brinkwood.actor.pc.character .bans-armor .character-bans table tr:nth-child(even) {
+  background: transparent;
 }
-.brinkwood.actor.pc * .big-teeth-section .trauma-list label {
-  cursor: pointer;
-  font-size: 19px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  margin-right: 10px;
-  transition: filter 0.1s;
-  cursor: pointer;
-  /* Hide the browser's default checkbox */
-}
-.brinkwood.actor.pc * .big-teeth-section .trauma-list label:hover {
-  filter: brightness(0.8);
-  opacity: 0.9;
-}
-.brinkwood.actor.pc * .big-teeth-section .trauma-list label input {
-  display: none;
-}
-.brinkwood.actor.pc * .big-teeth-section .trauma-list label input:checked ~ .checkmark {
-  color: red;
-}
-.brinkwood.actor.pc * .big-teeth-section .trauma-list label .checkmark {
-  text-decoration: none;
-  font-weight: bold;
-}
-.brinkwood.actor.pc * .character-stress label[for$="-0"] {
-  margin-right: 0px;
-}
-.brinkwood.actor.pc * .abilities .item-name, .brinkwood.actor.pc * .loadout .item-name {
-  width: 100px;
-}
-.brinkwood.actor.pc * .abilities .item-body, .brinkwood.actor.pc * .loadout .item-body {
-  width: auto;
-}
-.brinkwood.actor.pc * .abilities .item-description, .brinkwood.actor.pc * .loadout .item-description {
-  width: 260px;
-}
-.brinkwood.actor.pc * .abilities .label-stripe p:first-child {
-  margin-right: 10px;
-}
-.brinkwood.actor.pc * .loadout .item-add-popup {
-  margin-left: 10px;
-}
-.brinkwood.actor.pc * .teeth-experience {
-  display: flex;
-  /* Hide the browser's default checkbox */
-  position: absolute;
-  top: 0px;
-  right: 10px;
-}
-.brinkwood.actor.pc * .teeth-experience label {
-  height: 30px;
-  width: 10px;
-  background-image: url("assets/teeth/stresstooth-red.png");
-  background-repeat: no-repeat;
-  background-size: contain;
-  margin-right: 5px;
-  transition: filter 0.1s;
-  cursor: pointer;
-}
-.brinkwood.actor.pc * .teeth-experience label:last-of-type {
-  margin-right: 0px;
-}
-.brinkwood.actor.pc * .teeth-experience label[for$="-0"] {
-  width: auto;
-  height: auto;
-  background-image: none !important;
+.brinkwood.actor.pc.character .bans-armor .character-bans table th {
+  background: #191813;
   color: #EEEFFF;
+  font-family: Kirsty, serif;
 }
-.brinkwood.actor.pc * .teeth-experience label[for$="-0"] i {
-  margin-top: 4px;
+.brinkwood.actor.pc.character .bans-armor .character-bans table td {
+  padding: 5px;
 }
-.brinkwood.actor.pc * .teeth-experience label:hover {
-  filter: brightness(0.8);
-  opacity: 0.9;
-}
-.brinkwood.actor.pc * .teeth-experience input {
-  display: none;
-}
-.brinkwood.actor.pc * .teeth-experience input:checked ~ label {
-  background-image: url("assets/teeth/stresstooth-halfgrey.png");
-}
-.brinkwood.actor.pc * .teeth-experience input:checked + label {
-  background-image: url("assets/teeth/stresstooth-red.png");
-}
-.brinkwood.actor.pc * .bans-armor {
-  display: flex;
-}
-.brinkwood.actor.pc * .bans-armor .character-bans {
+.brinkwood.actor.pc.character .bans-armor .character-bans table input[type=text] {
   width: 100%;
+  min-width: 0;
+  height: 1.8em;
 }
-.brinkwood.actor.pc * .bans-armor .character-bans table {
-  width: 100%;
-  background: none;
-}
-.brinkwood.actor.pc * .bans-armor .character-bans table tr:nth-child(even) {
-  background: none;
-}
-.brinkwood.actor.pc * .bans-armor .character-bans table th {
-  background-color: #191813;
-  color: #EEEFFF;
-}
-.brinkwood.actor.pc * .bans-armor .character-bans table input[type=text] {
-  width: 100%;
-}
-.brinkwood.actor.pc * .bans-armor .character-scars-clock, .brinkwood.actor.pc * .bans-armor .character-oath-clock {
+.brinkwood.actor.pc.character .bans-armor .character-scars-clock,
+.brinkwood.actor.pc.character .bans-armor .character-oath-clock {
+  width: 88px;
   margin: 0 auto;
+  text-align: left;
   position: relative;
 }
-.brinkwood.actor.pc * .bans-armor .character-scars-clock .blades-clock, .brinkwood.actor.pc * .bans-armor .character-oath-clock .blades-clock {
+.brinkwood.actor.pc.character .bans-armor .character-scars-clock .blades-clock,
+.brinkwood.actor.pc.character .bans-armor .character-oath-clock .blades-clock {
   position: relative;
   padding: 0;
   width: 44px;
@@ -660,7 +623,8 @@
   overflow: hidden;
   background-size: cover;
 }
-.brinkwood.actor.pc * .bans-armor .character-scars-clock .blades-clock label, .brinkwood.actor.pc * .bans-armor .character-oath-clock .blades-clock label {
+.brinkwood.actor.pc.character .bans-armor .character-scars-clock .blades-clock label,
+.brinkwood.actor.pc.character .bans-armor .character-oath-clock .blades-clock label {
   overflow: hidden;
   position: absolute;
   top: -50%;
@@ -671,181 +635,135 @@
   transition: filter 0.1s;
   cursor: pointer;
 }
-.brinkwood.actor.pc * .bans-armor .character-scars-clock .blades-clock label:hover, .brinkwood.actor.pc * .bans-armor .character-oath-clock .blades-clock label:hover {
+.brinkwood.actor.pc.character .bans-armor .character-scars-clock .blades-clock label:hover,
+.brinkwood.actor.pc.character .bans-armor .character-oath-clock .blades-clock label:hover {
   filter: brightness(0.8);
   opacity: 0.9;
 }
-.brinkwood.actor.pc * .bans-armor .character-scars-clock .blades-clock input, .brinkwood.actor.pc * .bans-armor .character-oath-clock .blades-clock input {
+.brinkwood.actor.pc.character .bans-armor .character-scars-clock .blades-clock input,
+.brinkwood.actor.pc.character .bans-armor .character-oath-clock .blades-clock input {
   position: absolute;
   display: none;
 }
-.brinkwood.actor.pc * .bans-armor .character-scars-clock .blades-clock input[value="0"], .brinkwood.actor.pc * .bans-armor .character-oath-clock .blades-clock input[value="0"] {
+.brinkwood.actor.pc.character .bans-armor .character-scars-clock .blades-clock input[value="0"],
+.brinkwood.actor.pc.character .bans-armor .character-oath-clock .blades-clock input[value="0"] {
   display: none;
 }
-.brinkwood.actor.pc * .bans-armor .character-scars-clock .blades-clock *:nth-child(3), .brinkwood.actor.pc * .bans-armor .character-oath-clock .blades-clock *:nth-child(3) {
+.brinkwood.actor.pc.character .bans-armor .character-scars-clock .blades-clock *:nth-child(3),
+.brinkwood.actor.pc.character .bans-armor .character-oath-clock .blades-clock *:nth-child(3) {
   transform: rotate(0deg) skewY(180deg);
 }
-.brinkwood.actor.pc * .bans-armor .character-scars-clock .blades-clock *:nth-child(5), .brinkwood.actor.pc * .bans-armor .character-oath-clock .blades-clock *:nth-child(5) {
+.brinkwood.actor.pc.character .bans-armor .character-scars-clock .blades-clock *:nth-child(5),
+.brinkwood.actor.pc.character .bans-armor .character-oath-clock .blades-clock *:nth-child(5) {
   transform: rotate(90deg) skewY(180deg);
 }
-.brinkwood.actor.pc * .bans-armor .character-scars-clock .blades-clock *:nth-child(7), .brinkwood.actor.pc * .bans-armor .character-oath-clock .blades-clock *:nth-child(7) {
+.brinkwood.actor.pc.character .bans-armor .character-scars-clock .blades-clock *:nth-child(7),
+.brinkwood.actor.pc.character .bans-armor .character-oath-clock .blades-clock *:nth-child(7) {
   transform: rotate(180deg) skewY(180deg);
 }
-.brinkwood.actor.pc * .bans-armor .character-scars-clock .blades-clock *:nth-child(9), .brinkwood.actor.pc * .bans-armor .character-oath-clock .blades-clock *:nth-child(9) {
+.brinkwood.actor.pc.character .bans-armor .character-scars-clock .blades-clock *:nth-child(9),
+.brinkwood.actor.pc.character .bans-armor .character-oath-clock .blades-clock *:nth-child(9) {
   transform: rotate(270deg) skewY(180deg);
 }
-.brinkwood.actor.pc * .bans-armor .character-scars-clock span.clock-label, .brinkwood.actor.pc * .bans-armor .character-oath-clock span.clock-label {
-  text-transform: capitalize;
-  font-weight: bold;
+.brinkwood.actor.pc.character .bans-armor .character-scars-clock span.clock-label,
+.brinkwood.actor.pc.character .bans-armor .character-oath-clock span.clock-label {
   margin-left: 5px;
+  font-weight: bold;
+  text-transform: capitalize;
 }
-.brinkwood.actor.pc * .bans-armor .character-armor-uses div {
+.brinkwood.actor.pc.character .bans-armor .character-armor-uses div {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  gap: 8px;
 }
-.brinkwood.actor.pc * .attributes {
-  display: flex;
-  flex-direction: column;
+.brinkwood.actor.pc.character > .window-content > form.actor-sheet > .flex-horizontal:last-child {
+  align-items: flex-start;
+  gap: 10px;
+}
+.brinkwood.actor.pc.character .tab-content {
+  min-width: 0;
+}
+.brinkwood.actor.pc.character nav.tabs {
+  min-height: 28px;
+  margin-bottom: 0;
+  border-top: 1px solid rgba(25, 24, 19, 0.6);
+  border-bottom: 1px solid rgba(25, 24, 19, 0.6);
+}
+.brinkwood.actor.pc.character nav.tabs .item {
+  flex: 1 1 0;
+  padding: 4px 0;
+  color: #191813;
+  text-align: left;
+  text-shadow: none;
+  white-space: nowrap;
+}
+.brinkwood.actor.pc.character nav.tabs .item.active {
+  color: #191813;
+  font-weight: bold;
+  text-decoration: none;
+}
+.brinkwood.actor.pc.character .tab[data-tab] {
+  display: none;
+  min-height: 0;
+  padding-top: 8px;
+}
+.brinkwood.actor.pc.character .tab[data-tab].active {
+  display: block;
+}
+.brinkwood.actor.pc.character .attributes {
   width: 200px;
+  flex: 0 0 200px;
+  color: #191813;
 }
-.brinkwood.actor.pc * .attributes .stripe {
-  background-color: #191813;
+.brinkwood.actor.pc.character .attributes .attribute {
+  margin-bottom: 10px;
+}
+.brinkwood.actor.pc.character .attributes .stripe {
+  padding-left: 5px;
+  background: #191813;
   color: #EEEFFF;
   font-size: 17px;
-  padding-left: 5px;
 }
-.brinkwood.actor.pc * .attributes .attribute-label,
-.brinkwood.actor.pc * .attributes .attribute-skill-label {
+.brinkwood.actor.pc.character .attributes .attribute-label,
+.brinkwood.actor.pc.character .attributes .attribute-skill-label {
+  color: inherit;
   font-weight: bold;
   text-transform: uppercase;
+  text-shadow: none;
 }
-.brinkwood.actor.pc * .attributes .attribute-skill-label {
+.brinkwood.actor.pc.character .attributes .attribute-skill-label {
   margin-top: 0.3em;
 }
-.brinkwood.actor.pc * .attributes .attributes-exp {
+.brinkwood.actor.pc.character .attributes .attributes-exp {
+  position: relative;
   margin-top: 1em;
 }
-.brinkwood.actor.pc * .attributes .attributes-exp .stripe-tooth-body {
+.brinkwood.actor.pc.character .attributes .attributes-container {
   display: flex;
-  /* Hide the browser's default checkbox */
-  position: absolute;
-  top: 0px;
-  right: 0px;
+  align-items: center;
+  margin: 3px 0;
 }
-.brinkwood.actor.pc * .attributes .attributes-exp .stripe-tooth-body label {
-  height: 30px;
-  width: 10px;
-  background-image: url("assets/teeth/xptooth-red.png");
-  background-repeat: no-repeat;
-  background-size: contain;
+.brinkwood.actor.pc.character .attributes .attributes-container .dot-value {
+  display: inline-block;
   margin-right: 5px;
-  transition: filter 0.1s;
-  cursor: pointer;
+  color: #191813;
+  line-height: 1;
 }
-.brinkwood.actor.pc * .attributes .attributes-exp .stripe-tooth-body label:last-of-type {
-  margin-right: 0px;
+.brinkwood.actor.pc.character .traits .label-stripe p:first-child,
+.brinkwood.actor.pc.character .loadout .label-stripe p:first-child {
+  margin-right: 10px;
 }
-.brinkwood.actor.pc * .attributes .attributes-exp .stripe-tooth-body label[for$="-0"] {
-  width: auto;
-  height: auto;
-  background-image: none !important;
-  color: #EEEFFF;
-}
-.brinkwood.actor.pc * .attributes .attributes-exp .stripe-tooth-body label[for$="-0"] i {
-  margin-top: 4px;
-}
-.brinkwood.actor.pc * .attributes .attributes-exp .stripe-tooth-body label:hover {
-  filter: brightness(0.8);
-  opacity: 0.9;
-}
-.brinkwood.actor.pc * .attributes .attributes-exp .stripe-tooth-body input {
-  display: none;
-}
-.brinkwood.actor.pc * .attributes .attributes-exp .stripe-tooth-body input:checked ~ label {
-  background-image: url("assets/teeth/xptooth-white.png");
-}
-.brinkwood.actor.pc * .attributes .attributes-exp .stripe-tooth-body input:checked + label {
-  background-image: url("assets/teeth/xptooth-red.png");
-}
-.brinkwood.actor.pc * .attributes .attributes-container {
-  display: flex;
-  margin: 3px 0px;
-  display: flex;
-  /* Hide the browser's default checkbox */
-}
-.brinkwood.actor.pc * .attributes .attributes-container label {
-  height: 15px;
-  width: 15px;
-  background-color: #191813;
-  vertical-align: middle;
-  border: 2px solid #191813;
-  border-radius: 24px;
-  transition: filter 0.1s;
-  cursor: pointer;
-}
-.brinkwood.actor.pc * .attributes .attributes-container label[for$="-0"] {
-  height: 5px;
-  width: 5px;
-  border-radius: 24px;
-  background-image: none !important;
-  background-color: red !important;
-  margin-right: 0px;
-}
-.brinkwood.actor.pc * .attributes .attributes-container label:hover {
-  filter: brightness(0.7);
-  opacity: 0.7;
-}
-.brinkwood.actor.pc * .attributes .attributes-container input {
-  display: none;
-}
-.brinkwood.actor.pc * .attributes .attributes-container input:checked ~ label {
-  background-color: #EEEFFF;
-}
-.brinkwood.actor.pc * .attributes .attributes-container input:checked + label {
-  transition: filter 0.1s;
-  cursor: pointer;
-  background-color: #191813;
-}
-.brinkwood.actor.pc * .attributes .attributes-container input:checked + label:hover {
-  filter: brightness(0.7);
-  opacity: 0.7;
-}
-.brinkwood.actor.pc * .attributes .attributes-container * {
-  margin-right: 5px;
-}
-.brinkwood.actor.pc * .item-block {
-  justify-content: normal;
-  margin-bottom: 0.3em;
-  align-items: baseline;
-  height: 1.2em;
-  width: 100%;
-}
-.brinkwood.actor.pc * .item-block .item {
-  margin-left: 1em;
-}
-.brinkwood.actor.pc * .item-block .item .item-body {
+.brinkwood.actor.pc.character .traits .item-name,
+.brinkwood.actor.pc.character .loadout .item-name {
   width: auto;
 }
-.brinkwood.actor.pc * .item-block .item-class-label {
-  min-width: 33%;
+.brinkwood.actor.pc.character .traits .item-body,
+.brinkwood.actor.pc.character .loadout .item-body {
+  width: auto;
 }
-.brinkwood.actor.pc * .item {
-  justify-content: space-between;
-}
-.brinkwood.actor.pc * .item div {
-  flex-grow: 2;
-}
-.brinkwood.actor.pc * .item .item-body {
-  width: 100px;
-}
-.brinkwood.actor.pc * .item .item-body .item-name {
-  font-weight: bold;
-}
-.brinkwood.actor.pc * .name,
-.brinkwood.actor.pc * .lair,
-.brinkwood.actor.pc * .alias {
-  margin-bottom: 10px;
+.brinkwood.actor.pc.character .loadout .item-add-popup {
+  margin-left: 10px;
 }
 .brinkwood.actor.rebelion {
   /*
