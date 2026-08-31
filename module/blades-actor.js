@@ -209,7 +209,7 @@ export class BladesActor extends foundry.documents.Actor {
       case "upbringing":
       case "mask":
 			case "class":
-	      this._deleteTraits(removedItem, removedItem.type);
+        await this._deleteTraits(removedItem);
 				await this._modActionPoints( removedItem, true );
       break;
     }
@@ -237,9 +237,9 @@ export class BladesActor extends foundry.documents.Actor {
       await this.createEmbeddedDocuments("Item", traits.map(item => item.toObject()));
   }
 
-  _deleteTraits(data) {
-    const charTraits = this.items.filter(i => i.type == "trait" && i.system.class == data.name).map(i => i._id)
-    this.deleteEmbeddedDocuments( "Item", charTraits );
+  async _deleteTraits(data) {
+    const charTraits = this.items.filter(i => i.type == "trait" && i.system.class == data.name).map(i => i._id);
+    await this.deleteEmbeddedDocuments( "Item", charTraits );
   }
 
   async _loadBasicItems() {
@@ -249,6 +249,6 @@ export class BladesActor extends foundry.documents.Actor {
     
     // Load and create custom basic items
     const customBasicItems = await game.items.filter(i => i.type == "item" && i.system.class == "");
-      await this.createEmbeddedDocuments("Item", customBasicItems);
+      await this.createEmbeddedDocuments("Item", customBasicItems.map(i => i.toObject()));
   }
 }
