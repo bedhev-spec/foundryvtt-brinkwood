@@ -42,30 +42,27 @@ Hooks.once("init", async function() {
   // Register System Settings
   registerSystemSettings();
 
-  // Register sheet application classes
+  // Register sheet application classes (ApplicationV2)
   const { DocumentSheetConfig } = foundry.applications.apps;
-  DocumentSheetConfig.unregisterSheet(foundry.documents.Actor, "core", foundry.appv1.sheets.ActorSheet);
+  // Unregister Foundry's default v2 sheets so ours take precedence
+  DocumentSheetConfig.unregisterSheet(foundry.documents.Actor, "core", foundry.applications.sheets.ActorSheetV2);
   DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesActorSheet, { types: ["character"], makeDefault: true });
   DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesClockSheet, { types: ["\uD83D\uDD5B clock"], makeDefault: true });
   DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesNPCSheet, { types: ["npc"], makeDefault: true });
   DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesMaskSheet, { types: ["mask"], makeDefault: true });
   DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesRebelionSheet, { types: ["rebelion"], makeDefault: true });
-  DocumentSheetConfig.unregisterSheet(foundry.documents.Item, "core", foundry.appv1.sheets.ItemSheet);
+  DocumentSheetConfig.unregisterSheet(foundry.documents.Item, "core", foundry.applications.sheets.ItemSheetV2);
   DocumentSheetConfig.registerSheet(foundry.documents.Item, "brinkwood", BladesItemSheet, {makeDefault: true});
   await preloadHandlebarsTemplates();
 
 
-  // Multiboxes.
+  // Multiboxes – native DOM, no jQuery.
   Handlebars.registerHelper('multiboxes', function(selected, options) {
-
-    
-    let html = $( options.fn(this) );
-    let query = `input[type='radio'][value='${selected}']`;
-
-    html.find(query).attr("checked", true);
- 
-
-    return html.prop('outerHTML');
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = options.fn(this);
+    const input = wrapper.querySelector(`input[type='radio'][value='${selected}']`);
+    if (input) input.checked = true;
+    return wrapper.innerHTML;
   });
 
 

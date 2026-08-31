@@ -1,66 +1,78 @@
 /**
- * Extend the basic ItemSheet
- * @extends {ItemSheet}
+ * Extend the basic ItemSheet – uses ItemSheetV2 (ApplicationV2 lifecycle).
+ * @extends {ItemSheetV2}
  */
 import { BladesActiveEffect } from "./blades-active-effect.js";
 
-export class BladesItemSheet extends foundry.appv1.sheets.ItemSheet {
+export class BladesItemSheet extends foundry.applications.sheets.ItemSheetV2 {
+
+  /**
+   * Supported item-type → template mapping.
+   * Simple types all share the same template.
+   */
+  static SIMPLE_TYPES = new Set(["profession", "upbringing", "crew_reputation", "mask", "pact"]);
+
+  static DEFAULT_OPTIONS = {
+    classes: ["brinkwood", "sheet", "item"],
+    position: { width: 560 },
+    window: { resizable: true },
+    form: { submitOnChange: true },
+    tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description" }],
+  };
+
+  /**
+   * All known PARTS; _configureRenderOptions selects the active one per render.
+   */
+  static PARTS = {
+    simple:        { template: "systems/brinkwood/templates/items/simple.html" },
+    item:          { template: "systems/brinkwood/templates/items/item.html" },
+    class:         { template: "systems/brinkwood/templates/items/class.html" },
+    trait:         { template: "systems/brinkwood/templates/items/trait.html" },
+    moot_decision: { template: "systems/brinkwood/templates/items/moot_decision.html" },
+  };
+
+  /* -------------------------------------------- */
 
   /** @override */
-	static get defaultOptions() {
-
-	  return foundry.utils.mergeObject(super.defaultOptions, {
-			classes: ["brinkwood", "sheet", "item"],
-			width: 560,
-			height: 'auto',
-      tabs: [{navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description"}]
-		});
+  _configureRenderOptions(options) {
+    super._configureRenderOptions(options);
+    const partId = BladesItemSheet.SIMPLE_TYPES.has(this.document.type)
+      ? "simple"
+      : this.document.type;
+    options.parts = [partId];
   }
 
   /* -------------------------------------------- */
 
   /** @override */
-  get template() {
-    const path = "systems/brinkwood/templates/items";
-    let simple_item_types = ["profession", "upbringing", "crew_reputation", "mask", "pact"];
-    let template_name = `${this.item.type}`;
-
-    if (simple_item_types.indexOf(this.item.type) >= 0) {
-      template_name = "simple";
-    }
-
-    return `${path}/${template_name}.html`;
+  async _prepareContext(options) {
+    const doc     = this.document;
+    const context = doc.toObject();               // _id, name, img, type, system …
+    context.isGM     = game.user.isGM;
+    context.owner    = doc.isOwner;
+    context.editable = this.isEditable;
+    context.cssClass = this.isEditable ? "editable" : "locked";
+    context.effects  = BladesActiveEffect.prepareActiveEffectCategories(doc.effects);
+    return context;
   }
 
   /* -------------------------------------------- */
 
   /** @override */
-	activateListeners(html) {
-    super.activateListeners(html);
+  _onRender(context, options) {
+    const html = this.element;
 
-    // Everything below here is only needed if the sheet is editable
-    if (!this.options.editable) return;
+    if (!this.isEditable) return;
 
-    html.find(".effect-control").click(ev => {
-      if ( this.item.isEmbedded ) return ui.notifications.warn(game.i18n.localize("BITD.EffectWarning"))
-      BladesActiveEffect.onManageActiveEffect(ev, this.item)
-    });
+    // Active effect controls – use data-effect-action to avoid AppV2 action dispatch
+    html.querySelectorAll(".effect-control").forEach(el =>
+      el.addEventListener("click", ev => {
+        if (this.document.isEmbedded) return ui.notifications.warn(game.i18n.localize("BITD.EffectWarning"));
+        BladesActiveEffect.onManageActiveEffect(ev, this.document);
+      })
+    );
   }
 
   /* -------------------------------------------- */
 
-  /** @override */
-  async getData(options) {
-    const superData = super.getData( options );
-    const sheetData = superData.data;
-
-    sheetData.isGM = game.user.isGM;
-    sheetData.owner = superData.owner;
-    sheetData.editable = superData.editable;
-
-    // Prepare Active Effects
-    sheetData.effects = BladesActiveEffect.prepareActiveEffectCategories(this.document.effects);
-
-    return sheetData;
-  }
 }

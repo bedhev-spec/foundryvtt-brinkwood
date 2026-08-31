@@ -31,7 +31,7 @@ export class BladesActiveEffect extends foundry.documents.ActiveEffect {
     if(parsed instanceof Array){
       change.value = parsed;
     }
-		
+
 		return super.apply(actor, change);
   }
   /* --------------------------------------------- */
@@ -52,23 +52,25 @@ export class BladesActiveEffect extends foundry.documents.ActiveEffect {
   static onManageActiveEffect(event, owner) {
     event.preventDefault();
     const a = event.currentTarget;
-    const selector = a.closest("tr");
-    const effect = selector.dataset.effectId ? owner.effects.get(selector.dataset.effectId) : null;
-    switch ( a.dataset.action ) {
+    const tr = a.closest("tr");
+    const effect = tr?.dataset.effectId ? owner.effects.get(tr.dataset.effectId) : null;
+    // Read data-effect-action (avoids collision with ApplicationV2's data-action dispatch)
+    const action = a.dataset.effectAction;
+    switch ( action ) {
       case "create":
         return owner.createEmbeddedDocuments("ActiveEffect", [{
           name: "New Effect",
           img: "systems/brinkwood/styles/assets/icons/Icon.3_13.png",
           origin: owner.uuid,
-          "duration.rounds": selector.dataset.effectType === "temporary" ? 1 : undefined,
-          disabled: selector.dataset.effectType === "inactive"
+          "duration.rounds": tr?.dataset.effectType === "temporary" ? 1 : undefined,
+          disabled: tr?.dataset.effectType === "inactive",
         }]);
       case "edit":
         return effect.sheet.render(true);
       case "delete":
         return effect.delete();
       case "toggle":
-        return effect.update({disabled: !effect.disabled});
+        return effect.update({ disabled: !effect.disabled });
     }
   }
 
@@ -106,6 +108,7 @@ export class BladesActiveEffect extends foundry.documents.ActiveEffect {
     };
 
     // Iterate over active effects, classifying them into categories
+    // Use the synchronous sourceName getter (v13 replaced async _getSourceName())
     for ( let e of effects ) {
       if ( e.isSuppressed ) categories.suppressed.effects.push(e);
       else if ( e.disabled ) categories.inactive.effects.push(e);
@@ -114,14 +117,6 @@ export class BladesActiveEffect extends foundry.documents.ActiveEffect {
     }
     return categories;
   }
-
-  _applyCustom(actor, change, current, delta, changes) {
-		super._applyCustom(actor, change, current, delta, changes);
-		const preHook = foundry.utils.getProperty(actor, change.key);
-		const newValue = (preHook + delta > 4) ? 4 : preHook + delta;
-		changes[change.key] = newValue;
-		Hooks.call("applyActiveEffect", actor, change, current, delta, changes);
-	}
 
 }
 
