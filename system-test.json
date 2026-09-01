@@ -2,7 +2,7 @@
   "id": "brinkwood",
   "title": "Brinkwood",
   "description": "Brinkwood game system — Foundry VTT v13 migration test build.",
-  "version": "6.0.3",
+  "version": "0.6.4",
   "compatibility": { "minimum": "13", "verified": "13.351", "maximum": "13" },
   "url": "https://github.com/bedhev-spec/foundryvtt-brinkwood/tree/codex/fix-migrate-v13-review",
   "manifest": "https://raw.githubusercontent.com/bedhev-spec/foundryvtt-brinkwood/codex/fix-migrate-v13-review/system-test.json",
