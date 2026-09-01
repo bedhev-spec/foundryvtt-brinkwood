@@ -2,7 +2,7 @@
   "id": "brinkwood",
   "title": "Brinkwood",
   "description": "Brinkwood game system — Foundry VTT v13 migration test build.",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "compatibility": { "minimum": "13", "verified": "13.351", "maximum": "13" },
   "url": "https://github.com/bedhev-spec/foundryvtt-brinkwood/tree/codex/fix-roll-resolution",
   "manifest": "https://raw.githubusercontent.com/bedhev-spec/foundryvtt-brinkwood/codex/fix-roll-resolution/system-test.json",
