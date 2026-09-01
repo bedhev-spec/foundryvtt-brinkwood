@@ -34,7 +34,7 @@
       <input type="checkbox" id="clock-{{_id}}-show-description" name="system.show_description" {{checked system.show_description}}{{#unless editable}} disabled{{/unless}}>
     </div>
     {{#if editable}}
-    <prose-mirror name="system.description" value="{{system.description}}" document-uuid="{{actor.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
+    <prose-mirror name="system.description" value="{{system.description}}" data-document-uuid="{{actor.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
     {{else}}
     <div class="editor editor-content">{{{enrichedDescription}}}</div>
     {{/if}}

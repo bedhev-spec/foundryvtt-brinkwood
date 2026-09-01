@@ -15,8 +15,8 @@ test("NPC sheet is a compact editable dossier with v13 editor panels", async () 
     assert.match(template, new RegExp(`name="system\\.${field}" value="\\{\\{system\\.${field}\\}\\}"\\{\\{#unless editable\\}\\} disabled`));
   }
   assert.match(template, /aria-labelledby="npc-\{\{_id\}\}-profile-heading"/);
-  assert.match(template, /<prose-mirror name="system\.description" value="\{\{system\.description\}\}" document-uuid="\{\{actor\.uuid\}\}" collaborate toggled>/);
-  assert.match(template, /<prose-mirror name="system\.notes" value="\{\{system\.notes\}\}" document-uuid="\{\{actor\.uuid\}\}" collaborate toggled>/);
+  assert.match(template, /<prose-mirror name="system\.description" value="\{\{system\.description\}\}" data-document-uuid="\{\{actor\.uuid\}\}" collaborate toggled>/);
+  assert.match(template, /<prose-mirror name="system\.notes" value="\{\{system\.notes\}\}" data-document-uuid="\{\{actor\.uuid\}\}" collaborate toggled>/);
   assert.match(template, /<div class="editor editor-content">\{\{\{enrichedDescription\}\}\}<\/div>/);
   assert.match(template, /<div class="editor editor-content">\{\{\{enrichedNotes\}\}\}<\/div>/);
   assert.doesNotMatch(template, /\{\{editor\b/);

@@ -4,10 +4,11 @@ import { BladesActiveEffect } from "./blades-active-effect.js";
 import { preloadClockImages } from "./clock-utils.js";
 
 export function updateCharacterTrackerDisplay(element, value) {
-  const tracker = element.parentElement;
+  const group = element.parentElement;
+  const tracker = element.closest?.(".character-tracker") ?? group;
   const color = tracker?.classList.contains("character-xp") ? "blue" : "red";
 
-  tracker?.querySelectorAll(".dot-value").forEach(dot => {
+  group?.querySelectorAll(".dot-value").forEach(dot => {
     const filled = Number(dot.dataset.value) <= value;
     const tooth = dot.querySelector("img.big-teeth");
     if (tooth) {
@@ -21,11 +22,15 @@ export function updateCharacterTrackerDisplay(element, value) {
     dot.classList.toggle("dot-value--empty", !filled);
   });
 
-  const skillLabel = tracker?.querySelector?.(".attribute-skill-label");
+  const output = tracker?.querySelector?.("output");
+  const maxValue = Number(element.dataset.max_value);
+  if (output && Number.isFinite(maxValue)) output.textContent = `${value} / ${maxValue}`;
+
+  const skillLabel = group?.querySelector?.(".attribute-skill-label");
   if (!skillLabel) return;
   skillLabel.dataset.rollValue = String(value);
 
-  const attribute = tracker.closest?.(".attribute");
+  const attribute = group.closest?.(".attribute");
   const attributeLabel = attribute?.querySelector(".attribute-label");
   if (attributeLabel) {
     attributeLabel.dataset.rollValue = String(

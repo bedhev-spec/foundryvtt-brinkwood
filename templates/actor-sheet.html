@@ -291,7 +291,7 @@
           <p>{{localize "BITD.Notes"}}</p>
         </div>
         {{#if editable}}
-        <prose-mirror name="system.description" value="{{system.description}}" document-uuid="{{actor.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
+        <prose-mirror name="system.description" value="{{system.description}}" data-document-uuid="{{actor.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
         {{else}}
         <div class="editor editor-content">{{{enrichedDescription}}}</div>
         {{/if}}

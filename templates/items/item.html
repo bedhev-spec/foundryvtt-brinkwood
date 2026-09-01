@@ -12,7 +12,7 @@
     <h2>{{localize "BITD.Description"}}</h2>
     <div class="loadout-item-sheet__editor">
       {{#if editable}}
-      <prose-mirror name="system.description" value="{{system.description}}" document-uuid="{{item.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
+      <prose-mirror name="system.description" value="{{system.description}}" data-document-uuid="{{item.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
       {{else}}
       <div class="editor editor-content">{{{enrichedDescription}}}</div>
       {{/if}}

@@ -4,6 +4,7 @@
 
   form.mask-sheet {
     box-sizing: border-box;
+    width: 100%;
     min-height: 0;
     padding: 16px;
     container-type: inline-size;
@@ -191,27 +192,19 @@
 
   .mask-sheet__layout {
     display: grid;
-    grid-template-areas: "content attributes";
-    grid-template-columns: minmax(0, 1fr) 190px;
-    gap: 16px;
-    align-items: start;
-    padding-top: 16px;
-  }
-
-  .mask-sheet__layout:has(.mask-sheet__panel[data-tab="mask-notes"].active),
-  .mask-sheet__layout:has(.mask-sheet__panel[data-tab="effects"].active) {
-    grid-template-areas: "content";
+    box-sizing: border-box;
     grid-template-columns: minmax(0, 1fr);
-
-    > .mask-attributes {
-      display: none;
-    }
+    align-items: start;
+    justify-self: stretch;
+    width: 100%;
+    min-width: 0;
+    padding-top: 16px;
   }
 
   .mask-sheet__main {
     display: grid;
-    grid-area: content;
     grid-template-rows: auto minmax(0, 1fr);
+    box-sizing: border-box;
     min-width: 0;
     width: 100%;
   }
@@ -245,12 +238,19 @@
 
   .mask-sheet__panel {
     display: none;
+    box-sizing: border-box;
     min-width: 0;
     padding-top: 12px;
     width: 100%;
 
     &.active {
       display: block;
+    }
+
+    .effects-groups {
+      box-sizing: border-box;
+      width: 100%;
+      min-width: 0;
     }
 
     > h2,
@@ -267,6 +267,19 @@
     prose-mirror {
       min-height: 180px;
     }
+  }
+
+  .mask-sheet__traits-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(190px, 0.42fr);
+    gap: 16px;
+    align-items: start;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .mask-sheet__trait-library {
+    min-width: 0;
   }
 
   .mask-attributes > h2 {
@@ -313,7 +326,6 @@
   }
 
   .mask-attributes {
-    grid-area: attributes;
     min-width: 0;
     padding: 10px;
     border: 1px solid var(--bw-rule);
@@ -380,15 +392,8 @@
       grid-column: 1 / -1;
     }
 
-    .mask-sheet__layout {
-      grid-template-areas:
-        "content"
-        "attributes";
-      grid-template-columns: 1fr;
-    }
-
-    .mask-attributes {
-      order: 2;
+    .mask-sheet__traits-workspace {
+      grid-template-columns: minmax(0, 1fr);
     }
 
     .mask-attributes__skills {

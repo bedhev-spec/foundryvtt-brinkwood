@@ -70,28 +70,34 @@
       </nav>
 
       <section id="mask-{{_id}}-panel-traits" class="tab mask-sheet__panel {{#if (eq tabs.primary "traits")}}active{{/if}}" data-group="primary" data-tab="traits" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-traits">
-        <h2>{{localize "BITD.Traits"}}</h2>
-        <div class="mask-sheet__traits">
-          {{#each traits as |trait|}}
-          <article class="item mask-trait-card" data-item-id="{{trait._id}}">
-            <div class="item-select mask-trait-card__select" data-item-id="{{trait._id}}" data-item-list="traits">
-              <label class="mask-trait-card__title" for="mask-{{../_id}}-trait-{{trait._id}}">
-                <input type="checkbox" id="mask-{{../_id}}-trait-{{trait._id}}" class="dot" data-item-id="{{trait._id}}" {{#if trait.system.purchased}}checked{{/if}}{{#unless ../editable}} disabled{{/unless}}>
-                <span>{{trait.name}}</span>
-              </label>
-              <div class="mask-trait-card__description">{{{trait.system.description}}}</div>
+        <div class="mask-sheet__traits-workspace">
+          <div class="mask-sheet__trait-library">
+            <h2>{{localize "BITD.Traits"}}</h2>
+            <div class="mask-sheet__traits">
+              {{#each traits as |trait|}}
+              <article class="item mask-trait-card" data-item-id="{{trait._id}}">
+                <div class="item-select mask-trait-card__select" data-item-id="{{trait._id}}" data-item-list="traits">
+                  <label class="mask-trait-card__title" for="mask-{{../_id}}-trait-{{trait._id}}">
+                    <input type="checkbox" id="mask-{{../_id}}-trait-{{trait._id}}" class="dot" data-item-id="{{trait._id}}" {{#if trait.system.purchased}}checked{{/if}}{{#unless ../editable}} disabled{{/unless}}>
+                    <span>{{trait.name}}</span>
+                  </label>
+                  <div class="mask-trait-card__description">{{{trait.system.description}}}</div>
+                </div>
+              </article>
+              {{else}}
+              <p class="mask-sheet__empty">{{localize "BITD.Traits"}}</p>
+              {{/each}}
             </div>
-          </article>
-          {{else}}
-          <p class="mask-sheet__empty">{{localize "BITD.Traits"}}</p>
-          {{/each}}
+          </div>
+
+          {{> "systems/brinkwood/templates/parts/mask-attributes.html"}}
         </div>
       </section>
 
       <section id="mask-{{_id}}-panel-notes" class="tab mask-sheet__panel {{#if (eq tabs.primary "mask-notes")}}active{{/if}}" data-group="primary" data-tab="mask-notes" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-notes">
         <h2>{{localize "BITD.Notes"}}</h2>
       {{#if editable}}
-      <prose-mirror name="system.description" value="{{system.description}}" document-uuid="{{actor.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
+      <prose-mirror name="system.description" value="{{system.description}}" data-document-uuid="{{actor.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
       {{else}}
       <div class="editor editor-content">{{{enrichedDescription}}}</div>
       {{/if}}
@@ -104,7 +110,5 @@
       </section>
       {{/if}}
     </section>
-
-    {{> "systems/brinkwood/templates/parts/mask-attributes.html"}}
   </div>
 </form>

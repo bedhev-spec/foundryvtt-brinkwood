@@ -30,20 +30,22 @@ test("Mask sheet uses compact, accessible, controller-compatible markup", async 
 });
 
 test("Mask styles are scoped and adapt to the sheet container", async () => {
-  const [entrypoint, source, compiled] = await Promise.all([
+  const [entrypoint, source, compiled, sheet] = await Promise.all([
     read("scss/style.scss"),
     read("scss/import/mask-sheet.scss"),
-    read("styles/blades.css")
+    read("styles/blades.css"),
+    read("templates/mask-sheet.html")
   ]);
 
   assert.match(entrypoint, /&\.actor\.mask\s*\{\s*@import 'import\/mask-sheet\.scss'/);
   assert.match(source, /form\.mask-sheet\s*\{[\s\S]*container-type:\s*inline-size/);
   assert.match(source, /@container \(max-width: 620px\)/);
   assert.match(source, /@container \(max-width: 390px\)/);
-  assert.match(source, /grid-template-areas:\s*"content attributes"/);
-  assert.match(source, /:has\(\.mask-sheet__panel\[data-tab="mask-notes"\]\.active\)[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
-  assert.match(source, /:has\(\.mask-sheet__panel\[data-tab="effects"\]\.active\)[\s\S]*?> \.mask-attributes\s*\{[\s\S]*?display:\s*none/);
-  assert.match(source, /\.mask-sheet__main\s*\{[\s\S]*?grid-area:\s*content[\s\S]*?width:\s*100%/);
+  assert.match(source, /\.mask-sheet__layout\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)[\s\S]*?width:\s*100%/);
+  assert.match(source, /\.mask-sheet__main\s*\{[\s\S]*?box-sizing:\s*border-box[\s\S]*?width:\s*100%/);
+  assert.match(source, /\.mask-sheet__panel\s*\{[\s\S]*?width:\s*100%[\s\S]*?\.effects-groups\s*\{[\s\S]*?width:\s*100%/);
+  assert.match(source, /\.mask-sheet__traits-workspace\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) minmax\(190px, 0\.42fr\)/);
+  assert.match(sheet, /data-tab="traits"[\s\S]*?class="mask-sheet__traits-workspace"[\s\S]*?parts\/mask-attributes\.html/);
   assert.match(source, /\.editor,[\s\S]*?\.editor-content,[\s\S]*?prose-mirror\s*\{[\s\S]*?min-height:\s*180px/);
   assert.match(source, /\.mask-attributes > h2\s*\{/);
   assert.match(compiled, /\.brinkwood\.actor\.mask \.mask-sheet__header/);

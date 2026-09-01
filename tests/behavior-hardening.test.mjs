@@ -9,7 +9,12 @@ globalThis.foundry = {
   applications: {
     api: { HandlebarsApplicationMixin: Base => Base },
     sheets: {
-      ActorSheetV2: class { async _onRender() {} },
+      ActorSheetV2: class {
+        async _onRender() {}
+        async _processSubmitData(event, form, submitData, options) {
+          return { event, form, submitData, options };
+        }
+      },
       ItemSheetV2: class { async _onRender() {} }
     },
   },
@@ -131,6 +136,68 @@ test("clock updates still save actor state without active tokens or an active sc
     assert.match(actorUpdates[0].img, /Progress Clock 4-3\.svg$/);
     assert.match(actorUpdates[0]["prototypeToken.texture.src"], /Progress Clock 4-3\.svg$/);
   }
+});
+
+test("clock size changes suppress the stale document render and force one fresh sheet render", async () => {
+  tokenCalls.length = 0;
+  const updates = [];
+  const renders = [];
+  const actor = {
+    system: { type: 4, value: 1 },
+    getActiveTokens: () => []
+  };
+  game.scenes.current = { id: "scene-1" };
+
+  await BladesClockSheet.prototype._updateClock.call({
+    actor,
+    document: { update: async (data, options) => updates.push({ data, options }) },
+    render: async options => renders.push(options)
+  }, { "system.type": "8", "system.value": 1 });
+
+  const image = "systems/brinkwood/styles/assets/progressclocks-svg/Progress Clock 8-1.svg";
+  assert.deepEqual(updates, [{
+    data: {
+      "system.type": "8",
+      "system.value": 1,
+      img: image,
+      "prototypeToken.texture.src": image
+    },
+    options: { render: false }
+  }]);
+  assert.deepEqual(renders, [{ force: true }]);
+});
+
+test("clock submit dispatch rerenders only for clock size changes", async () => {
+  const clockUpdates = [];
+  const sheet = {
+    isEditable: true,
+    _updateClock: async data => clockUpdates.push(data)
+  };
+  const form = { id: "clock-form" };
+  const options = { render: false };
+
+  await BladesClockSheet.prototype._processSubmitData.call(
+    sheet,
+    { target: { name: "system.type" } },
+    form,
+    { "system.type": "8" }
+  );
+  assert.deepEqual(clockUpdates, [{ "system.type": "8" }]);
+
+  const result = await BladesClockSheet.prototype._processSubmitData.call(
+    sheet,
+    { target: { name: "system.description" } },
+    form,
+    { "system.description": "Updated notes" },
+    options
+  );
+  assert.deepEqual(clockUpdates, [{ "system.type": "8" }]);
+  assert.deepEqual(result, {
+    event: { target: { name: "system.description" } },
+    form,
+    submitData: { "system.description": "Updated notes" },
+    options
+  });
 });
 
 test("read-only sheets disable every input type while retaining read-only text areas", async () => {
@@ -266,6 +333,39 @@ test("character tracker updates avoid a sheet rerender and refresh the clicked t
   assert.match(tooth.src, /stresstooth-blue\.png$/);
 });
 
+test("V2 character tracker updates refresh numeric progress without a sheet rerender", () => {
+  const output = { textContent: "1 / 8" };
+  const classes = new Set(["dot-value", "dot-value--empty"]);
+  const dot = {
+    dataset: { path: "system.experience.value", value: "2", max_value: "8" },
+    setAttribute(name, value) { this[name] = value; },
+    querySelector() { return null; },
+    classList: {
+      toggle(name, enabled) {
+        if (enabled) classes.add(name);
+        else classes.delete(name);
+      }
+    }
+  };
+  const group = {
+    querySelectorAll: selector => selector === ".dot-value" ? [dot] : [],
+    querySelector: () => null,
+    closest: () => null
+  };
+  const tracker = {
+    classList: { contains: name => name === "character-xp" },
+    querySelector: selector => selector === "output" ? output : null
+  };
+  dot.parentElement = group;
+  dot.closest = selector => selector === ".character-tracker" ? tracker : null;
+
+  BladesActorSheet.prototype._updateTrackerDisplay(dot, 2);
+
+  assert.equal(dot["aria-pressed"], "true");
+  assert.equal(classes.has("dot-value--filled"), true);
+  assert.equal(output.textContent, "2 / 8");
+});
+
 test("character skill updates refresh flat pip state without a sheet rerender", async () => {
   const updates = [];
   const classes = new Set(["dot-value", "dot-value--empty"]);
@@ -359,6 +459,7 @@ test("Mask trackers update without a sheet rerender and refresh their output", a
 test("actor update synchronization refreshes every open tracker renderer", () => {
   const createForm = () => {
     const tooth = { src: "" };
+    const output = { textContent: "1 / 8" };
     const dot = {
       dataset: { path: "system.experience.value", value: "2", max_value: "8" },
       setAttribute(name, value) { this[name] = value; },
@@ -366,9 +467,11 @@ test("actor update synchronization refreshes every open tracker renderer", () =>
     };
     const tracker = {
       classList: { contains: name => name === "character-xp" },
-      querySelectorAll: selector => selector === ".dot-value" ? [dot] : []
+      querySelectorAll: selector => selector === ".dot-value" ? [dot] : [],
+      querySelector: selector => selector === "output" ? output : null
     };
     dot.parentElement = tracker;
+    dot.closest = selector => selector === ".character-tracker" ? tracker : null;
     return {
       dot,
       form: {
@@ -376,7 +479,8 @@ test("actor update synchronization refreshes every open tracker renderer", () =>
         dataset: { actorUuid: "Actor.actor-1" },
         querySelectorAll: selector => selector === ".dot-value" ? [dot] : []
       },
-      tooth
+      tooth,
+      output
     };
   };
   const first = createForm();
@@ -390,6 +494,7 @@ test("actor update synchronization refreshes every open tracker renderer", () =>
   for (const renderer of [first, second]) {
     assert.equal(renderer.dot["aria-pressed"], "true");
     assert.match(renderer.tooth.src, /stresstooth-blue\.png$/);
+    assert.equal(renderer.output.textContent, "2 / 8");
   }
 });
 

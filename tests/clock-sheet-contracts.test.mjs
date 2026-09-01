@@ -33,7 +33,7 @@ test("standalone clock keeps viewer progress public and GM notes permission-awar
   assert.match(template, /clock-sheet__progress/);
   assert.match(template, /\{\{\{blades-clock "system\.value" system\.type system\.value _id \(localize "Clock\.Progress"\)\}\}\}/);
   assert.match(template, /\{\{#if isGM\}\}/);
-  assert.match(template, /\{\{#if editable\}\}[\s\S]*?<prose-mirror name="system\.description" value="\{\{system\.description\}\}" document-uuid="\{\{actor\.uuid\}\}" collaborate toggled>/);
+  assert.match(template, /\{\{#if editable\}\}[\s\S]*?<prose-mirror name="system\.description" value="\{\{system\.description\}\}" data-document-uuid="\{\{actor\.uuid\}\}" collaborate toggled>/);
   assert.match(template, /\{\{else\}\}[\s\S]*?<div class="editor editor-content">\{\{\{enrichedDescription\}\}\}<\/div>/);
   assert.doesNotMatch(template, /\{\{editor\b/);
   assert.match(template, /name="system\.show_description"/);

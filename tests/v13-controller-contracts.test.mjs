@@ -99,7 +99,7 @@ test("each Actor HTML editor has its own enriched context and template target", 
       for (const field of fields) {
       const enrichedField = field === "notes" ? "enrichedNotes" : "enrichedDescription";
       assert.match(controller, new RegExp(`context\\.${enrichedField}\\s*=\\s*await[\\s\\S]*?enrichHTML`));
-      assert.match(template, new RegExp(`<prose-mirror name="system\\.${field}" value="\\{\\{system\\.${field}\\}\\}" document-uuid="\\{\\{actor\\.uuid\\}\\}" collaborate toggled>`));
+      assert.match(template, new RegExp(`<prose-mirror name="system\\.${field}" value="\\{\\{system\\.${field}\\}\\}" data-document-uuid="\\{\\{actor\\.uuid\\}\\}" collaborate toggled>`));
       assert.match(template, new RegExp(`\\{\\{\\{${enrichedField}\\}\\}`));
       assert.doesNotMatch(template, /\{\{editor\b/);
       }
@@ -119,7 +119,7 @@ test("each Item description editor uses the dedicated enriched context", async t
   for (const type of ["item", "simple", "trait", "class", "moot_decision"]) {
     await t.test(type, async () => {
       const template = await read(`templates/items/${type}.html`);
-      assert.match(template, /\{\{#if editable\}\}[\s\S]*?<prose-mirror name="system\.description" value="\{\{system\.description\}\}" document-uuid="\{\{item\.uuid\}\}" collaborate toggled>/);
+      assert.match(template, /\{\{#if editable\}\}[\s\S]*?<prose-mirror name="system\.description" value="\{\{system\.description\}\}" data-document-uuid="\{\{item\.uuid\}\}" collaborate toggled>/);
       assert.match(template, /\{\{else\}\}[\s\S]*?<div class="editor editor-content">\{\{\{enrichedDescription\}\}\}<\/div>/);
       assert.doesNotMatch(template, /\{\{editor\b/);
     });

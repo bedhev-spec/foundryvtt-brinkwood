@@ -80,9 +80,10 @@ export class BladesClockSheet extends BladesSheet {
    * old img / scale / mirrorX / mirrorY / tint / displayName).
    * @override
    */
-  async _processSubmitData(event, form, submitData) {
+  async _processSubmitData(event, form, submitData, options) {
     if (!this.isEditable) return;
-    return this._updateClock(submitData);
+    if (event.target?.name === "system.type") return this._updateClock(submitData);
+    return super._processSubmitData(event, form, submitData, options);
   }
 
   async _updateClock(submitData) {
@@ -114,7 +115,8 @@ export class BladesClockSheet extends BladesSheet {
     }
 
     // Delegate the actor update to the base class
-    return this.document.update(submitData);
+    await this.document.update(submitData, { render: false });
+    return this.render?.({ force: true });
   }
 
   /* -------------------------------------------- */

@@ -11,7 +11,7 @@
     <div class="legacy-item-sheet__primary">
     <label class="label-stripe">{{localize "BITD.Description"}}</label>
     {{#if editable}}
-    <prose-mirror name="system.description" value="{{system.description}}" document-uuid="{{item.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
+      <prose-mirror name="system.description" value="{{system.description}}" data-document-uuid="{{item.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
     {{else}}
     <div class="editor editor-content">{{{enrichedDescription}}}</div>
     {{/if}}
