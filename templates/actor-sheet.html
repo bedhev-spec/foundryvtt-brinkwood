@@ -9,7 +9,7 @@
 
   <section id="character-{{_id}}-name-alias" class="flex-horizontal name-alias">
     <div class="grow-two">
-      <img src="{{img}}" {{#if editable}}data-action="editImage" data-edit="img"{{/if}} title="{{name}}" class="portrait">
+      <img src="{{img}}" alt="{{name}}"{{#if editable}} data-action="editImage" data-edit="img" role="button" tabindex="0" aria-label="{{localize 'BITD.Name'}}: {{name}}"{{/if}} title="{{name}}" class="portrait">
     </div>
 
     <div class="grow-two">
@@ -27,7 +27,7 @@
           {{#each items as |item id|}}
             {{#if (eq item.type "upbringing")}}
 						<div class="item flex-horizontal tooltip" data-item-id="{{item._id}}" data-tooltip="Actor.Upbringings.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
-                <div class="item-body flex-horizontal">
+<div class="item-body flex-horizontal"{{#if editable}} role="button" tabindex="0"{{/if}}>
 									<div class="item-name">{{item.name}}</div>
                 </div>
               </div>
@@ -42,7 +42,7 @@
           {{#each items as |item id|}}
             {{#if (eq item.type "profession")}}
 						<div class="item flex-horizontal tooltip" data-item-id="{{item._id}}" data-tooltip="Actor.Professions.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
-              <div class="item-body flex-horizontal">
+<div class="item-body flex-horizontal"{{#if editable}} role="button" tabindex="0"{{/if}}>
                 <div class="item-name">{{item.name}}</div>
               </div>
             </div>
@@ -55,7 +55,7 @@
             {{#each items as |item id|}}
                 {{#if (eq item.type "class")}}
                 <div class="item flex-horizontal tooltip" data-item-id="{{item._id}}" data-tooltip="Actor.Classes.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
-                  <div class="item-body flex-horizontal">
+<div class="item-body flex-horizontal"{{#if editable}} role="button" tabindex="0"{{/if}}>
                     <div class="item-name">{{item.name}}</div>
                   </div>
                 </div>
@@ -68,7 +68,7 @@
             {{#each items as |item id|}}
                 {{#if (eq item.type "pact")}}
                 <div class="item flex-horizontal tooltip" data-item-id="{{item._id}}" data-tooltip="Actor.Pacts.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
-                  <div class="item-body flex-horizontal">
+<div class="item-body flex-horizontal"{{#if editable}} role="button" tabindex="0"{{/if}}>
                     <div class="item-name">{{item.name}}</div>
                   </div>
                 </div>
@@ -126,8 +126,8 @@
 
   </section>
 
-  {{!-- Harm, Healing and Armor --}}
-  <section id="character-{{_id}}-bans-armor" class="flex bans-armor">
+  {{!-- Bans, consequence clocks, and armor --}}
+  <section id="character-{{_id}}-bans-armor" class="bans-armor" aria-label="{{localize 'BITD.BansArmor'}}">
     <div id="character-{{_id}}-character-bans" class="character-bans">
       <table>
         <thead>
@@ -199,12 +199,12 @@
 
       {{!-- Nav menu --}}
 <nav class="tabs flex-horizontal" data-group="primary" role="tablist" aria-label="{{localize "BITD.Traits"}}">
- <a class="item {{#if (eq tabs.primary "traits")}}active{{/if}}" id="character-{{_id}}-tab-traits" role="tab" aria-controls="character-{{_id}}-traits-tab" aria-selected="{{#if (eq tabs.primary "traits")}}true{{else}}false{{/if}}" data-action="tab" data-group="primary" data-tab="traits">{{localize "BITD.Traits"}}</a>
- <a class="item {{#if (eq tabs.primary "loadout")}}active{{/if}}" id="character-{{_id}}-tab-loadout" role="tab" aria-controls="character-{{_id}}-loadout" aria-selected="{{#if (eq tabs.primary "loadout")}}true{{else}}false{{/if}}" data-action="tab" data-group="primary" data-tab="loadout">{{localize "BITD.Loadout"}}</a>
- <a class="item {{#if (eq tabs.primary "character-notes")}}active{{/if}}" id="character-{{_id}}-tab-notes" role="tab" aria-controls="character-{{_id}}-notes" aria-selected="{{#if (eq tabs.primary "character-notes")}}true{{else}}false{{/if}}" data-action="tab" data-group="primary" data-tab="character-notes">{{localize "BITD.Notes"}}</a>
- <a class="item {{#if (eq tabs.primary "downtime")}}active{{/if}}" id="character-{{_id}}-tab-downtime" role="tab" aria-controls="character-{{_id}}-downtime" aria-selected="{{#if (eq tabs.primary "downtime")}}true{{else}}false{{/if}}" data-action="tab" data-group="primary" data-tab="downtime">{{localize "BITD.Downtime"}}</a>
+    <button type="button" class="item {{#if (eq tabs.primary "traits")}}active{{/if}}" id="character-{{_id}}-tab-traits" role="tab" tabindex="{{#if (eq tabs.primary "traits")}}0{{else}}-1{{/if}}" aria-controls="character-{{_id}}-traits-tab" aria-selected="{{#if (eq tabs.primary "traits")}}true{{else}}false{{/if}}" data-action="tab" data-group="primary" data-tab="traits">{{localize "BITD.Traits"}}</button>
+    <button type="button" class="item {{#if (eq tabs.primary "loadout")}}active{{/if}}" id="character-{{_id}}-tab-loadout" role="tab" tabindex="{{#if (eq tabs.primary "loadout")}}0{{else}}-1{{/if}}" aria-controls="character-{{_id}}-loadout" aria-selected="{{#if (eq tabs.primary "loadout")}}true{{else}}false{{/if}}" data-action="tab" data-group="primary" data-tab="loadout">{{localize "BITD.Loadout"}}</button>
+    <button type="button" class="item {{#if (eq tabs.primary "character-notes")}}active{{/if}}" id="character-{{_id}}-tab-notes" role="tab" tabindex="{{#if (eq tabs.primary "character-notes")}}0{{else}}-1{{/if}}" aria-controls="character-{{_id}}-notes" aria-selected="{{#if (eq tabs.primary "character-notes")}}true{{else}}false{{/if}}" data-action="tab" data-group="primary" data-tab="character-notes">{{localize "BITD.Notes"}}</button>
+    <button type="button" class="item {{#if (eq tabs.primary "downtime")}}active{{/if}}" id="character-{{_id}}-tab-downtime" role="tab" tabindex="{{#if (eq tabs.primary "downtime")}}0{{else}}-1{{/if}}" aria-controls="character-{{_id}}-downtime" aria-selected="{{#if (eq tabs.primary "downtime")}}true{{else}}false{{/if}}" data-action="tab" data-group="primary" data-tab="downtime">{{localize "BITD.Downtime"}}</button>
        {{#if isGM}}
- <a class="item {{#if (eq tabs.primary "effects")}}active{{/if}}" id="character-{{_id}}-tab-effects" role="tab" aria-controls="character-{{_id}}-effects" aria-selected="{{#if (eq tabs.primary "effects")}}true{{else}}false{{/if}}" data-action="tab" data-group="primary" data-tab="effects">{{localize "BITD.Effects"}}</a>
+      <button type="button" class="item {{#if (eq tabs.primary "effects")}}active{{/if}}" id="character-{{_id}}-tab-effects" role="tab" tabindex="{{#if (eq tabs.primary "effects")}}0{{else}}-1{{/if}}" aria-controls="character-{{_id}}-effects" aria-selected="{{#if (eq tabs.primary "effects")}}true{{else}}false{{/if}}" data-action="tab" data-group="primary" data-tab="effects">{{localize "BITD.Effects"}}</button>
         {{/if}}
       </nav>
 
@@ -286,11 +286,11 @@
         </div>
       </div>
 
-      <div class="tab flex-vertical {{#if (eq tabs.primary "character-notes")}}active{{/if}}" data-group="primary" data-tab="character-notes">
+      <div id="character-{{_id}}-notes" class="tab flex-vertical {{#if (eq tabs.primary "character-notes")}}active{{/if}}" role="tabpanel" data-group="primary" data-tab="character-notes">
         <div class="label-stripe">
           <p>{{localize "BITD.Notes"}}</p>
         </div>
-{{editor system.description target="system.description" button=true editable=editable documents=true engine="prosemirror" collaborate=true}}
+        {{editor content=system.description target="system.description" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
       </div>
 
       {{!-- Active Effects --}}

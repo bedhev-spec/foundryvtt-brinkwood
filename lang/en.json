@@ -311,6 +311,7 @@
   "BITD.Experience": "XP",
 	"BITD.ExperienceTriggers": "- If you brought into play your upbringing, profession, or personal history.\n - If you took a course of action because of or expressed your tragedy, triumph, or scars.\n - If you brought into play some aspect of your relationship to your fellow brigands, the rebellion, the Masks, or the Fae.",
   "BITD.Bans": "Bans",
+  "BITD.BansArmor": "Bans, consequences, and armor",
   "BITD.Healing": "Healing",
   "BITD.Armor": "Armor",
   "BITD.NeedHelp": "Need Help",
@@ -320,6 +321,8 @@
   "BITD.Special": "Special",
   "BITD.LessEffect": "Less Effect",
   "BITD.Description": "Description",
+  "BITD.Profile": "Profile",
+  "BITD.ShortDescription": "Short description",
   "BITD.Loadout": "Loadout",
   "BITD.Load": "Load",
   "BITD.Mask": "Mask type",
@@ -561,6 +564,10 @@
   "BITD.Add": "Add",
   "BITD.Effects": "Effects",
   "BITD.EffectCreate": "Create Effect",
+  "BITD.EffectSource": "Source",
+  "BITD.EffectDuration": "Duration",
+  "BITD.EffectActions": "Effect actions",
+  "BITD.EffectEmpty": "No effects in this group.",
   "BITD.EffectToggle": "Toggle Effect",
   "BITD.EffectEdit": "Edit Effect",
   "BITD.EffectDelete": "Delete Effect",
@@ -578,6 +585,10 @@
   "BITD.SlyFriends": "Sly Friends",
   "BITD.ShrewdFriends": "Shrewd Friends",
   "BITD.DarkServants": "Dark Servants",
-  "BITD.StrangeFriends": "Strange Friends"
+  "BITD.StrangeFriends": "Strange Friends",
+  "Clock.Type": "Clock size",
+  "Clock.GMDescription": "GM description",
+  "Clock.ShowDescription": "Show description to players",
+  "Clock.Progress": "Progress"
 
 }

@@ -1,17 +1,50 @@
-<form class="{{cssClass}} actor-sheet" autocomplete="off">
-    <img src="{{img}}" data-edit="img" title="{{name}}" height="100" width="100"/>
-	<input type="text" id="character-{{_id}}-name" name="name" value="{{name}} ">
-	<label for="character-{{_id}}-name">Name</label>
-	<input type="text" id="character-{{_id}}-short-description" name="system.description_short" value="{{system.description_short}} ">
-	<label for="character-{{_id}}-short-description">Short description</label>
-	<input type="text" id="character-{{_id}}-associated-class" name="system.associated_class" value="{{system.associated_class}} ">
-	<label for="character-{{_id}}-associated-class">Associated Class</label>
-	<input type="text" id="character-{{_id}}-description" name="system.description" value="{{system.description}} ">
-	<label for="character-{{_id}}-description">Description</label>
-	<input type="text" id="character-{{_id}}-associated-crew-type" name="system.associated_crew_type" value="{{system.associated_crew_type}} ">
-	<label for="character-{{_id}}-associated-crew-type">Associated Crew Type</label>
-	<input type="text" id="character-{{_id}}-notes" name="system.notes" value="{{system.notes}} ">
-	<label for="character-{{_id}}-notes">Notes</label>
-	<input type="text" id="character-{{_id}}-associated-faction" name="system.associated_faction" value="{{system.associated_faction}}" >
-	<label for="character-{{_id}}-associated-faction">Associated Faction</label>
+<form class="{{cssClass}} actor-sheet npc-dossier" autocomplete="off">
+  <header class="npc-dossier__header">
+    <img class="npc-dossier__portrait" src="{{img}}" alt="{{name}}" title="{{name}}"{{#if editable}} data-action="editImage" data-edit="img" role="button" tabindex="0" aria-label="{{localize 'BITD.Name'}}: {{name}}"{{/if}}>
+
+    <div class="npc-dossier__identity">
+      <div class="npc-dossier__field">
+        <label for="npc-{{_id}}-name">{{localize "BITD.Name"}}</label>
+        <input type="text" id="npc-{{_id}}-name" name="name" value="{{name}}"{{#unless editable}} disabled{{/unless}}>
+      </div>
+
+      <div class="npc-dossier__field">
+        <label for="npc-{{_id}}-short-description">{{localize "BITD.ShortDescription"}}</label>
+        <input type="text" id="npc-{{_id}}-short-description" name="system.description_short" value="{{system.description_short}}"{{#unless editable}} disabled{{/unless}}>
+      </div>
+    </div>
+  </header>
+
+  <section class="npc-dossier__profile" aria-labelledby="npc-{{_id}}-profile-heading">
+    <h2 id="npc-{{_id}}-profile-heading">{{localize "BITD.Profile"}}</h2>
+
+    <div class="npc-dossier__profile-fields">
+      <div class="npc-dossier__field">
+        <label for="npc-{{_id}}-associated-class">{{localize "BITD.Class"}}</label>
+        <input type="text" id="npc-{{_id}}-associated-class" name="system.associated_class" value="{{system.associated_class}}"{{#unless editable}} disabled{{/unless}}>
+      </div>
+
+      <div class="npc-dossier__field">
+        <label for="npc-{{_id}}-associated-faction">{{localize "BITD.Faction"}}</label>
+        <input type="text" id="npc-{{_id}}-associated-faction" name="system.associated_faction" value="{{system.associated_faction}}"{{#unless editable}} disabled{{/unless}}>
+      </div>
+
+      <div class="npc-dossier__field">
+        <label for="npc-{{_id}}-associated-crew-type">{{localize "BITD.CrewType"}}</label>
+        <input type="text" id="npc-{{_id}}-associated-crew-type" name="system.associated_crew_type" value="{{system.associated_crew_type}}"{{#unless editable}} disabled{{/unless}}>
+      </div>
+    </div>
+  </section>
+
+  <div class="npc-dossier__editors">
+    <section class="npc-dossier__editor-panel" aria-labelledby="npc-{{_id}}-description-heading">
+      <h2 id="npc-{{_id}}-description-heading">{{localize "BITD.Description"}}</h2>
+      {{editor content=system.description target="system.description" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
+    </section>
+
+    <section class="npc-dossier__editor-panel" aria-labelledby="npc-{{_id}}-notes-heading">
+      <h2 id="npc-{{_id}}-notes-heading">{{localize "BITD.Notes"}}</h2>
+      {{editor content=system.notes target="system.notes" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
+    </section>
+  </div>
 </form>

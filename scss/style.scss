@@ -35,10 +35,13 @@ $hover-brightness: 0.8;
   font-family: "Crimson Text", serif;
 
   @import 'import/general-styles.scss';
-  @import 'import/clocks.scss';
 
   &.actor.pc.character{
     @import 'import/character-sheet.scss';
+  }
+
+  &.actor.mask {
+    @import 'import/mask-sheet.scss';
   }
 
 	&.actor.rebelion {
@@ -46,6 +49,11 @@ $hover-brightness: 0.8;
 	}
 
   &.actor.clock{
+    @import 'import/clocks.scss';
+  }
+
+  &.actor.npc {
+    @import 'import/npc-sheet.scss';
   }
 
   &.item.sheet{

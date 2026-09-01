@@ -1,6 +1,6 @@
 <form class="{{cssClass}}" autocomplete="off">
     <header class="sheet-header">
-        <img src="{{item.img}}" system-edit="img" title="{{item.name}}"/>
+  <img src="{{img}}" title="{{name}}" alt="{{name}}"{{#if editable}} data-action="editImage" data-edit="img" role="button" tabindex="0" aria-label="{{localize 'BITD.Name'}}: {{name}}"{{/if}}/>
         <div class="header-fields">
             <h1 class="charname"><input name="name" type="text" value="{{name}}" placeholder="{{localize 'BITD.Name'}}"/></h1>
         </div>
@@ -8,7 +8,7 @@
     
     {{!-- Sheet Body --}}
     <section class="sheet-body flex">
-      {{editor content=system.description target="system.description" button=true owner=owner editable=editable}}
+  {{editor content=enrichedDescription target="system.description" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
     </section>
     <div class="flex-vertical">
       <label class="label-stripe">{{localize "BITD.AbilityPrice"}}</label>

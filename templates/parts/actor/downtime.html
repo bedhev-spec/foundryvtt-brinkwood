@@ -1,6 +1,8 @@
-{{#times_from_1 9}}
-<div>
-	<div><h3>{{localize (concat "BITD.Downtime" this ".name") }}</h3></div>
-	<div>{{localize (concat "BITD.Downtime" this ".desc") }}</div>
+<div class="downtime-actions">
+  {{#times_from_1 9}}
+    <article class="downtime-action">
+      <h3>{{localize (concat "BITD.Downtime" this ".name")}}</h3>
+      <p>{{localize (concat "BITD.Downtime" this ".desc")}}</p>
+    </article>
+  {{/times_from_1}}
 </div>
-{{/times_from_1}}

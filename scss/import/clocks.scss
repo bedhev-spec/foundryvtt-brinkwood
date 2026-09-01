@@ -1,32 +1,237 @@
-&{
-  min-width: 420px;
-  min-height: 320px;
-}
+/* Standalone clock sheet. Imported under .brinkwood.actor.clock. */
+& {
+  min-width: 320px;
+  min-height: 0;
+  color: var(--bw-ink);
 
-.clock-zero-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: $almost_black;
-}
+  .window-content {
+    padding: 0;
+    background: var(--bw-paper);
+  }
 
-.clocks {
-  &.clocks-4 {
-    @include clock(4, 200);
+  .clock-sheet {
+    display: grid;
+    gap: 14px;
+    box-sizing: border-box;
+    min-height: 0;
+    padding: 14px;
+    background: var(--bw-paper);
+    container-type: inline-size;
   }
-  &.clocks-6 {
-    @include clock(6, 200);
-  }
-  &.clocks-8 {
-    @include clock(8, 200);
-  }
-}
 
-.blades-clock-name-type {
-  > * {
-    margin-bottom: 0;
+  .clock-sheet__header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: end;
+    padding: 10px 12px;
+    border: 1px solid var(--bw-rule);
+    border-radius: 8px;
+    background: var(--bw-paper-deep);
   }
-  .blades-clock{
-    margin: 10px auto;
+
+  .clock-sheet__identity,
+  .clock-sheet__type-control {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .clock-sheet__label {
+    color: var(--bw-ink-soft);
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1.15;
+  }
+
+  .clock-sheet__name,
+  .clock-sheet__name-input {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 40px;
+    margin: 0;
+    color: var(--bw-ink);
+    font-family: "Crimson Text", serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  .clock-sheet__name-input,
+  .clock-sheet__type-control select {
+    padding: 5px 7px;
+    border: 1px solid var(--bw-rule);
+    border-radius: 4px;
+    background: var(--bw-inverse);
+    color: var(--bw-ink);
+
+    &:focus-visible {
+      outline: 3px solid var(--bw-focus);
+      outline-offset: 1px;
+    }
+  }
+
+  .clock-sheet__type-control select {
+    min-width: 66px;
+    min-height: 36px;
+    font: inherit;
+  }
+
+  .clock-sheet__progress {
+    margin: 0;
+    color: var(--bw-ink-soft);
+    font-size: 1rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .clock-sheet__clock {
+    display: grid;
+    place-items: center;
+    min-height: 196px;
+    padding: 4px;
+    border: 1px solid var(--bw-rule);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.28);
+  }
+
+  .clocks {
+    display: grid;
+    justify-items: center;
+    gap: 7px;
+
+    &.clocks-4 {
+      @include clock(4, 184);
+    }
+
+    &.clocks-6 {
+      @include clock(6, 184);
+    }
+
+    &.clocks-8 {
+      @include clock(8, 184);
+    }
+
+    .clock-zero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-height: 30px;
+      color: var(--bw-ink-soft);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 700;
+
+      &:has(+ .blades-clock input[value="0"]:focus-visible) {
+        outline: 3px solid var(--bw-focus);
+        outline-offset: 2px;
+      }
+    }
+
+    .blades-clock {
+      cursor: pointer;
+    }
+
+    .clock-progress {
+      color: var(--bw-ink-soft);
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  .clock-sheet__gm-note,
+  .clock-sheet__public-description {
+    overflow: hidden;
+    border: 1px solid var(--bw-rule);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.28);
+  }
+
+  .clock-sheet__gm-note {
+    summary {
+      padding: 10px 12px;
+      background: var(--bw-paper-deep);
+      color: var(--bw-ink);
+      cursor: pointer;
+      font-weight: 700;
+
+      &:focus-visible {
+        outline: 3px solid var(--bw-focus);
+        outline-offset: -3px;
+      }
+    }
+
+    &[open] summary {
+      border-bottom: 1px solid var(--bw-rule);
+    }
+
+    .editor {
+      min-height: 160px;
+      padding: 10px 12px;
+      color: var(--bw-ink);
+    }
+
+    .editor-edit {
+      display: inline-grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      color: var(--bw-ink);
+
+      &:focus-visible {
+        outline: 3px solid var(--bw-focus);
+        outline-offset: 1px;
+      }
+    }
+  }
+
+  .clock-sheet__description-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--bw-rule);
+
+    input {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--bw-accent);
+
+      &:focus-visible {
+        outline: 3px solid var(--bw-focus);
+        outline-offset: 2px;
+      }
+    }
+  }
+
+  .clock-sheet__public-description {
+    padding: 12px;
+    color: var(--bw-ink);
+    line-height: 1.45;
+  }
+
+  .clock-sheet.locked {
+    .clock-sheet__name,
+    .clock-sheet__progress,
+    .clock-sheet__public-description {
+      color: var(--bw-ink);
+    }
+
+    .clock-sheet__gm-note .editor-edit {
+      display: none;
+    }
+  }
+
+  @container (max-width: 330px) {
+    .clock-sheet__header {
+      grid-template-columns: 1fr;
+      align-items: stretch;
+    }
+
+    .clock-sheet__type-control select {
+      width: 100%;
+    }
   }
 }

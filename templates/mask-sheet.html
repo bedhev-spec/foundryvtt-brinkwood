@@ -1,131 +1,106 @@
-<form class="{{cssClass}} actor-sheet" autocomplete="off">
+<form class="{{cssClass}} actor-sheet mask-sheet" autocomplete="off">
+  <header class="mask-sheet__header">
+  <img class="mask-sheet__portrait" src="{{img}}" title="{{name}}" alt="{{name}}"{{#if editable}} data-action="editImage" data-edit="img" role="button" tabindex="0" aria-label="{{localize 'BITD.Name'}}: {{name}}"{{/if}}>
 
-  <section id="mask-{{_id}}-name-alias" class="flex-horizontal name-alias">
+    <section class="mask-sheet__identity" aria-label="{{localize 'BITD.Mask'}}">
+      <label for="mask-{{_id}}-name">{{localize "BITD.Name"}}</label>
+      <input type="text" id="mask-{{_id}}-name" class="name" name="name" value="{{name}}">
 
-    <div class="grow-two">
-    <img src="{{img}}" data-edit="img" title="{{name}}" class="portrait" />
-    </div>
-
-    <div class="grow-two">
-      <div id="mask-{{_id}}-name-box">
-        <label for="mask-{{_id}}-name">{{localize "BITD.Name"}}</label>
-        <input type="text" id="mask-{{_id}}-name" class="name" name="name" value="{{name}}">
-      </div>
-
-      <div id="mask-{{_id}}-traits" class="flex-column">
-
-        <div class="item-block flex-horizontal">
-         <div class="item-class-label"><a class="item-add-popup" data-distinct="true" data-item-type="mask">{{localize "BITD.Mask"}}</a></div>
-          {{#each items as |item id|}}
-            {{#if (eq item.type "mask")}}
-              <div class="item flex-horizontal" data-item-id="{{item._id}}">
-                <div class="item-body flex-horizontal">
-                  <div class="item-name">{{item.name}}</div>
-                </div>
-                <a class="item-control item-delete" title="{{localize 'BITD.TitleDeleteItem'}}"><i class="fas fa-trash"></i></a>
-              </div>
-              {{/if}}
+      <div class="mask-sheet__item-block">
+        <div class="mask-sheet__item-heading">
+          <span>{{localize "BITD.Mask"}}</span>
+          {{#if editable}}
+          <button type="button" class="item-add-popup" data-distinct="true" data-item-type="mask">{{localize "Add"}}</button>
+          {{/if}}
+        </div>
+        <div id="mask-{{_id}}-items" class="mask-sheet__item-list">
+          {{#each items as |item|}}
+          {{#if (eq item.type "mask")}}
+          <article class="item mask-sheet__item" data-item-id="{{item._id}}">
+            <button type="button" class="item-body mask-sheet__item-open" aria-label="{{item.name}}">{{item.name}}</button>
+            {{#if ../editable}}
+            <button type="button" class="item-control item-delete" title="{{localize 'BITD.TitleDeleteItem'}}" aria-label="{{localize 'BITD.TitleDeleteItem'}}"><i class="fas fa-trash" aria-hidden="true"></i></button>
+            {{/if}}
+          </article>
+          {{/if}}
           {{/each}}
         </div>
-    </div>
+      </div>
+    </section>
 
-    <div class="grow-two">
-      {{!-- XP --}}
-      <div class="section big-teeth-section">
-				<div id="mask-{{_id}}-xp" class="big-teeth character-xp tooltip" data-tooltip="{{system.xp_tooltip}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
-          <label class="black-label" for="mask-{{_id}}-xp-0">{{localize system.experience.name}}</label>
-          {{#with system as | system | }}
+    <section class="mask-sheet__trackers" aria-label="{{localize 'BITD.Experience'}}">
+      <div class="mask-tracker tooltip" data-tooltip="{{system.xp_tooltip}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
+        <div class="mask-tracker__heading">
+          <span>{{localize system.experience.name}}</span>
+          <output>{{system.experience.value}} / {{system.experience.max}}</output>
+        </div>
+        <div class="mask-tracker__dots" role="group" aria-label="{{localize system.experience.name}}">
           {{#times_from_1 system.experience.max}}
-            <span class="dot-value" data-path="experience.value" data-max_value="{{system.experience.max}}" data-value="{{this}}">
-              {{#if (lt system.experience.value this)}}
-                <img class="big-teeth" src="systems/brinkwood/styles/assets/teeth/stresstooth-halfgrey.png">
-              {{else}}
-                <img class="big-teeth" src="systems/brinkwood/styles/assets/teeth/stresstooth-blue.png">
-              {{/if}}
-            </span>
+          <button type="button" class="dot-value" data-path="experience.value" data-max_value="{{../system.experience.max}}" data-value="{{this}}" aria-label="{{localize ../system.experience.name}} {{this}} of {{../system.experience.max}}"{{#unless ../editable}} disabled{{/unless}}>
+            {{#if (lt ../system.experience.value this)}}<img src="systems/brinkwood/styles/assets/teeth/stresstooth-halfgrey.png" alt="">{{else}}<img src="systems/brinkwood/styles/assets/teeth/stresstooth-blue.png" alt="">{{/if}}
+          </button>
           {{/times_from_1}}
-          {{/with}}
         </div>
       </div>
- 
-      {{!-- Stress --}}
-      <div id="mask-{{_id}}-stress-trauma" class="section big-teeth-section tooltip" data-tooltip="Mask.Essence.Tooltip" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
-        <div id="mask-{{_id}}-stress" class="big-teeth character-stress">
-					<label class="black-label roll-die-attribute rollable-text" data-roll-attribute-label="Mask.Essence.Name" data-roll-value="{{system.oath}}" for="mask-{{_id}}-stress-0">{{localize "Mask.Essence.Name"}}</label>
-          {{#with system as | system | }}
+
+      <div class="mask-tracker tooltip" data-tooltip="Mask.Essence.Tooltip" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
+        <div class="mask-tracker__heading">
+          <button type="button" class="roll-die-attribute rollable-text" data-roll-attribute-label="Mask.Essence.Name" data-roll-value="{{system.oath}}">{{localize "Mask.Essence.Name"}}</button>
+          <output>{{system.essence.value}} / {{system.essence.max}}</output>
+        </div>
+        <div class="mask-tracker__dots" role="group" aria-label="{{localize 'Mask.Essence.Name'}}">
           {{#times_from_1 system.essence.max}}
-            <span class="dot-value" data-path="essence.value" data-max_value="{{system.essence.max}}" data-value="{{this}}">
-              {{#if (lt system.essence.value this)}}
-	        <img class="big-teeth" src="systems/brinkwood/styles/assets/teeth/stresstooth-halfgrey.png">
-              {{else}}
-                <img class="big-teeth" src="systems/brinkwood/styles/assets/teeth/stresstooth-red.png">
-              {{/if}}
-            </span>
+          <button type="button" class="dot-value" data-path="essence.value" data-max_value="{{../system.essence.max}}" data-value="{{this}}" aria-label="{{localize 'Mask.Essence.Name'}} {{this}} of {{../system.essence.max}}"{{#unless ../editable}} disabled{{/unless}}>
+            {{#if (lt ../system.essence.value this)}}<img src="systems/brinkwood/styles/assets/teeth/stresstooth-halfgrey.png" alt="">{{else}}<img src="systems/brinkwood/styles/assets/teeth/stresstooth-red.png" alt="">{{/if}}
+          </button>
           {{/times_from_1}}
-          {{/with}}
         </div>
       </div>
-    </div>
+    </section>
+  </header>
 
-
-  </section>
-
-  {{!-- Attributes --}}
-  <section class="flex-horizontal">
-
-    <div class="tab-content flex-vertical grow-two">
-
-      {{!-- Nav menu --}}
-      <nav class="tabs flex-horizontal" data-group="primary">
-        <a class="item {{#if (eq tabs.primary "traits")}}active{{/if}}" data-action="tab" data-group="primary" data-tab="traits">{{localize "BITD.Traits"}}</a>
-        <a class="item {{#if (eq tabs.primary "mask-notes")}}active{{/if}}" data-action="tab" data-group="primary" data-tab="mask-notes">{{localize "BITD.Notes"}}</a>
+  <div class="mask-sheet__layout">
+    <section class="mask-sheet__main">
+      <nav class="tabs mask-sheet__tabs" aria-label="{{localize 'BITD.Mask'}}" data-group="primary" role="tablist">
+    <button type="button" id="mask-{{_id}}-tab-traits" class="item {{#if (eq tabs.primary "traits")}}active{{/if}}" data-action="tab" data-group="primary" data-tab="traits" role="tab" tabindex="{{#if (eq tabs.primary "traits")}}0{{else}}-1{{/if}}" aria-controls="mask-{{_id}}-panel-traits" aria-selected="{{#if (eq tabs.primary "traits")}}true{{else}}false{{/if}}">{{localize "BITD.Traits"}}</button>
+    <button type="button" id="mask-{{_id}}-tab-notes" class="item {{#if (eq tabs.primary "mask-notes")}}active{{/if}}" data-action="tab" data-group="primary" data-tab="mask-notes" role="tab" tabindex="{{#if (eq tabs.primary "mask-notes")}}0{{else}}-1{{/if}}" aria-controls="mask-{{_id}}-panel-notes" aria-selected="{{#if (eq tabs.primary "mask-notes")}}true{{else}}false{{/if}}">{{localize "BITD.Notes"}}</button>
         {{#if isGM}}
-        <a class="item {{#if (eq tabs.primary "effects")}}active{{/if}}" data-action="tab" data-group="primary" data-tab="effects">{{localize "BITD.Effects"}}</a>
+      <button type="button" id="mask-{{_id}}-tab-effects" class="item {{#if (eq tabs.primary "effects")}}active{{/if}}" data-action="tab" data-group="primary" data-tab="effects" role="tab" tabindex="{{#if (eq tabs.primary "effects")}}0{{else}}-1{{/if}}" aria-controls="mask-{{_id}}-panel-effects" aria-selected="{{#if (eq tabs.primary "effects")}}true{{else}}false{{/if}}">{{localize "BITD.Effects"}}</button>
         {{/if}}
       </nav>
 
-      <div id="mask-{{_id}}-traits" class="tab flex-vertical traits {{#if (eq tabs.primary "traits")}}active{{/if}}" data-group="primary" data-tab="traits">
-        <div class="label-stripe">
-          <p><label for="mask-{{_id}}-experience-0">{{localize "BITD.Traits"}}</label></p>
-        </div>
-
-        <div id="mask-{{_id}}-traits-list">
-          {{#each traits as |trait id|}}
-            <div class="item flex-horizontal">
-              <div class="item-select" data-item-id="{{trait._id}}" data-item-list="traits">
- 	      <div class="item-name">
-		<h3>
-		  <input type="checkbox" id="item-{{trait._id}}-purchased" class="dot" data-item-id="{{trait._id}}" {{#if trait.system.purchased }}checked{{/if}}>
-                  {{trait.name}}
-		</h3>
-	      </div>
-                <div class="flex-horizontal trait">
-                  <div class="item-description">{{{trait.system.description}}}</div>
-                </div>
-              </div>
+      <section id="mask-{{_id}}-panel-traits" class="tab mask-sheet__panel {{#if (eq tabs.primary "traits")}}active{{/if}}" data-group="primary" data-tab="traits" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-traits">
+        <h2>{{localize "BITD.Traits"}}</h2>
+        <div class="mask-sheet__traits">
+          {{#each traits as |trait|}}
+          <article class="item mask-trait-card" data-item-id="{{trait._id}}">
+            <div class="item-select mask-trait-card__select" data-item-id="{{trait._id}}" data-item-list="traits">
+              <label class="mask-trait-card__title" for="mask-{{../_id}}-trait-{{trait._id}}">
+                <input type="checkbox" id="mask-{{../_id}}-trait-{{trait._id}}" class="dot" data-item-id="{{trait._id}}" {{#if trait.system.purchased}}checked{{/if}}{{#unless ../editable}} disabled{{/unless}}>
+                <span>{{trait.name}}</span>
+              </label>
+              <div class="mask-trait-card__description">{{{trait.system.description}}}</div>
             </div>
+          </article>
+          {{else}}
+          <p class="mask-sheet__empty">{{localize "BITD.Traits"}}</p>
           {{/each}}
         </div>
+      </section>
 
-      </div>
+      <section id="mask-{{_id}}-panel-notes" class="tab mask-sheet__panel {{#if (eq tabs.primary "mask-notes")}}active{{/if}}" data-group="primary" data-tab="mask-notes" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-notes">
+        <h2>{{localize "BITD.Notes"}}</h2>
+        {{editor content=system.description target="system.description" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
+      </section>
 
-      <div class="tab flex-vertical {{#if (eq tabs.primary "mask-notes")}}active{{/if}}" data-group="primary" data-tab="mask-notes">
-        <div class="label-stripe">
-          <p>{{localize "BITD.Notes"}}</p>
-        </div>
-				{{editor system.description target="system.description" button=true editable=true documents=true engine="prosemirror" collaborate=true}}
-      </div>
-
-      {{!-- Active Effects --}}
-      <div id="mask-{{_id}}-effects" class="tab effects flex-vertical {{#if (eq tabs.primary "effects")}}active{{/if}}" data-group="primary" data-tab="effects">
-        <div class="label-stripe">
-          <p>{{localize "BITD.Effects"}}</p>
-        </div>
+      {{#if isGM}}
+      <section id="mask-{{_id}}-panel-effects" class="tab mask-sheet__panel effects {{#if (eq tabs.primary "effects")}}active{{/if}}" data-group="primary" data-tab="effects" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-effects">
+        <h2>{{localize "BITD.Effects"}}</h2>
         {{> "systems/brinkwood/templates/parts/active-effects.html"}}
-      </div>
+      </section>
+      {{/if}}
+    </section>
 
-    </div>
-    {{!-- Attributes --}}
     {{> "systems/brinkwood/templates/parts/mask-attributes.html"}}
-  </section>
+  </div>
 </form>

@@ -1,16 +1,43 @@
-<form class="{{cssClass}} clock-block" autocomplete="off">
-
-    <div class="flexcol blades-clock-name-type">
-        {{#if editable}}
-        <input type="text" id="{{id}}-clock-name" name="name" value="{{name}}">
-
-        <select data-type="String" name="system.type">
-            {{selectOptions clockSizes selected=system.type}}
-        </select>
-        {{/if}}
-
-        <div class="clocks clocks-{{system.type}}">
-            {{{blades-clock "system.value" system.type system.value _id}}}
-        </div>
+<form class="{{cssClass}} clock-sheet" autocomplete="off">
+  <header class="clock-sheet__header">
+    <div class="clock-sheet__identity">
+      {{#if editable}}
+      <label class="clock-sheet__label" for="clock-{{_id}}-name">{{localize "BITD.Name"}}</label>
+      <input class="clock-sheet__name-input" type="text" id="clock-{{_id}}-name" name="name" value="{{name}}">
+      {{else}}
+      <h1 class="clock-sheet__name" id="clock-{{_id}}-name">{{name}}</h1>
+      {{/if}}
+      <p class="clock-sheet__progress" aria-live="polite">{{system.value}} / {{system.type}}</p>
     </div>
+
+    {{#if editable}}
+    <div class="clock-sheet__type-control">
+      <label class="clock-sheet__label" for="clock-{{_id}}-type">{{localize "Clock.Type"}}</label>
+      <select id="clock-{{_id}}-type" data-dtype="Number" name="system.type">
+        {{selectOptions clockSizes selected=system.type}}
+      </select>
+    </div>
+    {{/if}}
+  </header>
+
+  <section class="clock-sheet__clock" aria-label="{{name}}: {{system.value}} / {{system.type}}">
+    <div class="clocks clocks-{{system.type}}">
+      {{{blades-clock "system.value" system.type system.value _id (localize "Clock.Progress")}}}
+    </div>
+  </section>
+
+  {{#if isGM}}
+  <details class="clock-sheet__gm-note">
+    <summary>{{localize "Clock.GMDescription"}}</summary>
+    <div class="clock-sheet__description-control">
+      <label class="clock-sheet__label" for="clock-{{_id}}-show-description">{{localize "Clock.ShowDescription"}}</label>
+      <input type="checkbox" id="clock-{{_id}}-show-description" name="system.show_description" {{checked system.show_description}}{{#unless editable}} disabled{{/unless}}>
+    </div>
+    {{editor content=system.description target="system.description" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
+  </details>
+  {{else if system.show_description}}
+  <section class="clock-sheet__public-description" aria-label="{{localize "BITD.Description"}}">
+    {{{system.description}}}
+  </section>
+  {{/if}}
 </form>

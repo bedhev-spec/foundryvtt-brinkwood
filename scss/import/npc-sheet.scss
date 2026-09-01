@@ -1,0 +1,185 @@
+/* Compact NPC dossier. Imported under .brinkwood.actor.npc. */
+& {
+  min-width: 320px;
+  color: var(--bw-ink);
+
+  .window-content {
+    padding: 0;
+    background: var(--bw-paper);
+  }
+
+  .npc-dossier {
+    display: grid;
+    gap: 16px;
+    box-sizing: border-box;
+    min-height: 0;
+    padding: 16px;
+    background: var(--bw-paper);
+    container-type: inline-size;
+  }
+
+  .npc-dossier__header {
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr);
+    gap: 16px;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid var(--bw-rule);
+    border-radius: 8px;
+    background: var(--bw-paper-deep);
+  }
+
+  .npc-dossier__portrait {
+    display: block;
+    width: 112px;
+    height: 112px;
+    border: 1px solid var(--bw-rule);
+    border-radius: 6px;
+    object-fit: cover;
+
+    &[data-action="editImage"] {
+      cursor: pointer;
+
+      &:hover,
+      &:focus-visible {
+        outline: 3px solid var(--bw-focus);
+        outline-offset: 2px;
+      }
+    }
+  }
+
+  .npc-dossier__identity,
+  .npc-dossier__profile-fields,
+  .npc-dossier__editors {
+    display: grid;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .npc-dossier__field {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+
+    label,
+    h2 {
+      color: var(--bw-ink-soft);
+      font-size: 0.9rem;
+      font-weight: 700;
+      line-height: 1.15;
+    }
+
+    input {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 38px;
+      padding: 6px 8px;
+      border: 1px solid var(--bw-rule);
+      border-radius: 4px;
+      background: var(--bw-inverse);
+      color: var(--bw-ink);
+      font: inherit;
+
+      &:focus-visible {
+        outline: 3px solid var(--bw-focus);
+        outline-offset: 1px;
+      }
+
+      &:disabled {
+        border-color: transparent;
+        background: transparent;
+        color: var(--bw-ink);
+        cursor: default;
+        opacity: 1;
+      }
+    }
+  }
+
+  .npc-dossier__identity input[name="name"] {
+    min-height: 46px;
+    font-family: "Crimson Text", serif;
+    font-size: 1.65rem;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  .npc-dossier__profile {
+    padding: 12px;
+    border: 1px solid var(--bw-rule);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.28);
+
+    h2 {
+      margin: 0 0 10px;
+      color: var(--bw-ink);
+      font-family: "Crimson Text", serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+  }
+
+  .npc-dossier__profile-fields {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .npc-dossier__editors {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .npc-dossier__editor-panel {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--bw-rule);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.28);
+
+    > h2 {
+      margin: 0;
+      padding: 10px 12px;
+      background: var(--bw-paper-deep);
+      color: var(--bw-ink);
+      font-family: "Crimson Text", serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .editor {
+      min-height: 210px;
+      padding: 10px 12px;
+      color: var(--bw-ink);
+    }
+
+    .editor-edit {
+      display: inline-grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      color: var(--bw-ink);
+
+      &:focus-visible {
+        outline: 3px solid var(--bw-focus);
+        outline-offset: 1px;
+      }
+    }
+  }
+
+  @container (max-width: 620px) {
+    .npc-dossier__profile-fields,
+    .npc-dossier__editors {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @container (max-width: 430px) {
+    .npc-dossier__header {
+      grid-template-columns: 1fr;
+    }
+
+    .npc-dossier__portrait {
+      width: 96px;
+      height: 96px;
+    }
+  }
+}

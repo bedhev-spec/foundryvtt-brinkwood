@@ -229,6 +229,11 @@
     background-color: var(--bw-paper);
     background-size: cover;
 
+    &:has(input[value="0"]:focus-visible) {
+      outline: 3px solid var(--bw-focus);
+      outline-offset: 3px;
+    }
+
     label {
       overflow: hidden;
       position: absolute;
@@ -242,9 +247,16 @@
       @include changeable(0.1s, 0.8, 0.9);
     }
 
-    input {
-      position: absolute;
-      display: none;
+      input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+
+        &:focus-visible + label {
+          outline: 3px solid var(--bw-focus);
+          outline-offset: -3px;
+        }
 
       &:checked {
         & ~ label {
@@ -261,9 +273,10 @@
     }
 
     // Zero value to clear everything.
-    input[value="0"] {
-      display: none;
-    }
+      input[value="0"] {
+        width: 1px;
+        height: 1px;
+      }
 
     @for $i from 1 through $segments {
 
