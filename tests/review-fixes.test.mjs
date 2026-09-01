@@ -114,7 +114,13 @@ test("character clocks can return from one segment to empty", async () => {
 });
 
 test("clock-sheet segments fill and empty contiguous clock progress", async () => {
-  const { clockValueAfterClick } = await import("../module/clock-utils.js");
+  const {
+    clockImagePath,
+    clockValueAfterClick,
+    normalizeClockLabel,
+    normalizeClockState,
+    preloadClockImages
+  } = await import("../module/clock-utils.js");
   const source = await read("module/blades-clock-sheet.js");
 
   assert.equal(clockValueAfterClick(3, 1, 4), 3);
@@ -123,17 +129,77 @@ test("clock-sheet segments fill and empty contiguous clock progress", async () =
   assert.equal(clockValueAfterClick(2, 4, 4), 1);
   assert.match(source, /input\[name="system\.value"\]/);
   assert.match(source, /addEventListener\("click", this\._onClockSegmentClick\.bind\(this\)/);
+
+  assert.equal(normalizeClockLabel({ hash: {} }), "");
+  assert.equal(normalizeClockLabel("oath"), "oath");
+  assert.deepEqual(normalizeClockState("4", 8), { type: "4", value: 4 });
+  assert.deepEqual(normalizeClockState("8", -1), { type: "8", value: 0 });
+  assert.match(source, /submitData\["prototypeToken\.texture\.src"\] = image_path/);
+  for (const type of [4, 6, 8]) {
+    for (let value = 0; value <= type; value += 1) {
+      const path = clockImagePath(type, value);
+      assert.equal(path, `systems/brinkwood/styles/assets/progressclocks-svg/Progress Clock ${type}-${value}.svg`);
+      const svg = await read(path.replace("systems/brinkwood/", ""));
+      if (value === type) assert.match(svg, /stroke="#EEEAE0"/);
+    }
+  }
+
+  const loaded = [];
+  globalThis.Image = class {
+    set src(value) {
+      loaded.push(value);
+      queueMicrotask(() => this.onload());
+    }
+  };
+  await preloadClockImages(4);
+  delete globalThis.Image;
+  assert.equal(loaded.length, 5);
+  assert.equal(loaded.at(0), clockImagePath(4, 0));
+  assert.equal(loaded.at(-1), clockImagePath(4, 4));
 });
 
 test("item-picker interpolations are escaped before entering HTML", async () => {
   const source = await read("module/blades-sheet.js");
   const { escapeHTML } = await import("../module/html-utils.js");
+  const { renderItemTooltip } = await import("../module/item-tooltip.js");
   const payload = `&<>"'`;
 
   assert.equal(escapeHTML(payload), "&amp;&lt;&gt;&quot;&#39;");
   assert.match(source, /const itemId = escapeHTML\(e\._id\)/);
   assert.match(source, /const itemName = escapeHTML\(game\.i18n\.localize\(e\.name\)\)/);
   assert.match(source, /const itemDetails = escapeHTML\(addition_price_load\)/);
+  assert.match(source, /data-tooltip-html="\$\{itemTooltip\}"/);
+  assert.match(source, /data-tooltip-class="brinkwood-item-tooltip-shell"/);
+  assert.match(source, /tabindex="0" aria-label="\$\{itemTooltipLabel\}"/);
+
+  const tooltip = renderItemTooltip({
+    name: "Shortbow",
+    system: {
+      load: 3,
+      uses: 0,
+      num_available: 1,
+      class: "Ranger",
+      additional_info: '<script>alert("no")</script>'
+    }
+  });
+  assert.match(tooltip, /Shortbow/);
+  assert.match(tooltip, /BITD\.Load/);
+  assert.match(tooltip, /<strong>3<\/strong>/);
+  assert.doesNotMatch(tooltip, /<script>/);
+});
+
+test("loadout item sheet uses compact semantic sections", async () => {
+  const [template, styles] = await Promise.all([
+    read("templates/items/item.html"),
+    read("scss/import/item-sheet.scss")
+  ]);
+
+  assert.match(template, /class="\{\{cssClass\}\} loadout-item-sheet"/);
+  assert.match(template, /data-action="editImage" data-edit="img"/);
+  assert.match(template, /loadout-item-sheet__grid/);
+  assert.match(template, /type="number" min="0" step="1" name="system\.load"/);
+  assert.match(styles, /grid-template-columns: 104px minmax\(0, 1fr\)/);
+  assert.match(styles, /background: var\(--bw-ink\)/);
 });
 
 test("legacy migration preserves effects and updates embedded items in place", async () => {
