@@ -7,11 +7,10 @@ import { BladesSheet } from "./blades-sheet.js";
 export class BladesNPCSheet extends BladesSheet {
 
   static DEFAULT_OPTIONS = {
-    classes: ["brinkwood", "sheet", "actor"],
+    classes: ["brinkwood", "sheet", "actor", "npc"],
     position: { width: 900 },
     form: { submitOnChange: true },
     window: { resizable: true },
-    tabs: [{ navSelector: ".tabs", contentSelector: ".tab-content" }],
   };
 
   static PARTS = {
@@ -28,18 +27,11 @@ export class BladesNPCSheet extends BladesSheet {
       context.system.description,
       { async: true, relativeTo: this.document, secrets: this.document.isOwner }
     );
+    context.system.notes = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+      context.system.notes,
+      { async: true, relativeTo: this.document, secrets: this.document.isOwner }
+    );
 
     return context;
   }
-
-  /* -------------------------------------------- */
-
-  /** @override */
-  _onRender(context, options) {
-    super._onRender(context, options);
-    // Editable-only listeners can be added here as needed.
-  }
-
-  /* -------------------------------------------- */
-
 }

@@ -19,7 +19,7 @@ import { BladesNPCSheet } from "./blades-npc-sheet.js";
 import { BladesMaskSheet } from "./blades-mask-sheet.js";
 import { BladesRebelionSheet } from "./blades-rebelion-sheet.js";
 import { showRollStatistics } from "./roll-statistics.js";
-import { clockImagePath, normalizeClockLabel } from "./clock-utils.js";
+import { clockImagePath, prepareClockLabel } from "./clock-utils.js";
 
 
 import * as migrations from "./migration.js";
@@ -203,8 +203,7 @@ Hooks.once("init", async function() {
 
   Handlebars.registerHelper('blades-clock', function(parameter_name, type, current_value, uniq_id, label=null) {
     let html = '';
-    const clockLabel = normalizeClockLabel(label);
-    const labelSuffix = clockLabel ? `-${clockLabel}` : '';
+    const { text: clockLabel, suffix: labelSuffix } = prepareClockLabel(label);
   
     if (current_value === null || current_value === 'null') {
       current_value = 0;
@@ -215,21 +214,22 @@ Hooks.once("init", async function() {
     }
 
     // Label for 0
-    html += `<label class="clock-zero-label" for="clock-0-${uniq_id}${labelSuffix}"><i class="fab fa-creative-commons-zero nullifier"></i>${clockLabel}</label>`;
+    html += `<label class="clock-zero-label" for="clock-0-${uniq_id}${labelSuffix}" title="${clockLabel} 0/${type}"><i class="fab fa-creative-commons-zero nullifier" aria-hidden="true"></i><span class="clock-label">${clockLabel}</span></label>`;
     html += `<div id="blades-clock-${uniq_id}${labelSuffix}" class="blades-clock clock-${type} clock-${type}-${current_value}" style="background-image:url('${clockImagePath(type, current_value)}');">`;
 
     let zero_checked = (parseInt(current_value) === 0) ? 'checked' : '';
-    html += `<input type="radio" value="0" id="clock-0-${uniq_id}${labelSuffix}" data-dType="Number" name="${parameter_name}" ${zero_checked}>`;
+    html += `<input type="radio" value="0" id="clock-0-${uniq_id}${labelSuffix}" data-dType="Number" name="${parameter_name}" aria-label="${clockLabel} 0/${type}" ${zero_checked}>`;
 
     for (let i = 1; i <= parseInt(type); i++) {
       let checked = (parseInt(current_value) === i) ? 'checked' : '';
       html += `
-        <input type="radio" value="${i}" id="clock-${i}-${uniq_id}${labelSuffix}" data-dType="Number" name="${parameter_name}" ${checked}>
-        <label for="clock-${i}-${uniq_id}${labelSuffix}"></label>
+        <input type="radio" value="${i}" id="clock-${i}-${uniq_id}${labelSuffix}" data-dType="Number" name="${parameter_name}" aria-label="${clockLabel} ${i}/${type}" ${checked}>
+        <label for="clock-${i}-${uniq_id}${labelSuffix}" title="${clockLabel} ${i}/${type}"></label>
       `;
     }
 
     html += `</div>`;
+    html += `<span class="clock-progress" aria-live="polite">${current_value}/${type}</span>`;
     return html;
   });
 });

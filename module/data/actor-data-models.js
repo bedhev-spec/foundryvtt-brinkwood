@@ -86,6 +86,7 @@ export class CharacterData extends TypeDataModel {
     return {
       alias:            new fields.StringField({ required: false, initial: "" }),
       look:             new fields.StringField({ required: false, initial: "" }),
+      description:      new fields.HTMLField({ required: false, initial: "" }),
       associates_label: new fields.StringField({ required: false, initial: "BITD.Acquaintances" }),
       stress: new fields.SchemaField({
         value:        new fields.NumberField({ required: false, nullable: false, initial: 0, integer: true }),
@@ -134,12 +135,13 @@ export class NpcData extends TypeDataModel {
   /** @override */
   static defineSchema() {
     return {
+      name:                 new fields.StringField({ required: false, initial: "" }),
       description_short:    new fields.StringField({ required: false, initial: "" }),
       description:          new fields.HTMLField({ required: false, initial: "" }),
       associated_class:     new fields.StringField({ required: false, initial: "" }),
       associated_faction:   new fields.StringField({ required: false, initial: "" }),
       associated_crew_type: new fields.StringField({ required: false, initial: "" }),
-      notes:                new fields.StringField({ required: false, initial: "" })
+      notes:                new fields.HTMLField({ required: false, initial: "" })
     };
   }
 }
@@ -162,6 +164,7 @@ export class MaskActorData extends TypeDataModel {
       // system.name is used on the Actor document (distinct from Document name)
       name:       new fields.StringField({ required: false, initial: "" }),
       type:       new fields.StringField({ required: false, initial: "" }),
+      description: new fields.HTMLField({ required: false, initial: "" }),
       essence:    trackedValueField(0, 8),
       experience: new fields.SchemaField({
         name:  new fields.StringField({ required: false, initial: "Experience" }),
@@ -185,7 +188,9 @@ export class ClockActorData extends TypeDataModel {
       name:  new fields.StringField({ required: false, initial: "" }),
       // Clock size (4, 6, 8 …); stored as a number in template.json
       type:  new fields.NumberField({ required: false, nullable: false, initial: 4, integer: true }),
-      value: new fields.NumberField({ required: false, nullable: false, initial: 0, integer: true })
+      value: new fields.NumberField({ required: false, nullable: false, initial: 0, integer: true }),
+      description: new fields.HTMLField({ required: false, initial: "" }),
+      show_description: new fields.BooleanField({ required: false, initial: false })
     };
   }
 }

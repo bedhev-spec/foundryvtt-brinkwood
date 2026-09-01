@@ -1,3 +1,5 @@
+import { escapeHTML } from "./html-utils.js";
+
 export function clockValueAfterClick(selectedValue, currentValue, maximum) {
   const selected = Number(selectedValue);
   const current = Number(currentValue);
@@ -25,6 +27,14 @@ export function normalizeClockState(type, value) {
 
 export function normalizeClockLabel(label) {
   return ["string", "number"].includes(typeof label) ? String(label) : "";
+}
+
+export function prepareClockLabel(label) {
+  const raw = normalizeClockLabel(label);
+  return {
+    text: escapeHTML(raw),
+    suffix: raw ? `-${raw.replace(/[^a-zA-Z0-9_-]/g, "-")}` : ""
+  };
 }
 
 const clockImagePreloads = new Map();

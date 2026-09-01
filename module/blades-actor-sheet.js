@@ -87,7 +87,15 @@ export class BladesActorSheet extends BladesSheet {
     html.querySelectorAll(".item-body").forEach(el =>
       el.addEventListener("click", ev => {
         const item = this.actor.items.get(ev.currentTarget.closest(".item").dataset.itemId);
-        item.sheet.render(true);
+        item.sheet.render({ force: true });
+      }, listenerOptions)
+    );
+
+    html.querySelectorAll('.item-body[role="button"]').forEach(el =>
+      el.addEventListener("keydown", event => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        event.currentTarget.click();
       }, listenerOptions)
     );
 
@@ -111,7 +119,7 @@ export class BladesActorSheet extends BladesSheet {
 
     // Active effect controls – use data-effect-action to avoid AppV2 action dispatch
     html.querySelectorAll(".effect-control").forEach(el =>
-      el.addEventListener("click", ev => BladesActiveEffect.onManageActiveEffect(ev, this.actor), listenerOptions)
+      el.addEventListener("click", ev => BladesActiveEffect.onManageActiveEffect(ev, this.actor, { gmOnly: true }), listenerOptions)
     );
   }
 

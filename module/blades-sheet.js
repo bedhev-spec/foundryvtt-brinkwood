@@ -51,18 +51,45 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
 
     const html = this.element;
     if (!this.isEditable) {
-      html.querySelectorAll('input[type="text"], textarea').forEach((control) => {
-        control.readOnly = true;
-        control.setAttribute("aria-readonly", "true");
-      });
-      html.querySelectorAll('input[type="checkbox"], select').forEach((control) => {
+      html.querySelectorAll("input, select").forEach((control) => {
         control.disabled = true;
         control.setAttribute("aria-disabled", "true");
+      });
+      html.querySelectorAll("textarea").forEach((control) => {
+        control.readOnly = true;
+        control.setAttribute("aria-readonly", "true");
       });
     }
     this._brinkwoodListenerController?.abort();
     this._brinkwoodListenerController = new AbortController();
     const listenerOptions = { signal: this._brinkwoodListenerController.signal };
+
+    html.querySelectorAll('[role="tab"][data-action="tab"]').forEach(tab =>
+      tab.addEventListener("keydown", event => {
+        const tabs = Array.from(tab.closest('[role="tablist"]')?.querySelectorAll('[role="tab"]') ?? []);
+        if (!tabs.length) return;
+        const current = tabs.indexOf(event.currentTarget);
+        const key = event.key;
+        const target = key === "Home" ? tabs[0]
+          : key === "End" ? tabs.at(-1)
+          : key === "ArrowRight" || key === "ArrowDown" ? tabs[(current + 1) % tabs.length]
+          : key === "ArrowLeft" || key === "ArrowUp" ? tabs[(current - 1 + tabs.length) % tabs.length]
+          : null;
+        if (!target) return;
+        event.preventDefault();
+        tabs.forEach(control => { control.tabIndex = control === target ? 0 : -1; });
+        target.focus();
+        target.click();
+      }, listenerOptions)
+    );
+
+    html.querySelectorAll('[data-action="editImage"][role="button"]').forEach(image =>
+      image.addEventListener("keydown", event => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        event.currentTarget.click();
+      }, listenerOptions)
+    );
 
     if (this.isEditable) {
       html.querySelectorAll(".item-add-popup").forEach(el =>
@@ -181,8 +208,9 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
     const update_type  = el.dataset.utype;
 
     if (update_value === undefined) {
-      update_value = document.getElementById(`fac-${update_type}-${item_id}`).value;
+      update_value = this.element.querySelector(`#fac-${update_type}-${item_id}`)?.value;
     }
+    if (update_value === undefined) return;
 
     let update;
     if (update_type === "status") {

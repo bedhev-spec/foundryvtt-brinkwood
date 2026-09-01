@@ -93,17 +93,20 @@ export class BladesMaskSheet extends BladesSheet {
   /** @override */
   async _onRender(context, options) {
     await super._onRender(context, options);
+    this._maskSheetListenerController?.abort();
     const html = this.element;
-
-    if (!this.isEditable) return;
+    this._maskSheetListenerController = new AbortController();
+    const listenerOptions = { signal: this._maskSheetListenerController.signal };
 
     // Open inventory item sheet
     html.querySelectorAll(".item-body").forEach(el =>
       el.addEventListener("click", ev => {
         const item = this.actor.items.get(ev.currentTarget.closest(".item").dataset.itemId);
-        item.sheet.render(true);
-      })
+        item?.sheet.render({ force: true });
+      }, listenerOptions)
     );
+
+    if (!this.isEditable) return;
 
     // Delete inventory item
     html.querySelectorAll(".item-delete").forEach(el =>
@@ -111,17 +114,17 @@ export class BladesMaskSheet extends BladesSheet {
         const element = ev.currentTarget.closest(".item");
         await this.actor.deleteEmbeddedDocuments("Item", [element.dataset.itemId]);
         element.remove();
-      })
+      }, listenerOptions)
     );
 
     // Dot rating controls
     html.querySelectorAll(".dot-value").forEach(el =>
-      el.addEventListener("click", this._onDotChange.bind(this))
+      el.addEventListener("click", this._onDotChange.bind(this), listenerOptions)
     );
 
     // Active effect controls
     html.querySelectorAll(".effect-control").forEach(el =>
-      el.addEventListener("click", ev => BladesActiveEffect.onManageActiveEffect(ev, this.actor))
+      el.addEventListener("click", ev => BladesActiveEffect.onManageActiveEffect(ev, this.actor, { gmOnly: true }), listenerOptions)
     );
   }
 
@@ -129,38 +132,19 @@ export class BladesMaskSheet extends BladesSheet {
 
   async _onDotChange(event) {
     event.preventDefault();
+    if (!this.isEditable) return;
     const element   = event.currentTarget;
     const dataset   = element.dataset;
 
     let new_value   = parseInt(dataset.value);
     const max_value = parseInt(dataset.max_value);
-    const actor_data = foundry.utils.deepClone(this.actor.toObject());
-    const old_value = this._dig(actor_data.system, dataset.path);
+    if (!dataset.path) return;
+    const old_value = foundry.utils.getProperty(this.actor.system, dataset.path);
 
     if (new_value === old_value && new_value === 1) new_value = 0;
     if (new_value > max_value) new_value = max_value;
 
-    this._setDeep(actor_data.system, dataset.path, new_value);
-    await this.actor.update(actor_data);
+    await this.actor.update({ [`system.${dataset.path}`]: new_value });
   }
-
-  /* -------------------------------------------- */
-
-  _dig(from, selector) {
-    return selector
-      .split(".")
-      .filter(t => t !== "")
-      .reduce((prev, cur) => prev && prev[cur], from);
-  }
-
-  _setDeep(from, selector, value) {
-    const path = selector.split(".").filter(t => t !== "");
-    path.reduce((prev, cur, idx) => {
-      if (idx === path.length - 1) prev[cur] = value;
-      return prev && prev[cur];
-    }, from);
-  }
-
-  /* -------------------------------------------- */
 
 }

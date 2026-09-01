@@ -74,11 +74,40 @@ const schemaDefaults = Model => Object.fromEntries(
 
 test("typed actor models retain template defaults for new actors", async () => {
   const template = JSON.parse(await read("template.json"));
-  const { CharacterData, MaskActorData, RebelionData } = await import("../module/data/actor-data-models.js");
+  const { CharacterData, ClockActorData, MaskActorData, NpcData, RebelionData } = await import("../module/data/actor-data-models.js");
 
   assert.deepEqual(schemaDefaults(CharacterData), template.Actor.character);
   assert.deepEqual(schemaDefaults(MaskActorData), template.Actor.mask);
+  assert.deepEqual(schemaDefaults(NpcData), template.Actor.npc);
+  assert.deepEqual(schemaDefaults(ClockActorData), template.Actor["🕛 clock"]);
   assert.deepEqual(schemaDefaults(RebelionData), template.Actor.rebelion);
+});
+
+test("typed Item defaults retain their declared template values", async () => {
+  const template = JSON.parse(await read("template.json"));
+  const { ClassData, ItemData, TraitData } = await import("../module/data/item-data-models.js");
+  const item = template.Item.item;
+  const trait = template.Item.trait;
+  const defaultTemplate = template.Item.templates.default;
+  const classTemplate = template.Item.class;
+
+  const itemDefaults = schemaDefaults(ItemData);
+  assert.equal(itemDefaults.description, defaultTemplate.description);
+  for (const key of ["class", "load", "uses", "additional_info", "equipped", "num_available"]) {
+    assert.deepEqual(itemDefaults[key], item[key]);
+  }
+
+  const traitDefaults = schemaDefaults(TraitData);
+  assert.equal(traitDefaults.description, defaultTemplate.description);
+  for (const key of ["class", "price", "purchased", "class_default"]) {
+    assert.deepEqual(traitDefaults[key], trait[key]);
+  }
+
+  const classDefaults = schemaDefaults(ClassData);
+  assert.equal(classDefaults.description, defaultTemplate.description);
+  assert.deepEqual(classDefaults.experience_clues, classTemplate.experience_clues);
+  assert.ok(ClassData.defineSchema().experience_clues instanceof ArrayField);
+  assert.ok(ClassData.defineSchema().experience_clues.element instanceof DataField);
 });
 
 test("associates render through the simple item-sheet part", async () => {

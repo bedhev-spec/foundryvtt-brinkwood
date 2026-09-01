@@ -4,6 +4,7 @@
   "character": {
     "alias": "",
     "look": "",
+    "description": "",
     "associates_label": "BITD.Acquaintances",
     "stress": {
       "value": 0,
@@ -95,10 +96,11 @@
         }
     }
   },
-  "mask": {
-    "name": "",
-    "type": "",
-    "essence": {
+    "mask": {
+      "name": "",
+      "type": "",
+      "description": "",
+      "essence": {
       "value": 0,
       "max": 8
     },
@@ -225,7 +227,9 @@
   "\uD83D\uDD5B clock": {
     "name": "",
     "type": 4,
-    "value": 0
+    "value": 0,
+    "description": "",
+    "show_description": false
   },
   "npc": {
     "name": "",
@@ -495,4 +499,3 @@
 
 	}
 }
-

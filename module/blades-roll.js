@@ -221,8 +221,8 @@ export function getBladesRollEssence(rolls, zeromode = false) {
  */
 export async function simpleRollPopup() {
 
-  new foundry.appv1.api.Dialog({
-    title: `Simple Roll`,
+  const values = await foundry.applications.api.DialogV2.wait({
+    window: { title: "Simple Roll" },
     content: `
       <h2>${game.i18n.localize("BITD.RollSomeDice")}</h2>
       <p>${game.i18n.localize("BITD.RollTokenDescription")}</p>
@@ -233,27 +233,34 @@ export async function simpleRollPopup() {
             ${Array(11).fill().map((item, i) => `<option value="${i}">${i}d</option>`).join('')}
           </select>
         </div>
-        <div className="form-group">
+        <div class="form-group">
           <label>${game.i18n.localize('BITD.Notes')}:</label>
           <input id="note" name="note" type="text" value="">
         </div><br/>
       </form>
     `,
-    buttons: {
-      yes: {
+    buttons: [{
+      action: "roll",
         icon: "<i class='fas fa-check'></i>",
         label: `Roll`,
-        callback: async (html) => {
-          let diceQty = html.find('[name="qty"]')[0].value;
-          let note = html.find('[name="note"]')[0].value;
-          await bladesRoll(diceQty,"","","",note);
+        default: true,
+        callback: (_event, button, dialog) => {
+          const form = button.form ?? dialog.element.querySelector("form");
+          return {
+            diceQty: Number(form?.elements.qty?.value ?? 0),
+            note: form?.elements.note?.value ?? "",
+          };
         },
       },
-      no: {
+      {
+        action: "cancel",
         icon: "<i class='fas fa-times'></i>",
         label: game.i18n.localize('Cancel'),
       },
-    },
-    default: "yes"
-  }).render(true);
+    ],
+    rejectClose: false,
+  });
+
+  if (!values) return;
+  await bladesRoll(values.diceQty, "", "", "", values.note);
 }

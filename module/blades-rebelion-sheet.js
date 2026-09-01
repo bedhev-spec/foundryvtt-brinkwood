@@ -24,7 +24,8 @@ export class BladesRebelionSheet extends BladesSheet {
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
 
-    const decision_list = await game.packs.get("brinkwood.moot-decisions").getDocuments();
+    const decisionPack = game.packs.get("brinkwood.moot-decisions");
+    const decision_list = decisionPack ? await decisionPack.getDocuments() : [];
     context.system.aspects.forEach(a => {
       // Bug fix: use proper comparator instead of invalid .sort(d => d.rank)
       a.moot_decisions = decision_list
@@ -40,12 +41,15 @@ export class BladesRebelionSheet extends BladesSheet {
   /** @override */
   async _onRender(context, options) {
     await super._onRender(context, options);
+    this._rebelionSheetListenerController?.abort();
     const html = this.element;
 
     if (!this.isEditable) return;
+    this._rebelionSheetListenerController = new AbortController();
+    const listenerOptions = { signal: this._rebelionSheetListenerController.signal };
 
     html.querySelectorAll(".dot-value").forEach(el =>
-      el.addEventListener("click", this._onDotChange.bind(this))
+      el.addEventListener("click", this._onDotChange.bind(this), listenerOptions)
     );
   }
 
@@ -53,19 +57,20 @@ export class BladesRebelionSheet extends BladesSheet {
 
   async _onDotChange(event) {
     event.preventDefault();
+    if (!this.isEditable) return;
     const element   = event.currentTarget;
     const dataset   = element.dataset;
 
-    const actor_data = foundry.utils.deepClone(this.actor.toObject());
+    if (!dataset.path) return;
     let new_value    = parseInt(dataset.value);
     const max_value  = parseInt(dataset.max_value);
-    const old_value  = foundry.utils.getProperty(actor_data, dataset.path);
+    const path = dataset.path.startsWith("system.") ? dataset.path : `system.${dataset.path}`;
+    const old_value  = foundry.utils.getProperty(this.actor, path);
 
     if (new_value === old_value && new_value === 1) new_value = 0;
     if (new_value > max_value) new_value = max_value;
 
-    foundry.utils.setProperty(actor_data, dataset.path, new_value);
-    await this.actor.update(actor_data);
+    await this.actor.update({ [path]: new_value });
   }
 
   /* -------------------------------------------- */

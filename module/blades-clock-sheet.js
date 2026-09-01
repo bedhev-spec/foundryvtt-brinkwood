@@ -15,7 +15,7 @@ export class BladesClockSheet extends BladesSheet {
 
   static DEFAULT_OPTIONS = {
     classes: ["brinkwood", "sheet", "actor", "clock"],
-    position: { width: 700, height: 970 },
+    position: { width: 350, height: "auto" },
     form: { submitOnChange: true },
   };
 
@@ -30,6 +30,10 @@ export class BladesClockSheet extends BladesSheet {
     const context = await super._prepareContext(options);
     // v13: {{#select}} block helper removed — feed selectOptions a value map.
     context.clockSizes = { "4": "4", "6": "6", "8": "8" };
+    context.system.description = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+      context.system.description,
+      { async: true, relativeTo: this.document, secrets: this.document.isOwner }
+    );
     await preloadClockImages(context.system.type);
     return context;
   }
@@ -77,6 +81,7 @@ export class BladesClockSheet extends BladesSheet {
    * @override
    */
   async _processSubmitData(event, form, submitData) {
+    if (!this.isEditable) return;
     return this._updateClock(submitData);
   }
 
@@ -101,10 +106,11 @@ export class BladesClockSheet extends BladesSheet {
       height: 1,
     };
 
-    const tokens = this.actor.getActiveTokens();
-    if (tokens.length) {
+    const tokens = this.actor.getActiveTokens?.(false, true) ?? [];
+    const scene = game.scenes?.current;
+    if (tokens.length && scene) {
       const updates = tokens.map(token => foundry.utils.mergeObject({ _id: token.id }, tokenUpdate));
-      await foundry.documents.TokenDocument.updateDocuments(updates, { parent: game.scenes.current });
+      await foundry.documents.TokenDocument.updateDocuments(updates, { parent: scene });
     }
 
     // Delegate the actor update to the base class

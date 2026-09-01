@@ -49,11 +49,16 @@ export class BladesActiveEffect extends foundry.documents.ActiveEffect {
    * @param {MouseEvent} event      The left-click event on the effect control
    * @param {Actor|Item} owner      The owning entity which manages this effect
    */
-  static onManageActiveEffect(event, owner) {
+  static onManageActiveEffect(event, owner, { gmOnly = false } = {}) {
     event.preventDefault();
+    if (!owner?.isOwner) return;
+    if (gmOnly && !game.user.isGM) return;
     const a = event.currentTarget;
-    const tr = a.closest("tr");
-    const effect = tr?.dataset.effectId ? owner.effects.get(tr.dataset.effectId) : null;
+    const effectElement = a.closest("[data-effect-id]");
+    const categoryElement = a.closest("[data-effect-type]");
+    const effect = effectElement?.dataset.effectId
+      ? owner.effects.get(effectElement.dataset.effectId)
+      : null;
     // Read data-effect-action (avoids collision with ApplicationV2's data-action dispatch)
     const action = a.dataset.effectAction;
     switch ( action ) {
@@ -62,11 +67,11 @@ export class BladesActiveEffect extends foundry.documents.ActiveEffect {
           name: "New Effect",
           img: "systems/brinkwood/styles/assets/icons/Icon.3_13.png",
           origin: owner.uuid,
-          "duration.rounds": tr?.dataset.effectType === "temporary" ? 1 : undefined,
-          disabled: tr?.dataset.effectType === "inactive",
+          "duration.rounds": categoryElement?.dataset.effectType === "temporary" ? 1 : undefined,
+          disabled: categoryElement?.dataset.effectType === "inactive",
         }]);
       case "edit":
-        return effect.sheet.render(true);
+        return effect?.sheet.render({ force: true });
       case "delete":
         return effect.delete();
       case "toggle":
@@ -87,21 +92,25 @@ export class BladesActiveEffect extends foundry.documents.ActiveEffect {
       temporary: {
         type: "temporary",
         label: "Temporary Effects",
+        canCreate: true,
         effects: []
       },
       passive: {
         type: "passive",
         label: "Passive Effects",
+        canCreate: true,
         effects: []
       },
       inactive: {
         type: "inactive",
         label: "Inactive Effects",
+        canCreate: true,
         effects: []
       },
       suppressed: {
         type: "suppressed",
         label: "Suppressed Effects",
+        canCreate: false,
         effects: []
       }
 
