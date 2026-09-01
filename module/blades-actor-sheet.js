@@ -1,6 +1,7 @@
 
 import { BladesSheet } from "./blades-sheet.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
+import { preloadClockImages } from "./clock-utils.js";
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -24,6 +25,7 @@ export class BladesActorSheet extends BladesSheet {
   /** @override */
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
+    await preloadClockImages(4);
 
     // Prepare active effects
     context.effects = BladesActiveEffect.prepareActiveEffectCategories(this.actor.effects);

@@ -1,6 +1,11 @@
 
 import { BladesSheet } from "./blades-sheet.js";
-import { clockValueAfterClick } from "./clock-utils.js";
+import {
+  clockImagePath,
+  clockValueAfterClick,
+  normalizeClockState,
+  preloadClockImages
+} from "./clock-utils.js";
 
 /**
  * Extend the basic BladesSheet for the Clock actor type.
@@ -25,6 +30,7 @@ export class BladesClockSheet extends BladesSheet {
     const context = await super._prepareContext(options);
     // v13: {{#select}} block helper removed — feed selectOptions a value map.
     context.clockSizes = { "4": "4", "6": "6", "8": "8" };
+    await preloadClockImages(context.system.type);
     return context;
   }
 
@@ -75,10 +81,15 @@ export class BladesClockSheet extends BladesSheet {
   }
 
   async _updateClock(submitData) {
-    const type = submitData["system.type"] ?? this.actor.system.type;
-    const value = submitData["system.value"] ?? this.actor.system.value;
-    const image_path = `systems/brinkwood/styles/assets/progressclocks-svg/Progress Clock ${type}-${value}.svg`;
+    const { type, value } = normalizeClockState(
+      submitData["system.type"] ?? this.actor.system.type,
+      submitData["system.value"] ?? this.actor.system.value
+    );
+    const image_path = clockImagePath(type, value);
+    submitData["system.type"] = type;
+    submitData["system.value"] = value;
     submitData["img"] = image_path;
+    submitData["prototypeToken.texture.src"] = image_path;
 
     // Build token update payload using v13 texture field names
     const tokenUpdate = {

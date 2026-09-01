@@ -317,6 +317,9 @@
   min-height: 320px;
 }
 .brinkwood .clock-zero-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   color: #191813;
 }
 .brinkwood .clocks.clocks-4 {
@@ -330,6 +333,7 @@
   border-radius: 50%;
   list-style: none;
   overflow: hidden;
+  background-color: var(--bw-paper);
   background-size: cover;
 }
 .brinkwood .clocks.clocks-4 .blades-clock label {
@@ -377,6 +381,7 @@
   border-radius: 50%;
   list-style: none;
   overflow: hidden;
+  background-color: var(--bw-paper);
   background-size: cover;
 }
 .brinkwood .clocks.clocks-6 .blades-clock label {
@@ -430,6 +435,7 @@
   border-radius: 50%;
   list-style: none;
   overflow: hidden;
+  background-color: var(--bw-paper);
   background-size: cover;
 }
 .brinkwood .clocks.clocks-8 .blades-clock label {
@@ -647,6 +653,7 @@
   border-radius: 50%;
   list-style: none;
   overflow: hidden;
+  background-color: var(--bw-paper);
   background-size: cover;
 }
 .brinkwood.actor.pc.character .bans-armor .character-scars-clock .blades-clock label,

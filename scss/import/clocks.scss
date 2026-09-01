@@ -4,6 +4,9 @@
 }
 
 .clock-zero-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   color: $almost_black;
 }
 
@@ -27,4 +30,3 @@
     margin: 10px auto;
   }
 }
-

@@ -1152,4 +1152,8 @@
 		</g>
 	</g>
 </g>
+	<g fill="none" stroke="#EEEAE0" stroke-width="7" stroke-linecap="round" opacity="0.72">
+		<path d="M317 88 V552"/>
+		<path d="M85 320 H549"/>
+	</g>
 </svg>

@@ -2138,4 +2138,10 @@
 		</g>
 	</g>
 </g>
+	<g fill="none" stroke="#EEEAE0" stroke-width="7" stroke-linecap="round" opacity="0.72">
+		<path d="M317 91 V549"/>
+		<path d="M88 320 H546"/>
+		<path d="M155 158 L479 482"/>
+		<path d="M155 482 L479 158"/>
+	</g>
 </svg>
