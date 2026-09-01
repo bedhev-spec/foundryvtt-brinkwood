@@ -33,7 +33,7 @@
       <label class="clock-sheet__label" for="clock-{{_id}}-show-description">{{localize "Clock.ShowDescription"}}</label>
       <input type="checkbox" id="clock-{{_id}}-show-description" name="system.show_description" {{checked system.show_description}}{{#unless editable}} disabled{{/unless}}>
     </div>
-    {{editor content=system.description target="system.description" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
+    {{editor system.description target="system.description" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
   </details>
   {{else if system.show_description}}
   <section class="clock-sheet__public-description" aria-label="{{localize "BITD.Description"}}">

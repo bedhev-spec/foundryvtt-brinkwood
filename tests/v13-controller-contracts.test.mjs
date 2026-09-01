@@ -87,7 +87,8 @@ test("each Actor HTML editor has its own enriched context and template target", 
       const [controller, template] = await Promise.all([read(controllerPath), read(templatePath)]);
       for (const field of fields) {
         assert.match(controller, new RegExp(`context\\.system\\.${field}\\s*=\\s*await[\\s\\S]*?enrichHTML`));
-        assert.match(template, new RegExp(`\\{\\{editor content=system\\.${field} target="system\\.${field}"`));
+        assert.match(template, new RegExp(`\\{\\{editor system\\.${field} target="system\\.${field}"`));
+        assert.doesNotMatch(template, /\{\{editor\s+content=/);
       }
       assert.match(controller, /relativeTo:\s*this\.document/);
       assert.match(controller, /secrets:\s*this\.document\.isOwner/);
@@ -104,7 +105,8 @@ test("each Item description editor uses the dedicated enriched context", async t
   for (const type of ["item", "simple", "trait", "class", "moot_decision"]) {
     await t.test(type, async () => {
       const template = await read(`templates/items/${type}.html`);
-      assert.match(template, /\{\{editor content=enrichedDescription target="system\.description"/);
+      assert.match(template, /\{\{editor enrichedDescription target="system\.description"/);
+      assert.doesNotMatch(template, /\{\{editor\s+content=/);
       assert.match(template, /owner=owner editable=editable/);
     });
   }

@@ -8,7 +8,7 @@
 
   <section class="flex-vertical">
     <label class="label-stripe">{{localize "BITD.Description"}}</label>
-    {{editor content=enrichedDescription target="system.description" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
+    {{editor enrichedDescription target="system.description" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
     {{#if isGM}}
 			<div>
 				<input name="system.aspect" type="text" value="{{system.aspect}}" placeholder="{{localize 'BITD.Aspect'}}"/>

@@ -38,9 +38,10 @@ test("v13 image actions and editors are editable-only", async () => {
   for (const template of templates) {
     assert.match(template, /\{\{#if editable\}\}\s*data-action="editImage" data-edit="img"/);
   }
-  assert.match(templates[0], /\{\{editor content=system\.description[^}]*owner=owner editable=editable/);
-  assert.match(templates[1], /\{\{editor content=system\.description[^}]*owner=owner editable=editable/);
-  assert.match(templates[1], /\{\{editor content=system\.notes[^}]*owner=owner editable=editable/);
+  assert.match(templates[0], /\{\{editor system\.description[^}]*owner=owner editable=editable/);
+  assert.match(templates[1], /\{\{editor system\.description[^}]*owner=owner editable=editable/);
+  assert.match(templates[1], /\{\{editor system\.notes[^}]*owner=owner editable=editable/);
+  for (const template of templates) assert.doesNotMatch(template, /\{\{editor\s+content=/);
   assert.doesNotMatch(templates[3], /\{\{editor system\.experience_clues/);
   assert.match(templates[3], /name="system\.experience_clues\.\{\{index\}\}"/);
   assert.doesNotMatch(templates[5], /system-edit="img"|\{\{item\.img\}\}/);

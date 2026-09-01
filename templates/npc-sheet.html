@@ -39,12 +39,12 @@
   <div class="npc-dossier__editors">
     <section class="npc-dossier__editor-panel" aria-labelledby="npc-{{_id}}-description-heading">
       <h2 id="npc-{{_id}}-description-heading">{{localize "BITD.Description"}}</h2>
-      {{editor content=system.description target="system.description" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
+      {{editor system.description target="system.description" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
     </section>
 
     <section class="npc-dossier__editor-panel" aria-labelledby="npc-{{_id}}-notes-heading">
       <h2 id="npc-{{_id}}-notes-heading">{{localize "BITD.Notes"}}</h2>
-      {{editor content=system.notes target="system.notes" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
+      {{editor system.notes target="system.notes" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
     </section>
   </div>
 </form>

@@ -15,7 +15,8 @@ test("character notes use a declared persistent v13 editor field", async () => {
   assert.match(model, /description:\s+new fields\.HTMLField\(\{ required: false, initial: "" \}\)/);
   assert.equal(defaults.Actor.character.description, "");
   assert.match(template, /id="character-\{\{_id\}\}-notes"[^>]+role="tabpanel"/);
-  assert.match(template, /\{\{editor content=system\.description target="system\.description" button=true owner=owner editable=editable/);
+  assert.match(template, /\{\{editor system\.description target="system\.description" button=true owner=owner editable=editable/);
+  assert.doesNotMatch(template, /\{\{editor\s+content=/);
 });
 
 test("shared clock and effect controls adapt to sheet size and editability", async () => {

@@ -90,7 +90,7 @@
 
       <section id="mask-{{_id}}-panel-notes" class="tab mask-sheet__panel {{#if (eq tabs.primary "mask-notes")}}active{{/if}}" data-group="primary" data-tab="mask-notes" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-notes">
         <h2>{{localize "BITD.Notes"}}</h2>
-        {{editor content=system.description target="system.description" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
+      {{editor system.description target="system.description" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
       </section>
 
       {{#if isGM}}
