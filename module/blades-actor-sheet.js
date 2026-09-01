@@ -104,7 +104,7 @@ export class BladesActorSheet extends BladesSheet {
     );
 
     html.querySelectorAll('input[name="system.scars"], input[name="system.oath"]').forEach(el =>
-      el.addEventListener("change", this._onClockChange.bind(this), listenerOptions)
+      el.addEventListener("click", this._onClockClick.bind(this), listenerOptions)
     );
 
     // Active effect controls – use data-effect-action to avoid AppV2 action dispatch
@@ -131,12 +131,15 @@ export class BladesActorSheet extends BladesSheet {
     await this.document.update({ [dataset.path]: new_value });
   }
 
-  async _onClockChange(event) {
+  async _onClockClick(event) {
     const { name, value } = event.currentTarget;
-    const clockValue = Number(value);
-    if (!this.isEditable || !["system.scars", "system.oath"].includes(name) || !Number.isInteger(clockValue)) return;
+    const selectedValue = Number(value);
+    if (!this.isEditable || !["system.scars", "system.oath"].includes(name) || !Number.isInteger(selectedValue)) return;
 
+    event.preventDefault();
     event.stopPropagation();
+    const currentValue = Number(foundry.utils.getProperty(this.document, name));
+    const clockValue = selectedValue === 1 && currentValue === 1 ? 0 : selectedValue;
     await this.document.update({ [name]: Math.min(4, Math.max(0, clockValue)) });
   }
 

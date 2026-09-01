@@ -5,6 +5,7 @@
  */
 
 import { BladesHelpers } from "./blades-helpers.js";
+import { escapeHTML } from "./html-utils.js";
 
 export class BladesSheet extends foundry.applications.api.HandlebarsApplicationMixin(
   foundry.applications.sheets.ActorSheetV2
@@ -97,10 +98,13 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
       } else if (typeof e.system.price !== "undefined") {
         addition_price_load += `(${e.system.price})`;
       }
+      const itemId = escapeHTML(e._id);
+      const itemName = escapeHTML(game.i18n.localize(e.name));
+      const itemDetails = escapeHTML(addition_price_load);
       htmlContent += `<div>
-        <input id="select-item-${e._id}" type="${input_type}" name="select_items" value="${e._id}">
-        <label class="flex-horizontal" for="select-item-${e._id}">
-          ${game.i18n.localize(e.name)} ${addition_price_load}
+        <input id="select-item-${itemId}" type="${input_type}" name="select_items" value="${itemId}">
+        <label class="flex-horizontal" for="select-item-${itemId}">
+          ${itemName} ${itemDetails}
           <i class="tooltip fas fa-question-circle"></i>
         </label>
       </div>`;

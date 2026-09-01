@@ -11,7 +11,7 @@ export class BladesRebelionSheet extends BladesSheet {
     classes: ["brinkwood", "sheet", "actor", "pc", "rebelion"],
     position: { width: 500, height: 870 },
     form: { submitOnChange: true },
-    tabs: [{ navSelector: ".tabs", contentSelector: ".content", initial: "overview" }],
+    tabGroups: { primary: "overview" },
   };
 
   static PARTS = {
@@ -38,8 +38,8 @@ export class BladesRebelionSheet extends BladesSheet {
   /* -------------------------------------------- */
 
   /** @override */
-  _onRender(context, options) {
-    super._onRender(context, options);
+  async _onRender(context, options) {
+    await super._onRender(context, options);
     const html = this.element;
 
     if (!this.isEditable) return;

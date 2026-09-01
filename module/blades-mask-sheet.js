@@ -13,7 +13,7 @@ export class BladesMaskSheet extends BladesSheet {
     classes: ["brinkwood", "sheet", "actor", "pc", "mask"],
     position: { width: 700, height: 970 },
     form: { submitOnChange: true },
-    tabs: [{ navSelector: ".tabs", contentSelector: ".tab-content", initial: "abilities" }],
+    tabGroups: { primary: "traits" },
   };
 
   static PARTS = {
@@ -91,8 +91,8 @@ export class BladesMaskSheet extends BladesSheet {
   /* -------------------------------------------- */
 
   /** @override */
-  _onRender(context, options) {
-    super._onRender(context, options);
+  async _onRender(context, options) {
+    await super._onRender(context, options);
     const html = this.element;
 
     if (!this.isEditable) return;

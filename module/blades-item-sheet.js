@@ -12,7 +12,7 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
    * Supported item-type → template mapping.
    * Simple types all share the same template.
    */
-  static SIMPLE_TYPES = new Set(["profession", "upbringing", "crew_reputation", "mask", "pact"]);
+  static SIMPLE_TYPES = new Set(["profession", "upbringing", "crew_reputation", "associates", "mask", "pact"]);
 
   static DEFAULT_OPTIONS = {
     classes: ["brinkwood", "sheet", "item"],

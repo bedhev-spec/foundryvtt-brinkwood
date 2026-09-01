@@ -5,7 +5,7 @@
 export const migrateWorld = async function() {
   ui.notifications.info(`Applying Brinkwood Actors migration for version ${game.version}. Please be patient and do not close your game or shut down your server.`, {permanent: true});
 
-  const currentVersion = game.settings.get("brinkwood", "systemMigrationVersion").toString();
+  const currentVersion = String(game.settings.get("brinkwood", "systemMigrationVersion") ?? "0");
 
   if (foundry.utils.isNewerVersion("0.5.4", currentVersion)) {
     const classPack = game.packs.get("brinkwood.class");
@@ -16,20 +16,16 @@ export const migrateWorld = async function() {
     ]);
 
     for (const actor of game.actors) {
-      const attributes = foundry.utils.deepClone(actor.system.attributes);
       const oldClass = actor.items.find(item => item.type === "class");
       const oldProfession = actor.items.find(item => item.type === "profession");
-
-      if (actor.effects.size) {
-        await actor.deleteEmbeddedDocuments("ActiveEffect", actor.effects.map(effect => effect.id));
-      }
 
       if (oldClass) {
         const entry = classIndex.find(item => item.name === oldClass.name);
         const replacement = entry ? await classPack.getDocument(entry._id) : null;
         if (replacement) {
-          await oldClass.delete();
-          await actor.createEmbeddedDocuments("Item", [replacement.toObject()]);
+          const update = replacement.toObject();
+          delete update._id;
+          await oldClass.update(update);
         }
       }
 
@@ -37,12 +33,11 @@ export const migrateWorld = async function() {
         const entry = professionIndex.find(item => item.name === oldProfession.name);
         const replacement = entry ? await professionPack.getDocument(entry._id) : null;
         if (replacement) {
-          await oldProfession.delete();
-          await actor.createEmbeddedDocuments("Item", [replacement.toObject()]);
+          const update = replacement.toObject();
+          delete update._id;
+          await oldProfession.update(update);
         }
       }
-
-      await actor.update({"system.attributes": attributes});
     }
   }
 

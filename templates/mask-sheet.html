@@ -76,15 +76,15 @@
     <div class="tab-content flex-vertical grow-two">
 
       {{!-- Nav menu --}}
-      <nav class="tabs flex-horizontal">
-        <a class="item" data-tab="traits">{{localize "BITD.Traits"}}</a>
-        <a class="item" data-tab="mask-notes">{{localize "BITD.Notes"}}</a>
+      <nav class="tabs flex-horizontal" data-group="primary">
+        <a class="item {{#if (eq tabs.primary "traits")}}active{{/if}}" data-action="tab" data-group="primary" data-tab="traits">{{localize "BITD.Traits"}}</a>
+        <a class="item {{#if (eq tabs.primary "mask-notes")}}active{{/if}}" data-action="tab" data-group="primary" data-tab="mask-notes">{{localize "BITD.Notes"}}</a>
         {{#if isGM}}
-          <a class="item" data-tab="effects">{{localize "BITD.Effects"}}</a>
+        <a class="item {{#if (eq tabs.primary "effects")}}active{{/if}}" data-action="tab" data-group="primary" data-tab="effects">{{localize "BITD.Effects"}}</a>
         {{/if}}
       </nav>
 
-      <div id="mask-{{_id}}-traits" class="tab flex-vertical traits" data-tab="traits">
+      <div id="mask-{{_id}}-traits" class="tab flex-vertical traits {{#if (eq tabs.primary "traits")}}active{{/if}}" data-group="primary" data-tab="traits">
         <div class="label-stripe">
           <p><label for="mask-{{_id}}-experience-0">{{localize "BITD.Traits"}}</label></p>
         </div>
@@ -109,7 +109,7 @@
 
       </div>
 
-      <div class="tab flex-vertical" data-tab="mask-notes">
+      <div class="tab flex-vertical {{#if (eq tabs.primary "mask-notes")}}active{{/if}}" data-group="primary" data-tab="mask-notes">
         <div class="label-stripe">
           <p>{{localize "BITD.Notes"}}</p>
         </div>
@@ -117,7 +117,7 @@
       </div>
 
       {{!-- Active Effects --}}
-      <div id="mask-{{_id}}-effects" class="tab effects flex-vertical" data-tab="effects">
+      <div id="mask-{{_id}}-effects" class="tab effects flex-vertical {{#if (eq tabs.primary "effects")}}active{{/if}}" data-group="primary" data-tab="effects">
         <div class="label-stripe">
           <p>{{localize "BITD.Effects"}}</p>
         </div>

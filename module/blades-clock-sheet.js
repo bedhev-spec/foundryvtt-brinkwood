@@ -1,5 +1,6 @@
 
 import { BladesSheet } from "./blades-sheet.js";
+import { clockValueAfterClick } from "./clock-utils.js";
 
 /**
  * Extend the basic BladesSheet for the Clock actor type.
@@ -29,6 +30,39 @@ export class BladesClockSheet extends BladesSheet {
 
   /* -------------------------------------------- */
 
+  /** @override */
+  async _onRender(context, options) {
+    await super._onRender(context, options);
+
+    this._clockSheetListenerController?.abort();
+    if (!this.isEditable) return;
+    this._clockSheetListenerController = new AbortController();
+    const listenerOptions = { signal: this._clockSheetListenerController.signal };
+
+    this.element.querySelectorAll('input[name="system.value"]').forEach(input =>
+      input.addEventListener("click", this._onClockSegmentClick.bind(this), listenerOptions)
+    );
+  }
+
+  async _onClockSegmentClick(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const value = clockValueAfterClick(
+      event.currentTarget.value,
+      this.actor.system.value,
+      this.actor.system.type
+    );
+    if (value === null) return;
+
+    await this._updateClock({
+      "system.type": this.actor.system.type,
+      "system.value": value
+    });
+  }
+
+  /* -------------------------------------------- */
+
   /**
    * Override form submission to also update the prototype token texture and
    * any active scene tokens.  Fixes v13 texture field names
@@ -37,7 +71,13 @@ export class BladesClockSheet extends BladesSheet {
    * @override
    */
   async _processSubmitData(event, form, submitData) {
-    const image_path = `systems/brinkwood/styles/assets/progressclocks-svg/Progress Clock ${submitData["system.type"]}-${submitData["system.value"]}.svg`;
+    return this._updateClock(submitData);
+  }
+
+  async _updateClock(submitData) {
+    const type = submitData["system.type"] ?? this.actor.system.type;
+    const value = submitData["system.value"] ?? this.actor.system.value;
+    const image_path = `systems/brinkwood/styles/assets/progressclocks-svg/Progress Clock ${type}-${value}.svg`;
     submitData["img"] = image_path;
 
     // Build token update payload using v13 texture field names
