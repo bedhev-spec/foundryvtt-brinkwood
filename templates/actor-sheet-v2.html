@@ -1,0 +1,240 @@
+<form class="{{cssClass}} actor-sheet character-sheet character-sheet-v2" data-sheet-version="2" data-actor-uuid="{{actor.uuid}}" autocomplete="off">
+  <header id="character-{{_id}}-name-alias" class="character-sheet__header">
+    <div class="character-sheet__portrait-frame">
+      <img src="{{img}}" alt="{{name}}" title="{{name}}" class="portrait"{{#if editable}} data-action="editImage" data-edit="img" role="button" tabindex="0" aria-label="{{localize 'BITD.Name'}}: {{name}}"{{/if}}>
+      <button type="button" class="roll-statistics-control" title="{{localize 'BITD.RollStatistics'}}">
+        <i class="fas fa-chart-bar" aria-hidden="true"></i>
+        <span>{{localize "BITD.RollStatistics"}}</span>
+      </button>
+    </div>
+
+    <section class="character-sheet__identity" aria-label="{{localize 'BITD.Name'}}">
+      <div class="character-sheet__identity-fields">
+        <div id="character-{{_id}}-name-box" class="character-sheet__field">
+          <label for="character-{{_id}}-name">{{localize "BITD.Name"}}</label>
+          <input type="text" id="character-{{_id}}-name" class="name" name="name" value="{{name}}">
+        </div>
+        <div id="character-{{_id}}-alias-box" class="character-sheet__field">
+          <label for="character-{{_id}}-alias">{{localize "BITD.Alias"}}</label>
+          <input type="text" id="character-{{_id}}-alias" class="alias" name="system.alias" value="{{system.alias}}">
+        </div>
+      </div>
+
+      <div id="character-{{_id}}-traits" class="character-sheet__origins">
+        <section class="item-block character-origin">
+          <div class="character-origin__heading">
+            <span>{{localize "BITD.Upbringing"}}</span>
+            {{#if editable}}<button type="button" class="item-add-popup" data-distinct="true" data-item-type="upbringing" aria-label="{{localize 'BITD.Upbringing'}}"><i class="fas fa-plus" aria-hidden="true"></i></button>{{/if}}
+          </div>
+          {{#each items as |item|}}
+          {{#if (eq item.type "upbringing")}}
+          <article class="item character-origin__item tooltip" data-item-id="{{item._id}}" data-tooltip="Actor.Upbringings.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
+            <div class="item-body"{{#if ../editable}} role="button" tabindex="0"{{/if}}><span class="item-name">{{item.name}}</span></div>
+          </article>
+          {{/if}}
+          {{/each}}
+        </section>
+
+        <section class="item-block character-origin">
+          <div class="character-origin__heading">
+            <span>{{localize "BITD.Profession"}}</span>
+            {{#if editable}}<button type="button" class="item-add-popup" data-distinct="true" data-item-type="profession" aria-label="{{localize 'BITD.Profession'}}"><i class="fas fa-plus" aria-hidden="true"></i></button>{{/if}}
+          </div>
+          {{#each items as |item|}}
+          {{#if (eq item.type "profession")}}
+          <article class="item character-origin__item tooltip" data-item-id="{{item._id}}" data-tooltip="Actor.Professions.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
+            <div class="item-body"{{#if ../editable}} role="button" tabindex="0"{{/if}}><span class="item-name">{{item.name}}</span></div>
+          </article>
+          {{/if}}
+          {{/each}}
+        </section>
+
+        <section class="item-block character-origin">
+          <div class="character-origin__heading">
+            <span>{{localize "BITD.Class"}}</span>
+            {{#if editable}}<button type="button" class="item-add-popup" data-distinct="true" data-item-type="class" aria-label="{{localize 'BITD.Class'}}"><i class="fas fa-plus" aria-hidden="true"></i></button>{{/if}}
+          </div>
+          {{#each items as |item|}}
+          {{#if (eq item.type "class")}}
+          <article class="item character-origin__item tooltip" data-item-id="{{item._id}}" data-tooltip="Actor.Classes.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
+            <div class="item-body"{{#if ../editable}} role="button" tabindex="0"{{/if}}><span class="item-name">{{item.name}}</span></div>
+          </article>
+          {{/if}}
+          {{/each}}
+        </section>
+
+        <section class="item-block character-origin">
+          <div class="character-origin__heading">
+            <span>{{localize "BITD.Pact"}}</span>
+            {{#if editable}}<button type="button" class="item-add-popup" data-distinct="true" data-item-type="pact" aria-label="{{localize 'BITD.Pact'}}"><i class="fas fa-plus" aria-hidden="true"></i></button>{{/if}}
+          </div>
+          {{#each items as |item|}}
+          {{#if (eq item.type "pact")}}
+          <article class="item character-origin__item tooltip" data-item-id="{{item._id}}" data-tooltip="Actor.Pacts.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
+            <div class="item-body"{{#if ../editable}} role="button" tabindex="0"{{/if}}><span class="item-name">{{item.name}}</span></div>
+          </article>
+          {{/if}}
+          {{/each}}
+        </section>
+      </div>
+    </section>
+
+    <section class="character-sheet__trackers" aria-label="{{localize 'BITD.Experience'}}">
+      <div id="character-{{_id}}-xp" class="character-tracker character-xp tooltip" data-tooltip="Actor.XP.Tooltip" data-tooltip-class="brinkwood-tooltip">
+        <div class="character-tracker__heading">
+          <span>{{localize system.experience.name}}</span>
+          <output>{{system.experience.value}} / {{system.experience.max}}</output>
+        </div>
+        <div class="big-teeth character-tracker__pips" role="group" aria-label="{{localize system.experience.name}}">
+          {{#with system as |system|}}
+          {{#times_from_1 system.experience.max}}
+          <button type="button" class="dot-value {{#if (lt system.experience.value this)}}dot-value--empty{{else}}dot-value--filled{{/if}}" data-path="system.experience.value" data-max_value="{{system.experience.max}}" data-value="{{this}}" aria-label="{{localize system.experience.name}} {{this}} of {{system.experience.max}}" aria-pressed="{{#if (lt system.experience.value this)}}false{{else}}true{{/if}}"{{#unless ../../editable}} disabled{{/unless}}></button>
+          {{/times_from_1}}
+          {{/with}}
+        </div>
+      </div>
+
+      <div id="character-{{_id}}-stress-trauma" class="character-tracker character-stress tooltip" data-tooltip="Actor.Stress.Tooltip" data-tooltip-class="brinkwood-tooltip">
+        <div class="character-tracker__heading">
+          <span id="character-{{_id}}-stress">{{localize system.stress.name}}</span>
+          <output>{{system.stress.value}} / {{system.stress.max}}</output>
+        </div>
+        <div class="big-teeth character-tracker__pips" role="group" aria-labelledby="character-{{_id}}-stress">
+          {{#with system as |system|}}
+          {{#times_from_1 system.stress.max}}
+          <button type="button" class="dot-value {{#if (lt system.stress.value this)}}dot-value--empty{{else}}dot-value--filled{{/if}}" data-path="system.stress.value" data-max_value="{{system.stress.max}}" data-value="{{this}}" aria-label="{{localize system.stress.name}} {{this}} of {{system.stress.max}}" aria-pressed="{{#if (lt system.stress.value this)}}false{{else}}true{{/if}}"{{#unless ../../editable}} disabled{{/unless}}></button>
+          {{/times_from_1}}
+          {{/with}}
+        </div>
+      </div>
+    </section>
+  </header>
+
+  <section id="character-{{_id}}-bans-armor" class="character-state" aria-label="{{localize 'BITD.BansArmor'}}">
+    <section id="character-{{_id}}-character-bans" class="character-bans" aria-labelledby="character-{{_id}}-bans-title">
+      <h2 id="character-{{_id}}-bans-title">{{localize "BITD.Bans"}}</h2>
+      <div class="character-bans__rows">
+        <div class="character-bans__row" data-ban-level="3">
+          <span class="character-bans__level" aria-hidden="true">3</span>
+          <label class="visually-hidden" for="character-{{_id}}-bans-3-1">{{localize "BITD.Bans"}} 3</label>
+          <input class="character-bans__wide" type="text" id="character-{{_id}}-bans-3-1" name="system.bans.heavy.one" value="{{system.bans.heavy.one}}">
+        </div>
+        <div class="character-bans__row" data-ban-level="2">
+          <span class="character-bans__level" aria-hidden="true">2</span>
+          <label class="visually-hidden" for="character-{{_id}}-bans-2-1">{{localize "BITD.Bans"}} 2, 1 / 2</label>
+          <input type="text" id="character-{{_id}}-bans-2-1" name="system.bans.medium.one" value="{{system.bans.medium.one}}">
+          <label class="visually-hidden" for="character-{{_id}}-bans-2-2">{{localize "BITD.Bans"}} 2, 2 / 2</label>
+          <input type="text" id="character-{{_id}}-bans-2-2" name="system.bans.medium.two" value="{{system.bans.medium.two}}">
+        </div>
+        <div class="character-bans__row" data-ban-level="1">
+          <span class="character-bans__level" aria-hidden="true">1</span>
+          <label class="visually-hidden" for="character-{{_id}}-bans-1-1">{{localize "BITD.Bans"}} 1, 1 / 2</label>
+          <input type="text" id="character-{{_id}}-bans-1-1" name="system.bans.light.one" value="{{system.bans.light.one}}">
+          <label class="visually-hidden" for="character-{{_id}}-bans-1-2">{{localize "BITD.Bans"}} 1, 2 / 2</label>
+          <input type="text" id="character-{{_id}}-bans-1-2" name="system.bans.light.two" value="{{system.bans.light.two}}">
+        </div>
+      </div>
+    </section>
+
+    <section class="character-consequences" aria-label="{{localize 'BITD.BansArmor'}}">
+      <div id="character-{{_id}}-scars-clock" class="character-scars-clock">
+        {{{blades-clock "system.scars" 4 system.scars _id "scars"}}}
+      </div>
+      <div id="character-{{_id}}-oath-clock" class="character-oath-clock">
+        {{{blades-clock "system.oath" 4 system.oath _id "oath"}}}
+      </div>
+    </section>
+
+    <fieldset id="character-{{_id}}-armor-uses" class="character-armor-uses">
+      <legend>{{localize "BITD.Armor"}}</legend>
+      <label for="character-{{_id}}-armor-uses-armor"><span>{{localize "BITD.Armor"}}</span><input type="checkbox" id="character-{{_id}}-armor-uses-armor" name="system.armor-uses.armor" {{checked system.armor-uses.armor}}></label>
+      <label for="character-{{_id}}-armor-uses-heavy"><span>{{localize "BITD.Heavy"}}</span><input type="checkbox" id="character-{{_id}}-armor-uses-heavy" name="system.armor-uses.heavy" {{checked system.armor-uses.heavy}}></label>
+      <label for="character-{{_id}}-armor-uses-special"><span>{{localize "BITD.Special"}}</span><input type="checkbox" id="character-{{_id}}-armor-uses-special" name="system.armor-uses.special" {{checked system.armor-uses.special}}></label>
+    </fieldset>
+  </section>
+
+  <main class="character-sheet__workspace">
+    <nav class="tabs character-sheet__tabs" data-group="primary" role="tablist" aria-label="{{localize 'BITD.Traits'}}">
+      <button type="button" class="item {{#if (eq tabs.primary "traits")}}active{{/if}}" id="character-{{_id}}-tab-traits" data-action="tab" data-group="primary" data-tab="traits" role="tab" tabindex="{{#if (eq tabs.primary "traits")}}0{{else}}-1{{/if}}" aria-controls="character-{{_id}}-traits-tab" aria-selected="{{#if (eq tabs.primary "traits")}}true{{else}}false{{/if}}">{{localize "BITD.Traits"}}</button>
+      <button type="button" class="item {{#if (eq tabs.primary "loadout")}}active{{/if}}" id="character-{{_id}}-tab-loadout" data-action="tab" data-group="primary" data-tab="loadout" role="tab" tabindex="{{#if (eq tabs.primary "loadout")}}0{{else}}-1{{/if}}" aria-controls="character-{{_id}}-loadout" aria-selected="{{#if (eq tabs.primary "loadout")}}true{{else}}false{{/if}}">{{localize "BITD.Loadout"}}</button>
+      <button type="button" class="item {{#if (eq tabs.primary "character-notes")}}active{{/if}}" id="character-{{_id}}-tab-notes" data-action="tab" data-group="primary" data-tab="character-notes" role="tab" tabindex="{{#if (eq tabs.primary "character-notes")}}0{{else}}-1{{/if}}" aria-controls="character-{{_id}}-notes" aria-selected="{{#if (eq tabs.primary "character-notes")}}true{{else}}false{{/if}}">{{localize "BITD.Notes"}}</button>
+      <button type="button" class="item {{#if (eq tabs.primary "downtime")}}active{{/if}}" id="character-{{_id}}-tab-downtime" data-action="tab" data-group="primary" data-tab="downtime" role="tab" tabindex="{{#if (eq tabs.primary "downtime")}}0{{else}}-1{{/if}}" aria-controls="character-{{_id}}-downtime" aria-selected="{{#if (eq tabs.primary "downtime")}}true{{else}}false{{/if}}">{{localize "BITD.Downtime"}}</button>
+      {{#if isGM}}
+      <button type="button" class="item {{#if (eq tabs.primary "effects")}}active{{/if}}" id="character-{{_id}}-tab-effects" data-action="tab" data-group="primary" data-tab="effects" role="tab" tabindex="{{#if (eq tabs.primary "effects")}}0{{else}}-1{{/if}}" aria-controls="character-{{_id}}-effects" aria-selected="{{#if (eq tabs.primary "effects")}}true{{else}}false{{/if}}">{{localize "BITD.Effects"}}</button>
+      {{/if}}
+    </nav>
+
+    <section id="character-{{_id}}-traits-tab" class="tab character-sheet__panel {{#if (eq tabs.primary "traits")}}active{{/if}}" role="tabpanel" data-group="primary" data-tab="traits" aria-labelledby="character-{{_id}}-tab-traits">
+      <div class="character-traits__layout">
+        <section class="character-traits__library" aria-labelledby="character-{{_id}}-traits-heading">
+          <h2 id="character-{{_id}}-traits-heading">{{localize "BITD.Traits"}}</h2>
+          <div id="character-{{_id}}-traits-list" class="character-traits__list">
+            {{#each traits as |trait|}}
+            <article class="item character-trait" data-item-id="{{trait._id}}">
+              <label class="character-trait__select" for="item-{{trait._id}}-purchased">
+                <input type="checkbox" id="item-{{trait._id}}-purchased" class="dot item-select" data-item-id="{{trait._id}}" data-item-list="traits" {{#if trait.system.purchased}}checked{{/if}}{{#unless ../editable}} disabled{{/unless}}>
+                <span class="item-name"><strong>{{trait.name}}</strong></span>
+              </label>
+              <div class="item-description character-trait__description">{{{trait.system.description}}}</div>
+            </article>
+            {{else}}
+            <p class="character-sheet__empty">{{localize "BITD.Traits"}}</p>
+            {{/each}}
+          </div>
+        </section>
+
+        {{> "systems/brinkwood/templates/parts/attributes.html"}}
+      </div>
+    </section>
+
+    <section id="character-{{_id}}-loadout" class="tab character-sheet__panel {{#if (eq tabs.primary "loadout")}}active{{/if}}" role="tabpanel" data-group="primary" data-tab="loadout" aria-labelledby="character-{{_id}}-tab-loadout">
+      <header class="character-panel__header">
+        <div>
+          <h2>{{localize "BITD.Loadout"}}</h2>
+          <p>{{system.loadout}} / {{localize system.load_level}}</p>
+        </div>
+        <div class="character-loadout__actions">
+          <select name="system.selected_load_level" aria-label="{{localize 'BITD.Loadout'}}">{{selectOptions system.load_levels selected=system.selected_load_level localize=true}}</select>
+          {{#if editable}}<button type="button" class="item-add-popup" data-item-type="item"><i class="fas fa-plus" aria-hidden="true"></i> {{localize "BITD.AddItem"}}</button>{{/if}}
+        </div>
+      </header>
+      <div class="character-loadout__list">
+        {{#each items as |item|}}
+        {{#if (eq item.type "item")}}
+        <article class="item character-loadout__item" data-item-id="{{item._id}}">
+          <label class="character-loadout__toggle" for="item-{{item._id}}-equipped">
+            <input type="checkbox" id="item-{{item._id}}-equipped" class="dot item-select" data-item-id="{{item._id}}" {{#if item.system.equipped}}checked{{/if}}{{#unless ../editable}} disabled{{/unless}}>
+            <span class="visually-hidden">{{item.name}}</span>
+          </label>
+          <div class="item-body"{{#if ../editable}} role="button" tabindex="0"{{/if}}>
+            <span class="item-name">{{item.name}}</span>
+          </div>
+          <span class="character-loadout__load">{{item.system.load}}</span>
+        </article>
+        {{/if}}
+        {{/each}}
+      </div>
+    </section>
+
+    <section id="character-{{_id}}-notes" class="tab character-sheet__panel {{#if (eq tabs.primary "character-notes")}}active{{/if}}" role="tabpanel" data-group="primary" data-tab="character-notes" aria-labelledby="character-{{_id}}-tab-notes">
+      <h2>{{localize "BITD.Notes"}}</h2>
+      {{#if editable}}
+      <prose-mirror name="system.description" value="{{system.description}}" data-document-uuid="{{actor.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
+      {{else}}
+      <div class="editor editor-content">{{{enrichedDescription}}}</div>
+      {{/if}}
+    </section>
+
+    <section id="character-{{_id}}-downtime" class="tab character-sheet__panel downtime {{#if (eq tabs.primary "downtime")}}active{{/if}}" role="tabpanel" data-group="primary" data-tab="downtime" aria-labelledby="character-{{_id}}-tab-downtime">
+      <h2>{{localize "BITD.Downtime"}}</h2>
+      {{> "systems/brinkwood/templates/parts/actor/downtime.html" actor=actor}}
+    </section>
+
+    {{#if isGM}}
+    <section id="character-{{_id}}-effects" class="tab character-sheet__panel effects {{#if (eq tabs.primary "effects")}}active{{/if}}" role="tabpanel" data-group="primary" data-tab="effects" aria-labelledby="character-{{_id}}-tab-effects">
+      <h2>{{localize "BITD.Effects"}}</h2>
+      {{> "systems/brinkwood/templates/parts/active-effects.html"}}
+    </section>
+    {{/if}}
+  </main>
+</form>

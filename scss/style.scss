@@ -38,6 +38,10 @@ $hover-brightness: 0.8;
 
   &.actor.pc.character{
     @import 'import/character-sheet.scss';
+
+    &.character-v2 {
+      @import 'import/character-sheet-v2.scss';
+    }
   }
 
   &.actor.mask {

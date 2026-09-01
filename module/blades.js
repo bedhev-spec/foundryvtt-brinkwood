@@ -13,6 +13,7 @@ import { BladesActor } from "./blades-actor.js";
 import { BladesItem } from "./blades-item.js";
 import { BladesItemSheet } from "./blades-item-sheet.js";
 import { BladesActorSheet } from "./blades-actor-sheet.js";
+import { BladesActorSheetV2 } from "./blades-actor-sheet-v2.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
 import { BladesClockSheet } from "./blades-clock-sheet.js";
 import { BladesNPCSheet } from "./blades-npc-sheet.js";
@@ -79,7 +80,16 @@ Hooks.once("init", async function() {
   const { DocumentSheetConfig } = foundry.applications.apps;
   // Unregister Foundry's default v2 sheets so ours take precedence
   DocumentSheetConfig.unregisterSheet(foundry.documents.Actor, "core", foundry.applications.sheets.ActorSheetV2);
-  DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesActorSheet, { types: ["character"], makeDefault: true });
+  DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesActorSheet, {
+    types: ["character"],
+    makeDefault: true,
+    label: "Brinkwood Character Sheet (Legacy)",
+  });
+  DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesActorSheetV2, {
+    types: ["character"],
+    makeDefault: false,
+    label: "Brinkwood Character Sheet V2",
+  });
   DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesClockSheet, { types: ["\uD83D\uDD5B clock"], makeDefault: true });
   DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesNPCSheet, { types: ["npc"], makeDefault: true });
   DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesMaskSheet, { types: ["mask"], makeDefault: true });
