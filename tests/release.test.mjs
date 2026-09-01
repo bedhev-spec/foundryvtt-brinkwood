@@ -4,14 +4,14 @@ import test from "node:test";
 
 const root = new URL("../", import.meta.url);
 
-test("release manifests target version 0.6.8", async () => {
+test("release manifests target version 0.6.9", async () => {
   const [manifest, testManifest] = await Promise.all(
     ["system.json", "system-test.json"].map(async file =>
       JSON.parse(await readFile(new URL(file, root), "utf8"))
     )
   );
 
-  assert.equal(manifest.version, "0.6.8");
-  assert.equal(testManifest.version, "0.6.8");
-  assert.match(manifest.download, /\/v0\.6\.8\.zip$/);
+  assert.equal(manifest.version, "0.6.9");
+  assert.equal(testManifest.version, "0.6.9");
+  assert.match(manifest.download, /\/v0\.6\.9\.zip$/);
 });
