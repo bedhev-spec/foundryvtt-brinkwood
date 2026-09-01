@@ -2,15 +2,15 @@
   "id": "brinkwood",
   "title": "Brinkwood",
   "description": "Brinkwood game system.",
-  "version": "0.6.9",
+  "version": "0.6.10",
   "compatibility": {
     "minimum": "13",
     "verified": "13.351",
     "maximum": "13"
   },
-  "url": "https://github.com/bedhev-spec/foundryvtt-brinkwood",
-  "manifest": "https://raw.githubusercontent.com/bedhev-spec/foundryvtt-brinkwood/master/system.json",
-  "download": "https://github.com/bedhev-spec/foundryvtt-brinkwood/archive/refs/tags/v0.6.9.zip",
+  "url": "https://github.com/bedhev-spec/foundryvtt-brinkwood/tree/codex/redesign-character-sheet-ui",
+  "manifest": "https://raw.githubusercontent.com/bedhev-spec/foundryvtt-brinkwood/codex/redesign-character-sheet-ui/system-test.json",
+  "download": "https://github.com/bedhev-spec/foundryvtt-brinkwood/archive/refs/heads/codex/redesign-character-sheet-ui.zip",
   "authors": [
     {
       "name": "quad",
