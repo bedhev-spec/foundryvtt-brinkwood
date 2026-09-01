@@ -106,7 +106,7 @@ export function getBladesRollStatus(rolls, zeromode = false) {
   let roll_status = "failure"
 
   if (sorted_rolls[0] === 6 && zeromode) {
-    roll_status = "critical-success";
+    roll_status = "success";
   }
   else {
     let use_die;
@@ -163,7 +163,7 @@ export function getBladesRollStress(rolls, zeromode = false) {
   let roll_status = "failure"
 
   if (sorted_rolls[0] === 6 && zeromode) {
-    stress = -1;
+    stress = 0;
   }
   else {
     let use_die;

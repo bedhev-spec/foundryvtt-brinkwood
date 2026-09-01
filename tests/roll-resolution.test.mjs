@@ -54,6 +54,19 @@ test("negative pools resolve as zero dice and retain the complete equation", () 
   assert.equal(resolution.effect, "limited");
 });
 
+test("signed base ratings are combined with modifiers before the pool is clamped", () => {
+  const resolution = buildRollResolution({
+    baseDice: -1,
+    modifiers: [{ label: "Assist", value: 1 }]
+  });
+
+  assert.equal(resolution.baseDice, -1);
+  assert.equal(resolution.modifierTotal, 1);
+  assert.equal(resolution.unclampedDicePool, 0);
+  assert.equal(resolution.dicePool, 0);
+  assert.equal(resolution.zeroMode, true);
+});
+
 test("DialogV2 roll values are read from its element", () => {
   const values = { mod: "-2", pos: "controlled", fx: "standard", note: "Carefully" };
   const queried = [];
@@ -154,7 +167,13 @@ test("bladesRoll uses the resolved pool and forwards the full calculation to cha
     }
   };
 
-  const { bladesRoll } = await import(`../module/blades-roll.js?integration=${Date.now()}`);
+  const { bladesRoll, getBladesRollStatus, getBladesRollStress } = await import(`../module/blades-roll.js?integration=${Date.now()}`);
+  const doubleSix = [{ result: 6 }, { result: 6 }];
+  assert.equal(getBladesRollStatus(doubleSix, true), "success", "zero-dice rolls cannot score a critical");
+  assert.equal(getBladesRollStress(doubleSix, true), 0, "zero-dice resistance cannot clear stress");
+  assert.equal(getBladesRollStatus(doubleSix, false), "critical-success");
+  assert.equal(getBladesRollStress(doubleSix, false), -1);
+
   await bladesRoll(2, "Actor.Actions.Hunt.Name", "desperate", "great", "In the dark", {
     modifiers: [
       { label: "Push", value: 1 },

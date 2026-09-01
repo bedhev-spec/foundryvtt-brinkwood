@@ -22,7 +22,7 @@ export function buildRollResolution({
   position = "",
   effect = ""
 } = {}) {
-  const normalizedBaseDice = Math.max(0, toInteger(baseDice));
+  const normalizedBaseDice = toInteger(baseDice);
   const normalizedModifiers = (Array.isArray(modifiers) ? modifiers : [])
     .map((modifier, index) => {
       const value = toInteger(modifier?.value);
