@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   addActionRollToStatistics,
   emptyRollStatistics,
+  listStatisticsUsers,
   recordActionRoll,
   renderRollStatisticsContent,
   summarizeRollStatistics
@@ -35,6 +36,12 @@ test("player statistics aggregate action outcomes, pools, and zero-dice rolls", 
 test("unknown roll types cannot corrupt player statistics", () => {
   const original = addActionRollToStatistics(undefined, { outcome: "resistance", dicePool: 6 });
   assert.deepEqual(original, emptyRollStatistics());
+});
+
+test("the statistics selector includes players and GMs", () => {
+  const player = { id: "player", isGM: false };
+  const gm = { id: "gm", isGM: true };
+  assert.deepEqual(listStatisticsUsers([player, gm]), [player, gm]);
 });
 
 test("recording serializes user-flag updates", async () => {

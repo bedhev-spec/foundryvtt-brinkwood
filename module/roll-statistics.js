@@ -80,6 +80,10 @@ function formatPercentage(value) {
   return `${value.toFixed(1)}%`;
 }
 
+export function listStatisticsUsers(users) {
+  return Array.from(users ?? []);
+}
+
 export function renderRollStatisticsContent(statistics, playerName, localize = key => key) {
   const summary = summarizeRollStatistics(statistics);
   const rows = summary.rows.map(row => `
@@ -113,7 +117,7 @@ export function renderRollStatisticsContent(statistics, playerName, localize = k
 }
 
 async function selectStatisticsUser() {
-  const users = Array.from(game.users ?? []).filter(user => !user.isGM);
+  const users = listStatisticsUsers(game.users);
   if (!users.length) return game.user?.id;
   const options = users
     .map(user => `<option value="${escapeHTML(user.id)}">${escapeHTML(user.name)}</option>`)
