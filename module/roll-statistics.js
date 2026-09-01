@@ -84,8 +84,9 @@ export function listStatisticsUsers(users) {
   return Array.from(users ?? []);
 }
 
-export function renderRollStatisticsContent(statistics, playerName, localize = key => key) {
+export function renderRollStatisticsContent(statistics, playerName, localize = key => key, chat = false) {
   const summary = summarizeRollStatistics(statistics);
+  const chatClass = chat ? " brinkwood-roll-statistics--chat" : "";
   const rows = summary.rows.map(row => `
     <div class="brinkwood-roll-statistics__row brinkwood-roll-statistics__row--${row.outcome}">
       <span>${escapeHTML(localize(row.label))}</span>
@@ -101,7 +102,7 @@ export function renderRollStatisticsContent(statistics, playerName, localize = k
     : "";
 
   return `
-    <section class="brinkwood-roll-statistics">
+    <section class="brinkwood-roll-statistics${chatClass}">
       <header>
         <h2>${escapeHTML(playerName)}</h2>
         <p>${summary.total} ${escapeHTML(localize("BITD.RollStatisticsRecorded"))}</p>
@@ -114,6 +115,24 @@ export function renderRollStatisticsContent(statistics, playerName, localize = k
         <div><dt>${escapeHTML(localize("BITD.RollStatisticsZeroDice"))}</dt><dd>${summary.zeroDice}</dd></div>
       </dl>
     </section>`;
+}
+
+export async function sendRollStatisticsToChat(statistics, user) {
+  if (!user) return;
+  const content = renderRollStatisticsContent(
+    statistics,
+    user.name,
+    key => game.i18n.localize(key),
+    true
+  );
+  return CONFIG.ChatMessage.documentClass.create({
+    speaker: { alias: user.name },
+    content,
+    style: CONST.CHAT_MESSAGE_STYLES.OTHER,
+    whisper: [],
+    blind: false,
+    flags: { brinkwood: { rollStatistics: { userId: user.id } } }
+  });
 }
 
 async function selectStatisticsUser() {
@@ -142,10 +161,24 @@ export async function showRollStatistics(userId) {
 
   const statistics = user.getFlag(FLAG_SCOPE, FLAG_KEY);
   const content = renderRollStatisticsContent(statistics, user.name, key => game.i18n.localize(key));
-  return foundry.applications.api.DialogV2.prompt({
+  return foundry.applications.api.DialogV2.wait({
     window: { title: game.i18n.localize("BITD.RollStatistics") },
     content,
-    ok: { label: game.i18n.localize("Close") },
+    buttons: [
+      {
+        action: "send",
+        label: game.i18n.localize("BITD.RollStatisticsSendToChat"),
+        icon: "<i class='fas fa-paper-plane'></i>",
+        callback: () => sendRollStatisticsToChat(statistics, user)
+      },
+      {
+        action: "close",
+        label: game.i18n.localize("Close"),
+        icon: "<i class='fas fa-times'></i>",
+        default: true,
+        callback: () => "close"
+      }
+    ],
     rejectClose: false
   });
 }

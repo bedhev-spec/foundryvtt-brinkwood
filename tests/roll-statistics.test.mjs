@@ -7,6 +7,7 @@ import {
   listStatisticsUsers,
   recordActionRoll,
   renderRollStatisticsContent,
+  sendRollStatisticsToChat,
   summarizeRollStatistics
 } from "../module/roll-statistics.js";
 
@@ -80,4 +81,30 @@ test("statistics dialog is focused and escapes player names", () => {
   assert.match(content, /BITD\.RollStatisticsAveragePool/);
   assert.match(content, /BITD\.RollStatisticsZeroDice/);
   assert.doesNotMatch(content, /Most rolled action/i);
+});
+
+test("player statistics can be sent as a public chat card", async () => {
+  let message;
+  globalThis.game = { i18n: { localize: key => key } };
+  globalThis.CONST = { CHAT_MESSAGE_STYLES: { OTHER: 0 } };
+  globalThis.CONFIG = {
+    ChatMessage: {
+      documentClass: {
+        async create(data) { message = data; }
+      }
+    }
+  };
+
+  await sendRollStatisticsToChat(
+    addActionRollToStatistics(undefined, { outcome: "success", dicePool: 3 }),
+    { id: "player-1", name: "Player One" }
+  );
+
+  assert.equal(message.style, CONST.CHAT_MESSAGE_STYLES.OTHER);
+  assert.deepEqual(message.speaker, { alias: "Player One" });
+  assert.deepEqual(message.whisper, []);
+  assert.equal(message.blind, false);
+  assert.equal(message.flags.brinkwood.rollStatistics.userId, "player-1");
+  assert.match(message.content, /brinkwood-roll-statistics--chat/);
+  assert.match(message.content, /BITD\.RollSuccess/);
 });

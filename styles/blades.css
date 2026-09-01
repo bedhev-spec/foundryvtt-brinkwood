@@ -1261,3 +1261,6 @@ aside#tooltip {
   font-size: var(--font-size-14);
   max-width: 30em;
 }
+.brinkwood-roll-statistics--chat {
+  min-width: 0;
+}

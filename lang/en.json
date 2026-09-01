@@ -428,6 +428,7 @@
   "BITD.RollStatistics": "Roll Statistics",
   "BITD.RollStatisticsPlayer": "Player",
   "BITD.RollStatisticsView": "View Statistics",
+  "BITD.RollStatisticsSendToChat": "Send to Chat",
   "BITD.RollStatisticsRecorded": "recorded action rolls",
   "BITD.RollStatisticsEmpty": "No action rolls have been recorded yet.",
   "BITD.RollStatisticsSixPlus": "6+ outcomes",
