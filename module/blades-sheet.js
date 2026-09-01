@@ -6,6 +6,7 @@
 
 import { BladesHelpers } from "./blades-helpers.js";
 import { escapeHTML } from "./html-utils.js";
+import { showRollStatistics } from "./roll-statistics.js";
 
 export class BladesSheet extends foundry.applications.api.HandlebarsApplicationMixin(
   foundry.applications.sheets.ActorSheetV2
@@ -75,6 +76,9 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
     }
     html.querySelectorAll(".roll-die-attribute").forEach(el =>
       el.addEventListener("click", this._onRollAttributeDieClick.bind(this), listenerOptions)
+    );
+    html.querySelectorAll(".roll-statistics-control").forEach(el =>
+      el.addEventListener("click", () => showRollStatistics(), listenerOptions)
     );
   }
 

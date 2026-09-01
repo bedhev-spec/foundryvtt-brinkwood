@@ -18,6 +18,7 @@ import { BladesClockSheet } from "./blades-clock-sheet.js";
 import { BladesNPCSheet } from "./blades-npc-sheet.js";
 import { BladesMaskSheet } from "./blades-mask-sheet.js";
 import { BladesRebelionSheet } from "./blades-rebelion-sheet.js";
+import { showRollStatistics } from "./roll-statistics.js";
 
 
 import * as migrations from "./migration.js";
@@ -34,7 +35,8 @@ import {
 /* -------------------------------------------- */
 Hooks.once("init", async function() {
   game.blades = {
-    dice: bladesRoll
+    dice: bladesRoll,
+    rollStatistics: showRollStatistics
   };
   game.system.bladesClocks = {
     sizes: [ 4, 6, 8 ]

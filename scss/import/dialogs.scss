@@ -1,4 +1,98 @@
 // Add Items modal styling.
+.roll-statistics-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 4px;
+
+  .roll-statistics-control {
+    flex: 0 0 auto;
+    width: auto;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+  }
+}
+
+.brinkwood-roll-statistics {
+  min-width: 390px;
+
+  header {
+    margin-bottom: 12px;
+    border-bottom: 2px solid $almost_black;
+
+    h2,
+    p {
+      margin: 0 0 4px;
+    }
+  }
+}
+
+.brinkwood-roll-statistics__row {
+  display: grid;
+  grid-template-columns: 105px 1fr 48px 28px;
+  align-items: center;
+  gap: 7px;
+  margin: 6px 0;
+}
+
+.brinkwood-roll-statistics__track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: $lightgray;
+
+  span {
+    display: block;
+    height: 100%;
+    background: $blue;
+  }
+}
+
+.brinkwood-roll-statistics__row--critical-success .brinkwood-roll-statistics__track span {
+  background: $light_green;
+}
+
+.brinkwood-roll-statistics__row--success .brinkwood-roll-statistics__track span {
+  background: $green;
+}
+
+.brinkwood-roll-statistics__row--failure .brinkwood-roll-statistics__track span {
+  background: $red;
+}
+
+.brinkwood-roll-statistics__count {
+  color: $darkgray;
+  text-align: right;
+}
+
+.brinkwood-roll-statistics__summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 14px 0 0;
+
+  div {
+    padding-top: 6px;
+    border-top: 1px solid $gray;
+  }
+
+  dt {
+    color: $darkgray;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  dd {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
+}
+
+.brinkwood-roll-statistics__empty {
+  color: $darkgray;
+  font-style: italic;
+}
+
 .items-to-add {
 
   display: flex;
@@ -18,5 +112,4 @@
  //Tooltip.
 
 }
-
 

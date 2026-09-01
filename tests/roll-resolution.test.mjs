@@ -98,6 +98,7 @@ test("bladesRoll uses the resolved pool and forwards the full calculation to cha
   let renderedPath;
   let renderedData;
   let createdMessage;
+  let storedStatistics;
 
   globalThis.foundry = {
     abstract: { TypeDataModel },
@@ -134,6 +135,15 @@ test("bladesRoll uses the resolved pool and forwards the full calculation to cha
     }
   };
   globalThis.CONST = { CHAT_MESSAGE_STYLES: { ROLL: 5 } };
+  globalThis.game = {
+    user: {
+      id: "player-1",
+      getFlag: () => storedStatistics,
+      async setFlag(_scope, _key, value) {
+        storedStatistics = value;
+      }
+    }
+  };
   globalThis.CONFIG = {
     ChatMessage: {
       documentClass: {
@@ -165,4 +175,13 @@ test("bladesRoll uses the resolved pool and forwards the full calculation to cha
   assert.equal(createdMessage.content, "rendered card");
   assert.equal(createdMessage.style, 5);
   assert.equal(createdMessage.rolls.length, 1);
+  assert.equal(createdMessage.flags.brinkwood.roll.userId, "player-1");
+  assert.equal(createdMessage.flags.brinkwood.roll.outcome, "success");
+  assert.equal(createdMessage.flags.brinkwood.roll.dicePool, 1);
+  assert.equal(storedStatistics.total, 1);
+  assert.equal(storedStatistics.outcomes.success, 1);
+
+  await bladesRoll(2, "", "", "", "Utility roll");
+  assert.equal(createdMessage.flags, undefined);
+  assert.equal(storedStatistics.total, 1, "unlabelled simple rolls must not affect action statistics");
 });

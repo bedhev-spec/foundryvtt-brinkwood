@@ -1,5 +1,12 @@
 <form class="{{cssClass}} actor-sheet" autocomplete="off">
 
+  <div class="roll-statistics-toolbar">
+    <button type="button" class="roll-statistics-control" title="{{localize 'BITD.RollStatistics'}}">
+      <i class="fas fa-chart-bar" aria-hidden="true"></i>
+      {{localize "BITD.RollStatistics"}}
+    </button>
+  </div>
+
   <section id="character-{{_id}}-name-alias" class="flex-horizontal name-alias">
     <div class="grow-two">
       <img src="{{img}}" {{#if editable}}data-action="editImage" data-edit="img"{{/if}} title="{{name}}" class="portrait">

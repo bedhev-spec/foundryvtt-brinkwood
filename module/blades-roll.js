@@ -1,5 +1,6 @@
 import { BladesHelpers, capitalize } from "./blades-helpers.js";
 import { buildRollResolution } from "./roll-resolution.js";
+import { recordActionRoll } from "./roll-statistics.js";
 
 /**
  * Roll Dice.
@@ -43,7 +44,8 @@ async function showChatRollMessage(r, zeromode, attribute_label = "", position =
 
   let result;
 
-	switch ( BladesHelpers.rollType(attribute_label) ) {
+	const rollType = BladesHelpers.rollType(attribute_label);
+	switch ( rollType ) {
  		case 'resist':
       const stress = getBladesRollStress(rolls, zeromode);
       result = await foundry.applications.handlebars.renderTemplate("systems/brinkwood/templates/chat/resistance-roll.html", {rolls: rolls, roll_status: roll_status, attribute_label: attribute_label, stress: stress, note: note, calculation: calculation});
@@ -57,14 +59,34 @@ async function showChatRollMessage(r, zeromode, attribute_label = "", position =
  
 	}
 
+  const rollRecord = rollType === "action" && attribute_label ? {
+    version: 1,
+    userId: game.user?.id,
+    actorId: speaker.actor ?? null,
+    attributeLabel: attribute_label,
+    outcome: roll_status,
+    dicePool: calculation.dicePool,
+    zeroMode: calculation.zeroMode,
+    position,
+    effect,
+    modifiers: calculation.modifiers.map(({ label, value }) => ({ label, value }))
+  } : null;
   let messageData = {
     speaker: speaker,
     content: result,
     style: CONST.CHAT_MESSAGE_STYLES.ROLL,
-    rolls: [r]
+    rolls: [r],
+    ...(rollRecord ? { flags: { brinkwood: { roll: rollRecord } } } : {})
   }
 
   await CONFIG.ChatMessage.documentClass.create(messageData, {});
+  if (rollRecord) {
+    try {
+      await recordActionRoll(rollRecord);
+    } catch (error) {
+      console.warn("Brinkwood | Could not update player roll statistics", error);
+    }
+  }
 }
 
 /**
