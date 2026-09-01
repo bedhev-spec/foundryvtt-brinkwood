@@ -1,6 +1,26 @@
 .window-content {
-  background-color: #FFF;
+  background-color: var(--bw-paper);
   background-blend-mode: luminosity, normal;
+  color: var(--bw-ink);
+}
+
+.window-header {
+  background-color: var(--bw-ink);
+  color: var(--bw-inverse);
+
+  .window-title,
+  .header-control {
+    color: inherit;
+  }
+
+  .header-control:focus-visible {
+    outline: 3px solid var(--bw-focus);
+    outline-offset: -3px;
+  }
+}
+
+.window-content form {
+  color: var(--bw-ink);
 }
 
 textarea {
@@ -113,8 +133,8 @@ section {
   }
 }
 .black-label {
-  background-color: $almost_black;
-  color: $almost_white;
+  background-color: var(--bw-ink);
+  color: var(--bw-inverse);
   font-size: 21px;
   text-align: center;
   padding: 0px 5px;
@@ -124,8 +144,8 @@ section {
 }
 
 .gray-label {
-  background-color: $gray;
-  color: $almost_black;
+  background-color: var(--bw-paper-deep);
+  color: var(--bw-ink);
   font-size: 21px;
   text-align: center;
   padding: 0px 5px;
@@ -137,8 +157,8 @@ section {
 
 .label-stripe {
   text-transform: uppercase;
-  background-color: $almost_black;
-  color: $almost_white;
+  background-color: var(--bw-ink);
+  color: var(--bw-inverse);
   margin-bottom: 10px;
   position: relative;
   padding-left: 10px;
@@ -149,7 +169,8 @@ section {
 
 .label-stripe-gray {
   text-transform: uppercase;
-  background-color: $gray;
+  background-color: var(--bw-paper-deep);
+  color: var(--bw-ink);
   margin-bottom: 10px;
   position: relative;
   padding-left: 10px;
@@ -184,16 +205,17 @@ i {
     background: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>") no-repeat right;
     padding: 0 20px 0 0;
     margin: 0.1em -6px 0 0;
-    background-color: $almost_black;
+    background-color: var(--bw-ink);
     font-family: Georgia, "Bitstream Charter", "Times New Roman", serif;
     font-size: 14px;
     font-weight: bold;
     text-transform: uppercase;
-    color: white;
+    color: var(--bw-inverse);
     text-align: right;
 
     option {
-      color: white;
+      background-color: var(--bw-ink);
+      color: var(--bw-inverse);
     }
   }
 
@@ -232,5 +254,3 @@ td {
 		flex: 1.25;
 	}
 }
-
-
