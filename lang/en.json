@@ -543,6 +543,9 @@
   "BITD.Uses": "No. of Uses",
   "BITD.NumberAvailable": "Number Available",
   "BITD.AdditionalInfo": "Additional Information",
+  "BITD.ItemDetails": "Item Details",
+  "BITD.LoadoutItem": "Loadout Item",
+  "BITD.LoadoutItemHint": "Equipment carried into a foray.",
 
   "BITD.Position": "Position",
   "BITD.Effect": "Effect",

@@ -1,4 +1,137 @@
 // ITEM
+
+.loadout-item-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 100%;
+  padding: 16px;
+  overflow: auto;
+  color: var(--bw-ink);
+  background: var(--bw-paper);
+}
+
+.loadout-item-sheet__header {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+
+  img {
+    width: 104px;
+    height: 104px;
+    object-fit: contain;
+    padding: 10px;
+    border: 1px solid var(--bw-rule);
+    border-radius: 8px;
+    background: var(--bw-ink);
+    cursor: pointer;
+  }
+}
+
+.loadout-item-sheet__identity {
+  min-width: 0;
+
+  > span {
+    color: var(--bw-accent);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  input {
+    width: 100%;
+    height: auto;
+    padding: 2px 0 5px;
+    border: 0;
+    border-bottom: 2px solid var(--bw-ink);
+    border-radius: 0;
+    color: var(--bw-ink);
+    background: transparent;
+    font-family: Kirsty, serif;
+    font-size: 2rem;
+    line-height: 1.1;
+  }
+
+  p {
+    margin: 7px 0 0;
+    color: var(--bw-ink-soft);
+    font-size: 0.9rem;
+  }
+}
+
+.loadout-item-sheet__section {
+  padding: 12px;
+  border: 1px solid rgba(141, 98, 93, 0.55);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.24);
+
+  h2,
+  .loadout-item-sheet__textarea-label {
+    display: block;
+    margin: 0 0 9px;
+    color: var(--bw-ink-soft);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+}
+
+.loadout-item-sheet__editor {
+  min-height: 110px;
+  padding: 8px;
+  border: 1px solid rgba(33, 27, 29, 0.28);
+  border-radius: 6px;
+  background: var(--bw-paper-deep);
+
+  .editor,
+  .editor-content,
+  prose-mirror {
+    min-height: 92px;
+  }
+}
+
+.loadout-item-sheet__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: var(--bw-ink-soft);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  input {
+    width: 100%;
+    height: 34px;
+    padding: 5px 8px;
+    border: 1px solid rgba(33, 27, 29, 0.35);
+    border-radius: 5px;
+    color: var(--bw-ink);
+    background: #fffdf7;
+    font: inherit;
+    font-size: 1rem;
+  }
+}
+
+.loadout-item-sheet textarea {
+  width: 100%;
+  min-height: 84px;
+  padding: 8px;
+  resize: vertical;
+  border: 1px solid rgba(33, 27, 29, 0.35);
+  border-radius: 5px;
+  color: var(--bw-ink);
+  background: #fffdf7;
+  font: inherit;
+}
+
 .item {
 
   justify-content: space-between;

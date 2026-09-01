@@ -6,6 +6,7 @@
 
 import { BladesHelpers } from "./blades-helpers.js";
 import { escapeHTML } from "./html-utils.js";
+import { renderItemTooltip } from "./item-tooltip.js";
 import { showRollStatistics } from "./roll-statistics.js";
 
 export class BladesSheet extends foundry.applications.api.HandlebarsApplicationMixin(
@@ -105,12 +106,16 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
       const itemId = escapeHTML(e._id);
       const itemName = escapeHTML(game.i18n.localize(e.name));
       const itemDetails = escapeHTML(addition_price_load);
-      htmlContent += `<div>
+      const itemTooltip = escapeHTML(renderItemTooltip(e, key => game.i18n.localize(key)));
+      const itemTooltipLabel = escapeHTML(game.i18n.localize("BITD.ItemDetails"));
+      htmlContent += `<div class="item-picker-row">
         <input id="select-item-${itemId}" type="${input_type}" name="select_items" value="${itemId}">
         <label class="flex-horizontal" for="select-item-${itemId}">
-          ${itemName} ${itemDetails}
-          <i class="tooltip fas fa-question-circle"></i>
+          <span>${itemName}</span><span class="item-picker-row__detail">${itemDetails}</span>
         </label>
+        <i class="tooltip fas fa-question-circle" tabindex="0" aria-label="${itemTooltipLabel}"
+          data-tooltip-html="${itemTooltip}" data-tooltip-class="brinkwood-item-tooltip-shell"
+          data-tooltip-direction="RIGHT"></i>
       </div>`;
     });
     htmlContent += `</div>`;

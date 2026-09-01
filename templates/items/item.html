@@ -1,29 +1,51 @@
-<form class="{{cssClass}}" autocomplete="off">
-    <header class="sheet-header">
-        <img src="{{img}}" data-edit="img" title="{{name}}"/>
-        <div class="header-fields">
-            <h1 class="charname"><input name="name" type="text" value="{{name}}" placeholder="{{localize 'BITD.Name'}}"/></h1>
-        </div>
-    </header>
+<form class="{{cssClass}} loadout-item-sheet" autocomplete="off">
+  <header class="loadout-item-sheet__header">
+    <img src="{{img}}" title="{{name}}" alt="{{name}}"{{#if editable}} data-action="editImage" data-edit="img"{{/if}}/>
+    <div class="loadout-item-sheet__identity">
+      <span>{{localize "BITD.LoadoutItem"}}</span>
+      <input name="name" type="text" value="{{name}}" placeholder="{{localize 'BITD.Name'}}"/>
+      <p>{{localize "BITD.LoadoutItemHint"}}</p>
+    </div>
+  </header>
 
-    {{!-- Sheet Body --}}
-    <section class="sheet-body flex-vertical">
+  <section class="loadout-item-sheet__section">
+    <h2>{{localize "BITD.Description"}}</h2>
+    <div class="loadout-item-sheet__editor">
       {{editor system.description target="system.description" button=true editable=editable}}
-      <label class="label-stripe">{{localize "BITD.Loadout"}}</label>
-      <input id="item-load" type="text" name="system.load" value="{{system.load}}">
-      <label class="label-stripe">{{localize "BITD.Class"}}</label>
-      <input id="item-class" type="text" name="system.class" value="{{system.class}}">
-      <label class="label-stripe">{{localize "BITD.Uses"}}</label>
-      <input id="item-uses" type="text" name="system.uses" value="{{system.uses}}">
-      <label class="label-stripe">{{localize "BITD.NumberAvailable"}}</label>
-      <input id="item-num_available" type="text" name="system.num_available" value="{{system.num_available}}">
-      <label class="label-stripe">{{localize "BITD.AdditionalInfo"}}</label>
-      <textarea id="item-additional_info" type="text" name="system.additional_info" value="">{{system.additional_info}}</textarea>
-      {{#if isGM}}
-<!--         <div class="label-stripe">{{localize "BITD.Logic"}}</div> -->
-<!--         <textarea name="system.logic">{{{system.logic}}}</textarea> -->
-        <div class="label-stripe">{{localize "BITD.Effects"}}</div>
-        <div id="effects">{{> "systems/brinkwood/templates/parts/active-effects.html"}}</div>
-      {{/if}}
+    </div>
+  </section>
+
+  <section class="loadout-item-sheet__section">
+    <h2>{{localize "BITD.ItemDetails"}}</h2>
+    <div class="loadout-item-sheet__grid">
+      <label>
+        <span>{{localize "BITD.Load"}}</span>
+        <input id="item-load" type="number" min="0" step="1" name="system.load" value="{{system.load}}">
+      </label>
+      <label>
+        <span>{{localize "BITD.Uses"}}</span>
+        <input id="item-uses" type="number" min="0" step="1" name="system.uses" value="{{system.uses}}">
+      </label>
+      <label>
+        <span>{{localize "BITD.NumberAvailable"}}</span>
+        <input id="item-num_available" type="number" min="0" step="1" name="system.num_available" value="{{system.num_available}}">
+      </label>
+      <label>
+        <span>{{localize "BITD.Class"}}</span>
+        <input id="item-class" type="text" name="system.class" value="{{system.class}}">
+      </label>
+    </div>
+  </section>
+
+  <section class="loadout-item-sheet__section">
+    <label class="loadout-item-sheet__textarea-label" for="item-additional_info">{{localize "BITD.AdditionalInfo"}}</label>
+    <textarea id="item-additional_info" name="system.additional_info">{{system.additional_info}}</textarea>
+  </section>
+
+  {{#if isGM}}
+    <section class="loadout-item-sheet__section">
+      <h2>{{localize "BITD.Effects"}}</h2>
+      <div id="effects">{{> "systems/brinkwood/templates/parts/active-effects.html"}}</div>
     </section>
+  {{/if}}
 </form>
