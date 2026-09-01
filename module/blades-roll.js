@@ -1,4 +1,5 @@
 import { BladesHelpers, capitalize } from "./blades-helpers.js";
+import { buildRollResolution } from "./roll-resolution.js";
 
 /**
  * Roll Dice.
@@ -7,18 +8,19 @@ import { BladesHelpers, capitalize } from "./blades-helpers.js";
  * @param {string} position
  * @param {string} effect
  */
-export async function bladesRoll(dice_amount, attribute_label = "", position = "risky", effect = "standard", note = "") {
-
-  let zeromode = false;
-
-  if ( dice_amount < 0 ) { dice_amount = 0; }
-  if ( dice_amount === 0 ) { zeromode = true; dice_amount = 2; }
-
-  let r = new foundry.dice.Roll(`${dice_amount}d6`, {});
+export async function bladesRoll(dice_amount, attribute_label = "", position = "risky", effect = "standard", note = "", options = {}) {
+  const calculation = buildRollResolution({
+    baseDice: dice_amount,
+    modifiers: options.modifiers,
+    position,
+    effect
+  });
+  const zeromode = calculation.zeroMode;
+  let r = new foundry.dice.Roll(`${calculation.rolledDice}d6`, {});
 
   // show 3d Dice so Nice if enabled
   await r.evaluate();
-  await showChatRollMessage(r, zeromode, attribute_label, position, effect, note);
+  await showChatRollMessage(r, zeromode, attribute_label, calculation.position, calculation.effect, note, calculation);
 }
 
 /**
@@ -30,7 +32,7 @@ export async function bladesRoll(dice_amount, attribute_label = "", position = "
  * @param {string} position
  * @param {string} effect
  */
-async function showChatRollMessage(r, zeromode, attribute_label = "", position = "", effect = "", note = "") {
+async function showChatRollMessage(r, zeromode, attribute_label = "", position = "", effect = "", note = "", calculation = {}) {
 
   const speaker = foundry.documents.ChatMessage.getSpeaker();
   const rolls = r.dice[0].results;
@@ -44,14 +46,14 @@ async function showChatRollMessage(r, zeromode, attribute_label = "", position =
 	switch ( BladesHelpers.rollType(attribute_label) ) {
  		case 'resist':
       const stress = getBladesRollStress(rolls, zeromode);
-      result = await foundry.applications.handlebars.renderTemplate("systems/brinkwood/templates/chat/resistance-roll.html", {rolls: rolls, roll_status: roll_status, attribute_label: attribute_label, stress: stress, note: note});
+      result = await foundry.applications.handlebars.renderTemplate("systems/brinkwood/templates/chat/resistance-roll.html", {rolls: rolls, roll_status: roll_status, attribute_label: attribute_label, stress: stress, note: note, calculation: calculation});
     	break;
 		case 'essence':
       const essence = getBladesRollEssence(rolls, zeromode);
-      result = await foundry.applications.handlebars.renderTemplate('systems/brinkwood/templates/chat/essence-roll.html', {rolls: rolls, roll_status: roll_status, attribute_label: attribute_label, essence: essence, note: note});
+      result = await foundry.applications.handlebars.renderTemplate('systems/brinkwood/templates/chat/essence-roll.html', {rolls: rolls, roll_status: roll_status, attribute_label: attribute_label, essence: essence, note: note, calculation: calculation});
 			break;
   	default:
-      result = await foundry.applications.handlebars.renderTemplate("systems/brinkwood/templates/chat/action-roll.html", {rolls: rolls, roll_status: roll_status, attribute_label: attribute_label, position: position, position_localize: position_localize, effect: effect, effect_localize: effect_localize, note: note});
+      result = await foundry.applications.handlebars.renderTemplate("systems/brinkwood/templates/chat/action-roll.html", {rolls: rolls, roll_status: roll_status, attribute_label: attribute_label, position: position, position_localize: position_localize, effect: effect, effect_localize: effect_localize, note: note, calculation: calculation});
  
 	}
 

@@ -1,4 +1,5 @@
 import { bladesRoll } from "./blades-roll.js";
+import { readRollDialogValues } from "./roll-resolution.js";
 import { BladesHelpers } from "./blades-helpers.js";
 
 /**
@@ -83,10 +84,7 @@ export class BladesActor extends foundry.documents.Actor {
         icon: "<i class='fas fa-check'></i>",
         label: game.i18n.localize('BITD.Roll'),
         callback: async (_event, _button, dialog) => {
-          const modifier  = parseInt(dialog.querySelector('[name="mod"]').value);
-          const position  = dialog.querySelector('[name="pos"]').value;
-          const effect    = dialog.querySelector('[name="fx"]').value;
-          const note      = dialog.querySelector('[name="note"]').value;
+          const { modifier, position, effect, note } = readRollDialogValues(dialog);
           await this.rollAttribute(attribute_label, modifier, attribute_value, position, effect, note);
         },
       },
@@ -106,9 +104,9 @@ export class BladesActor extends foundry.documents.Actor {
       dice_amount = 1;
     }
 
-    dice_amount += additional_dice_amount;
-
-    await bladesRoll(dice_amount, attribute_label, position, effect, note);
+    await bladesRoll(dice_amount, attribute_label, position, effect, note, {
+      modifiers: [{ label: "BITD.Modifier", value: additional_dice_amount }]
+    });
   }
 
   /* -------------------------------------------- */

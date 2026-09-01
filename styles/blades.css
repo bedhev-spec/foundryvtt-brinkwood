@@ -1063,6 +1063,72 @@
   font-weight: bold;
 }
 
+.blades-die-tooltip .brinkwood-roll-calculation {
+  margin: 8px 0 10px;
+  padding: 8px;
+  border: 1px solid #999;
+  background: rgba(238, 239, 255, 0.55);
+}
+.blades-die-tooltip .brinkwood-roll-calculation__title {
+  margin-bottom: 6px;
+  color: #191813;
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.blades-die-tooltip .brinkwood-roll-equation {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.blades-die-tooltip .brinkwood-roll-term {
+  display: grid;
+  min-width: 44px;
+  color: #666;
+  font-size: 0.7rem;
+}
+.blades-die-tooltip .brinkwood-roll-term strong {
+  color: #191813;
+  font-size: 1rem;
+}
+.blades-die-tooltip .brinkwood-roll-term--total strong {
+  color: #04578f;
+}
+.blades-die-tooltip .brinkwood-roll-operator {
+  padding-bottom: 2px;
+  color: #666;
+  font-weight: bold;
+}
+.blades-die-tooltip .brinkwood-roll-pool-floor,
+.blades-die-tooltip .brinkwood-roll-zero-mode {
+  margin: 7px 0 0;
+  padding-top: 6px;
+  border-top: 1px dashed #999;
+  font-size: 0.8rem;
+  font-style: italic;
+}
+.blades-die-tooltip .brinkwood-roll-context {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin: 8px 0 0;
+}
+.blades-die-tooltip .brinkwood-roll-context div {
+  padding-top: 5px;
+  border-top: 1px solid #999;
+}
+.blades-die-tooltip .brinkwood-roll-context dt {
+  color: #666;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+.blades-die-tooltip .brinkwood-roll-context dd {
+  margin: 0;
+  color: #191813;
+  font-weight: bold;
+}
 .blades-die-tooltip .die {
   font-weight: bold;
   text-transform: capitalize;

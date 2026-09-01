@@ -11,6 +11,7 @@ export const preloadHandlebarsTemplates = async function() {
     "systems/brinkwood/templates/parts/attributes.html",
     "systems/brinkwood/templates/parts/mask-attributes.html",
     "systems/brinkwood/templates/parts/active-effects.html",
+		"systems/brinkwood/templates/chat/roll-calculation.html",
 		"systems/brinkwood/templates/parts/actor/downtime.html",
 		"systems/brinkwood/templates/parts/teeth-section.html",
 		"systems/brinkwood/templates/rebelion-sheet/sedition-section.html",

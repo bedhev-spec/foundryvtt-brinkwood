@@ -6,6 +6,8 @@
     </div>
   {{/if}}
 
+  {{> "systems/brinkwood/templates/chat/roll-calculation.html"}}
+
   {{#if (eq roll_status "critical-success")}}
   <div class="die {{roll_status}}">{{localize "BITD.RollCriticalSuccess"}}</div>
   <div class="description">

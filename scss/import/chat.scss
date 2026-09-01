@@ -42,6 +42,84 @@
 
 .blades-die-tooltip {
 
+  .brinkwood-roll-calculation {
+    margin: 8px 0 10px;
+    padding: 8px;
+    border: 1px solid $gray;
+    background: rgba(238, 239, 255, 0.55);
+  }
+
+  .brinkwood-roll-calculation__title {
+    margin-bottom: 6px;
+    color: $almost_black;
+    font-size: 0.75rem;
+    font-weight: bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .brinkwood-roll-equation {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .brinkwood-roll-term {
+    display: grid;
+    min-width: 44px;
+    color: $darkgray;
+    font-size: 0.7rem;
+
+    strong {
+      color: $almost_black;
+      font-size: 1rem;
+    }
+
+    &--total strong {
+      color: $blue;
+    }
+  }
+
+  .brinkwood-roll-operator {
+    padding-bottom: 2px;
+    color: $darkgray;
+    font-weight: bold;
+  }
+
+  .brinkwood-roll-pool-floor,
+  .brinkwood-roll-zero-mode {
+    margin: 7px 0 0;
+    padding-top: 6px;
+    border-top: 1px dashed $gray;
+    font-size: 0.8rem;
+    font-style: italic;
+  }
+
+  .brinkwood-roll-context {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin: 8px 0 0;
+
+    div {
+      padding-top: 5px;
+      border-top: 1px solid $gray;
+    }
+
+    dt {
+      color: $darkgray;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 0;
+      color: $almost_black;
+      font-weight: bold;
+    }
+  }
+
   .die {
     font-weight: bold;
     text-transform: capitalize;

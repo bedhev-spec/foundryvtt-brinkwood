@@ -171,9 +171,9 @@ test("legacy migration preserves effects and updates embedded items in place", a
   for (const [, update] of updates) assert.equal(update._id, undefined);
 });
 
-test("test manifest targets the reviewed branch", async () => {
+test("test manifest targets the roll-resolution branch", async () => {
   const manifest = JSON.parse(await read("system-test.json"));
   for (const field of ["url", "manifest", "download"]) {
-    assert.match(manifest[field], /codex\/fix-migrate-v13-review/);
+    assert.match(manifest[field], /codex\/fix-roll-resolution/);
   }
 });
