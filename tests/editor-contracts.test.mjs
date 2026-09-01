@@ -38,13 +38,55 @@ test("v13 image actions and editors are editable-only", async () => {
   for (const template of templates) {
     assert.match(template, /\{\{#if editable\}\}\s*data-action="editImage" data-edit="img"/);
   }
-  assert.match(templates[0], /\{\{editor system\.description[^}]*owner=owner editable=editable/);
-  assert.match(templates[1], /\{\{editor system\.description[^}]*owner=owner editable=editable/);
-  assert.match(templates[1], /\{\{editor system\.notes[^}]*owner=owner editable=editable/);
+  assert.match(templates[0], /\{\{#if editable\}\}[\s\S]*?<prose-mirror name="system\.description"[^>]*document-uuid="\{\{actor\.uuid\}\}"[^>]*collaborate toggled>/);
+  assert.match(templates[1], /<prose-mirror name="system\.description"[^>]*document-uuid="\{\{actor\.uuid\}\}"[^>]*collaborate toggled>/);
+  assert.match(templates[1], /<prose-mirror name="system\.notes"[^>]*document-uuid="\{\{actor\.uuid\}\}"[^>]*collaborate toggled>/);
+  assert.ok(templates.every(template => !/\{\{editor\b/.test(template)));
   for (const template of templates) assert.doesNotMatch(template, /\{\{editor\s+content=/);
   assert.doesNotMatch(templates[3], /\{\{editor system\.experience_clues/);
   assert.match(templates[3], /name="system\.experience_clues\.\{\{index\}\}"/);
   assert.doesNotMatch(templates[5], /system-edit="img"|\{\{item\.img\}\}/);
+});
+
+test("native rich-text controls submit source fields while viewers receive enriched content", async () => {
+  const contracts = [
+    ["templates/actor-sheet.html", "system.description", "actor.uuid", "enrichedDescription"],
+    ["templates/mask-sheet.html", "system.description", "actor.uuid", "enrichedDescription"],
+    ["templates/npc-sheet.html", "system.description", "actor.uuid", "enrichedDescription"],
+    ["templates/npc-sheet.html", "system.notes", "actor.uuid", "enrichedNotes"],
+    ["templates/actors/clock-sheet.html", "system.description", "actor.uuid", "enrichedDescription"],
+    ...["item", "simple", "trait", "class", "moot_decision"].map(type => [
+      `templates/items/${type}.html`, "system.description", "item.uuid", "enrichedDescription"
+    ])
+  ];
+
+  for (const [path, field, uuid, enriched] of contracts) {
+    const template = await read(path);
+    const control = [...template.matchAll(/<prose-mirror\s+([^>]+)>/g)].find(([, attributes]) =>
+      attributes.includes(`name="${field}"`)
+    );
+    assert.ok(control, `${path} has a native rich-text form control for ${field}`);
+    const tag = control[1];
+    assert.ok(tag, `${path} uses a native prose-mirror form control`);
+    const attributes = Object.fromEntries([...tag.matchAll(/([\w-]+)(?:="([^"]*)")?/g)].map(([, key, value]) => [key, value ?? true]));
+    assert.deepEqual(attributes, {
+      name: field,
+      value: `{{${field}}}`,
+      "document-uuid": `{{${uuid}}}`,
+      collaborate: true,
+      toggled: true
+    });
+    const contentStart = control.index + control[0].length;
+    const controlContent = template.slice(contentStart, template.indexOf("</prose-mirror>", contentStart));
+    assert.equal(controlContent.trim(), `{{{${enriched}}}}`, `${path} provides enriched closed-state content`);
+    const readOnlyBranch = template.slice(control.index, template.indexOf("{{/if}}", control.index));
+    assert.match(readOnlyBranch, new RegExp(`\\{\\{else\\}\\}\\s*<div class="editor editor-content">\\{\\{\\{${enriched}\\}\\}\\}<\\/div>`));
+  }
+});
+
+test("native rich-text controls retain a playable minimum editing height", async () => {
+  const styles = await read("scss/import/general-styles.scss");
+  assert.match(styles, /\.editor,[\s\S]*?\.editor-content,[\s\S]*?prose-mirror\s*\{[\s\S]*?min-height:\s*150px/);
 });
 
 test("Class clue form paths serialize as an ordered string array, not rich HTML", async () => {

@@ -33,7 +33,9 @@ test("standalone clock keeps viewer progress public and GM notes permission-awar
   assert.match(template, /clock-sheet__progress/);
   assert.match(template, /\{\{\{blades-clock "system\.value" system\.type system\.value _id \(localize "Clock\.Progress"\)\}\}\}/);
   assert.match(template, /\{\{#if isGM\}\}/);
-  assert.match(template, /target="system\.description"/);
+  assert.match(template, /\{\{#if editable\}\}[\s\S]*?<prose-mirror name="system\.description" value="\{\{system\.description\}\}" document-uuid="\{\{actor\.uuid\}\}" collaborate toggled>/);
+  assert.match(template, /\{\{else\}\}[\s\S]*?<div class="editor editor-content">\{\{\{enrichedDescription\}\}\}<\/div>/);
+  assert.doesNotMatch(template, /\{\{editor\b/);
   assert.match(template, /name="system\.show_description"/);
   assert.match(template, /\{\{else if system\.show_description\}\}/);
 
@@ -66,6 +68,7 @@ test("standalone clock styles stay compact, scoped, and responsive", async () =>
   assert.match(styles, /@container \(max-width: 330px\)/);
   assert.match(styles, /@include clock\(4, 184\)/);
   assert.match(styles, /\.clock-sheet__gm-note/);
+  assert.match(styles, /\.editor,[\s\S]*?prose-mirror\s*\{[\s\S]*?min-height:\s*160px/);
   assert.match(styles, /\.clock-sheet__public-description/);
   assert.match(styles, /&:focus-visible/);
   assert.match(stylesheet, /&\.actor\.clock\s*\{\s*@import 'import\/clocks\.scss';/);

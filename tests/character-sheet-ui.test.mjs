@@ -15,8 +15,9 @@ test("character notes use a declared persistent v13 editor field", async () => {
   assert.match(model, /description:\s+new fields\.HTMLField\(\{ required: false, initial: "" \}\)/);
   assert.equal(defaults.Actor.character.description, "");
   assert.match(template, /id="character-\{\{_id\}\}-notes"[^>]+role="tabpanel"/);
-  assert.match(template, /\{\{editor system\.description target="system\.description" button=true owner=owner editable=editable/);
-  assert.doesNotMatch(template, /\{\{editor\s+content=/);
+  assert.match(template, /\{\{#if editable\}\}[\s\S]*?<prose-mirror name="system\.description" value="\{\{system\.description\}\}" document-uuid="\{\{actor\.uuid\}\}" collaborate toggled>/);
+  assert.match(template, /\{\{else\}\}[\s\S]*?<div class="editor editor-content">\{\{\{enrichedDescription\}\}\}<\/div>/);
+  assert.doesNotMatch(template, /\{\{editor\b/);
 });
 
 test("shared clock and effect controls adapt to sheet size and editability", async () => {
@@ -34,6 +35,34 @@ test("shared clock and effect controls adapt to sheet size and editability", asy
   assert.match(effectStyles, /@container \(max-width: 600px\)/);
   assert.match(effectTemplate, /\{\{#if section\.canCreate\}\}[\s\S]*?\{\{#if \.\.\/editable\}\}[\s\S]*?data-effect-action="create"[\s\S]*?\{\{\/if\}\}/);
   assert.match(effectTemplate, /\{\{#if \.\.\/\.\.\/editable\}\}[\s\S]*?data-effect-action="toggle"[\s\S]*?\{\{\/if\}\}/);
+});
+
+test("character workspace gives effects the full pane and uses flat accessible skill pips", async () => {
+  const [template, attributes, styles, compiled] = await Promise.all([
+    read("templates/actor-sheet.html"),
+    read("templates/parts/attributes.html"),
+    read("scss/import/character-sheet.scss"),
+    read("styles/blades.css"),
+  ]);
+
+  assert.match(template, /class="character-sheet__workspace"/);
+  assert.match(styles, /\.character-sheet__workspace\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) minmax\(200px, 240px\)/);
+  assert.match(styles, /:has\(\.tab\[data-tab="loadout"\]\.active\)[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
+  assert.match(styles, /:has\(\.tab\[data-tab="character-notes"\]\.active\)[\s\S]*?display:\s*none/);
+  assert.match(styles, /@container \(max-width: 620px\)[\s\S]*?\.character-sheet__workspace/);
+  assert.match(styles, /@container \(max-width: 480px\)[\s\S]*?\.attributes\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(attributes, /button type="button" class="dot-value \{\{#if \(lt skill\.value this\)\}\}dot-value--empty/);
+  assert.match(attributes, /aria-pressed=/);
+  assert.match(attributes, /\{\{#unless @root\.editable\}\} disabled/);
+  assert.match(styles, /button\.dot-value\s*\{[\s\S]*?width:\s*28px[\s\S]*?background:\s*transparent/);
+  assert.match(styles, /\.dot-value--filled::before\s*\{[\s\S]*?background:\s*var\(--bw-ink\)/);
+  assert.match(styles, /nav\.tabs[\s\S]*?&\.active\s*\{[\s\S]*?box-shadow:\s*inset 0 -3px var\(--bw-accent\)/);
+  assert.match(styles, /\.tab\[data-tab="character-notes"\][\s\S]*?prose-mirror\s*\{[\s\S]*?min-height:\s*260px/);
+  assert.match(template, /button type="button" class="dot-value" data-path="system\.experience\.value"[\s\S]*?aria-pressed=/);
+  assert.match(template, /button type="button" class="dot-value" data-path="system\.stress\.value"[\s\S]*?aria-pressed=/);
+  assert.doesNotMatch(template, /for="character-\{\{_id\}\}-(?:xp|stress)-0"/);
+  assert.match(compiled, /\.brinkwood\.actor\.pc\.character \.character-sheet__workspace/);
+  assert.match(compiled, /\.brinkwood\.actor\.pc\.character \.attributes \.attributes-container button\.dot-value/);
 });
 
 test("effect management is grouped and uses markup-independent controls", async () => {

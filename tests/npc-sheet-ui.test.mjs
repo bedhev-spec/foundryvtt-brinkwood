@@ -15,9 +15,11 @@ test("NPC sheet is a compact editable dossier with v13 editor panels", async () 
     assert.match(template, new RegExp(`name="system\\.${field}" value="\\{\\{system\\.${field}\\}\\}"\\{\\{#unless editable\\}\\} disabled`));
   }
   assert.match(template, /aria-labelledby="npc-\{\{_id\}\}-profile-heading"/);
-  assert.match(template, /\{\{editor system\.description target="system\.description" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true\}\}/);
-  assert.match(template, /\{\{editor system\.notes target="system\.notes" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true\}\}/);
-  assert.doesNotMatch(template, /\{\{editor\s+content=/);
+  assert.match(template, /<prose-mirror name="system\.description" value="\{\{system\.description\}\}" document-uuid="\{\{actor\.uuid\}\}" collaborate toggled>/);
+  assert.match(template, /<prose-mirror name="system\.notes" value="\{\{system\.notes\}\}" document-uuid="\{\{actor\.uuid\}\}" collaborate toggled>/);
+  assert.match(template, /<div class="editor editor-content">\{\{\{enrichedDescription\}\}\}<\/div>/);
+  assert.match(template, /<div class="editor editor-content">\{\{\{enrichedNotes\}\}\}<\/div>/);
+  assert.doesNotMatch(template, /\{\{editor\b/);
   assert.doesNotMatch(template, /data-group=|data-tab=/);
 });
 
@@ -34,6 +36,7 @@ test("NPC dossier styles are scoped, responsive, and keyboard visible", async ()
   assert.match(styles, /var\(--bw-(?:paper|ink|rule|focus)\)/);
   assert.match(styles, /&:focus-visible/);
   assert.match(styles, /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(styles, /\.editor,[\s\S]*?prose-mirror\s*\{[\s\S]*?min-height:\s*210px/);
   assert.match(stylesheet, /&\.actor\.npc\s*\{\s*@import 'import\/npc-sheet\.scss';/);
 });
 

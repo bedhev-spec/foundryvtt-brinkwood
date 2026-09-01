@@ -9,6 +9,17 @@ import { escapeHTML } from "./html-utils.js";
 import { renderItemTooltip } from "./item-tooltip.js";
 import { showRollStatistics } from "./roll-statistics.js";
 
+export function lockSheetFormControls(html) {
+  html.querySelectorAll("input, select").forEach(control => {
+    control.disabled = true;
+    control.setAttribute("aria-disabled", "true");
+  });
+  html.querySelectorAll("textarea").forEach(control => {
+    control.readOnly = true;
+    control.setAttribute("aria-readonly", "true");
+  });
+}
+
 export class BladesSheet extends foundry.applications.api.HandlebarsApplicationMixin(
   foundry.applications.sheets.ActorSheetV2
 ) {
@@ -50,16 +61,7 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
     await super._onRender(context, options);
 
     const html = this.element;
-    if (!this.isEditable) {
-      html.querySelectorAll("input, select").forEach((control) => {
-        control.disabled = true;
-        control.setAttribute("aria-disabled", "true");
-      });
-      html.querySelectorAll("textarea").forEach((control) => {
-        control.readOnly = true;
-        control.setAttribute("aria-readonly", "true");
-      });
-    }
+    if (!this.isEditable) lockSheetFormControls(html);
     this._brinkwoodListenerController?.abort();
     this._brinkwoodListenerController = new AbortController();
     const listenerOptions = { signal: this._brinkwoodListenerController.signal };

@@ -3,6 +3,40 @@ import { BladesSheet } from "./blades-sheet.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
 import { capitalize } from "./blades-helpers.js";
 
+export function getMaskTypePresentation(typeName, attributes) {
+  const maskAttributes = attributes[typeName];
+  const typeLang = `BITD.${capitalize(typeName)}`;
+  return {
+    attributes: maskAttributes ?? [],
+    label: maskAttributes ? `${typeLang}Short` : "BITD.Mask",
+    typeLang,
+    xpKey: maskAttributes ? `Mask.XP.${capitalize(typeName)}` : null
+  };
+}
+
+export function updateMaskDotDisplay(element, value, maxValue) {
+  const group = element.parentElement;
+  const color = element.dataset.path === "experience.value" ? "blue" : "red";
+
+  group?.querySelectorAll(".dot-value").forEach(dot => {
+    const filled = Number(dot.dataset.value) <= value;
+    dot.setAttribute("aria-pressed", filled ? "true" : "false");
+    const tooth = dot.querySelector("img");
+    if (tooth) {
+      tooth.src = `systems/brinkwood/styles/assets/teeth/stresstooth-${filled ? color : "halfgrey"}.png`;
+    } else {
+      dot.textContent = filled ? "●" : "○";
+    }
+  });
+
+  const tracker = group?.closest?.(".mask-tracker");
+  const output = tracker?.querySelector("output");
+  if (output) output.textContent = `${value} / ${maxValue}`;
+
+  const skillLabel = group?.closest?.(".mask-skill")?.querySelector(".attribute-skill-label");
+  if (skillLabel) skillLabel.dataset.rollValue = String(value);
+}
+
 /**
  * Extend the basic BladesSheet for the Mask actor type.
  * @extends {BladesSheet}
@@ -11,7 +45,7 @@ export class BladesMaskSheet extends BladesSheet {
 
   static DEFAULT_OPTIONS = {
     classes: ["brinkwood", "sheet", "actor", "pc", "mask"],
-    position: { width: 700, height: 970 },
+    position: { width: 700, height: 840 },
     form: { submitOnChange: true },
     tabGroups: { primary: "traits" },
   };
@@ -27,6 +61,7 @@ export class BladesMaskSheet extends BladesSheet {
     const context = await super._prepareContext(options);
 
     context.system.mask_attributes = context.system.attributes[context.system.type] ?? [];
+    context.maskAttributesLabel = "BITD.Mask";
 
     // Prepare active effects
     context.effects = BladesActiveEffect.prepareActiveEffectCategories(this.actor.effects);
@@ -65,11 +100,13 @@ export class BladesMaskSheet extends BladesSheet {
     context.system.mask_attributes = [];
     if (context.system.type) {
       const typeName = context.system.type;
-      context.system.type_lang       = `BITD.${capitalize(typeName)}`;
-      context.system.mask_attributes = context.system.attributes[typeName] ?? [];
+      const presentation = getMaskTypePresentation(typeName, context.system.attributes);
+      context.system.type_lang       = presentation.typeLang;
+      context.maskAttributesLabel    = presentation.label;
+      context.system.mask_attributes = presentation.attributes;
       context.system.xp_tooltip      =
         game.i18n.localize("Mask.XP.Tooltip") +
-        game.i18n.localize(`Mask.XP.${capitalize(typeName)}`);
+        (presentation.xpKey ? game.i18n.localize(presentation.xpKey) : "");
     }
 
     // Look for Mule ability
@@ -80,7 +117,7 @@ export class BladesMaskSheet extends BladesSheet {
     context.system.load_level  = mule_present ? mule_level[loadout] : load_level[loadout];
     context.system.load_levels = { "BITD.Light": "BITD.Light", "BITD.Normal": "BITD.Normal", "BITD.Heavy": "BITD.Heavy" };
 
-    context.system.description = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+    context.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       context.system.description,
       { async: true, relativeTo: this.document, secrets: this.document.isOwner }
     );
@@ -144,7 +181,12 @@ export class BladesMaskSheet extends BladesSheet {
     if (new_value === old_value && new_value === 1) new_value = 0;
     if (new_value > max_value) new_value = max_value;
 
-    await this.actor.update({ [`system.${dataset.path}`]: new_value });
+    await this.actor.update({ [`system.${dataset.path}`]: new_value }, { render: false });
+    this._updateDotDisplay(element, new_value, max_value);
+  }
+
+  _updateDotDisplay(element, value, maxValue) {
+    updateMaskDotDisplay(element, value, maxValue);
   }
 
 }

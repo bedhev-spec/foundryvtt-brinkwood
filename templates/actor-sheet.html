@@ -1,4 +1,4 @@
-<form class="{{cssClass}} actor-sheet" autocomplete="off">
+<form class="{{cssClass}} actor-sheet character-sheet" data-actor-uuid="{{actor.uuid}}" autocomplete="off">
 
   <div class="roll-statistics-toolbar">
     <button type="button" class="roll-statistics-control" title="{{localize 'BITD.RollStatistics'}}">
@@ -87,18 +87,18 @@
       {{!-- XP --}}
       <div class="section big-teeth-section">
         <div id="character-{{_id}}-xp" class="big-teeth character-xp tooltip" data-tooltip="Actor.XP.Tooltip" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
-          <label class="black-label" for="character-{{_id}}-xp-0">
-						{{localize system.experience.name}}
-					</label>
+          <span class="black-label">
+            {{localize system.experience.name}}
+          </span>
           {{#with system as | system | }}
           {{#times_from_1 system.experience.max}}
-            <span class="dot-value" data-path="system.experience.value" data-max_value="{{system.experience.max}}" data-value="{{this}}">
-              {{#if (lt system.experience.value this)}}
-                <img class="big-teeth" src="systems/brinkwood/styles/assets/teeth/stresstooth-halfgrey.png">
-              {{else}}
-                <img class="big-teeth" src="systems/brinkwood/styles/assets/teeth/stresstooth-blue.png">
-              {{/if}}
-            </span>
+              <button type="button" class="dot-value" data-path="system.experience.value" data-max_value="{{system.experience.max}}" data-value="{{this}}" aria-label="{{localize system.experience.name}} {{this}} of {{system.experience.max}}" aria-pressed="{{#if (lt system.experience.value this)}}false{{else}}true{{/if}}"{{#unless ../../editable}} disabled{{/unless}}>
+                {{#if (lt system.experience.value this)}}
+                  <img class="big-teeth" src="systems/brinkwood/styles/assets/teeth/stresstooth-halfgrey.png" alt="">
+                {{else}}
+                  <img class="big-teeth" src="systems/brinkwood/styles/assets/teeth/stresstooth-blue.png" alt="">
+                {{/if}}
+              </button>
           {{/times_from_1}}
           {{/with}}
         </div>
@@ -107,16 +107,16 @@
       {{!-- Stress --}}
       <div id="character-{{_id}}-stress-trauma" class="section big-teeth-section">
         <div id="character-{{_id}}-stress" class="big-teeth character-stress tooltip" data-tooltip="Actor.Stress.Tooltip" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
-          <label class="black-label" for="character-{{_id}}-stress-0">{{localize system.stress.name}}</label>
+          <span class="black-label">{{localize system.stress.name}}</span>
           {{#with system as | system | }}
           {{#times_from_1 system.stress.max}}
-            <span class="dot-value" data-path="system.stress.value" data-max_value="{{system.stress.max}}" data-value="{{this}}">
-              {{#if (lt system.stress.value this)}}
-	      			  <img class="big-teeth" src="systems/brinkwood/styles/assets/teeth/stresstooth-halfgrey.png">
-              {{else}}
-                <img class="big-teeth" src="systems/brinkwood/styles/assets/teeth/stresstooth-red.png">
-              {{/if}}
-            </span>
+              <button type="button" class="dot-value" data-path="system.stress.value" data-max_value="{{system.stress.max}}" data-value="{{this}}" aria-label="{{localize system.stress.name}} {{this}} of {{system.stress.max}}" aria-pressed="{{#if (lt system.stress.value this)}}false{{else}}true{{/if}}"{{#unless ../../editable}} disabled{{/unless}}>
+                {{#if (lt system.stress.value this)}}
+                  <img class="big-teeth" src="systems/brinkwood/styles/assets/teeth/stresstooth-halfgrey.png" alt="">
+                {{else}}
+                  <img class="big-teeth" src="systems/brinkwood/styles/assets/teeth/stresstooth-red.png" alt="">
+                {{/if}}
+              </button>
           {{/times_from_1}}
           {{/with}}
         </div>
@@ -193,7 +193,7 @@
 
 
   {{!-- Attributes --}}
-  <section class="flex-horizontal">
+<section class="character-sheet__workspace">
 
     <div class="tab-content flex-vertical grow-two">
 
@@ -290,7 +290,11 @@
         <div class="label-stripe">
           <p>{{localize "BITD.Notes"}}</p>
         </div>
-        {{editor system.description target="system.description" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
+        {{#if editable}}
+        <prose-mirror name="system.description" value="{{system.description}}" document-uuid="{{actor.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
+        {{else}}
+        <div class="editor editor-content">{{{enrichedDescription}}}</div>
+        {{/if}}
       </div>
 
       {{!-- Active Effects --}}

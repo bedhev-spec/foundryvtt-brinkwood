@@ -3,6 +3,7 @@
  * @extends {ItemSheetV2}
  */
 import { BladesActiveEffect } from "./blades-active-effect.js";
+import { lockSheetFormControls } from "./blades-sheet.js";
 
 export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicationMixin(
   foundry.applications.sheets.ItemSheetV2
@@ -16,7 +17,7 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
 
   static DEFAULT_OPTIONS = {
     classes: ["brinkwood", "sheet", "item"],
-    position: { width: 560 },
+    position: { width: 560, height: 700 },
     window: { resizable: true },
     form: { submitOnChange: true },
   };
@@ -49,6 +50,7 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
   async _prepareContext(options) {
     const doc     = this.document;
     const context = doc.toObject();               // _id, name, img, type, system …
+    context.item     = doc;
     context.isGM     = game.user.isGM;
     context.owner    = doc.isOwner;
     context.editable = this.isEditable;
@@ -69,7 +71,10 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
     this._itemSheetListenerController?.abort();
     const html = this.element;
 
-    if (!this.isEditable) return;
+    if (!this.isEditable) {
+      lockSheetFormControls(html);
+      return;
+    }
     this._itemSheetListenerController = new AbortController();
     const listenerOptions = { signal: this._itemSheetListenerController.signal };
 

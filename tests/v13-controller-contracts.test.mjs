@@ -65,6 +65,17 @@ test("each audited module is free of legacy sheet APIs", async t => {
   }
 });
 
+test("tracker-only actor updates synchronize every open renderer", async () => {
+  const [bootstrap, characterTemplate, maskTemplate] = await Promise.all([
+    read("module/blades.js"),
+    read("templates/actor-sheet.html"),
+    read("templates/mask-sheet.html")
+  ]);
+  assert.match(bootstrap, /Hooks\.on\("updateActor", \(actor, changes\) => syncOpenActorTrackers\(actor, changes\)\)/);
+  assert.match(characterTemplate, /class="\{\{cssClass\}\} actor-sheet character-sheet" data-actor-uuid="\{\{actor\.uuid\}\}"/);
+  assert.match(maskTemplate, /class="\{\{cssClass\}\} actor-sheet mask-sheet" data-actor-uuid="\{\{actor\.uuid\}\}"/);
+});
+
 test("Simple Roll uses a close-safe native DialogV2 form contract", async () => {
   const source = await read("module/blades-roll.js");
   assert.match(source, /DialogV2\.wait/);
@@ -86,9 +97,11 @@ test("each Actor HTML editor has its own enriched context and template target", 
     await t.test(name, async () => {
       const [controller, template] = await Promise.all([read(controllerPath), read(templatePath)]);
       for (const field of fields) {
-        assert.match(controller, new RegExp(`context\\.system\\.${field}\\s*=\\s*await[\\s\\S]*?enrichHTML`));
-        assert.match(template, new RegExp(`\\{\\{editor system\\.${field} target="system\\.${field}"`));
-        assert.doesNotMatch(template, /\{\{editor\s+content=/);
+      const enrichedField = field === "notes" ? "enrichedNotes" : "enrichedDescription";
+      assert.match(controller, new RegExp(`context\\.${enrichedField}\\s*=\\s*await[\\s\\S]*?enrichHTML`));
+      assert.match(template, new RegExp(`<prose-mirror name="system\\.${field}" value="\\{\\{system\\.${field}\\}\\}" document-uuid="\\{\\{actor\\.uuid\\}\\}" collaborate toggled>`));
+      assert.match(template, new RegExp(`\\{\\{\\{${enrichedField}\\}\\}`));
+      assert.doesNotMatch(template, /\{\{editor\b/);
       }
       assert.match(controller, /relativeTo:\s*this\.document/);
       assert.match(controller, /secrets:\s*this\.document\.isOwner/);
@@ -99,15 +112,16 @@ test("each Actor HTML editor has its own enriched context and template target", 
 test("each Item description editor uses the dedicated enriched context", async t => {
   const controller = await read("module/blades-item-sheet.js");
   assert.match(controller, /context\.enrichedDescription\s*=\s*await[\s\S]*?enrichHTML/);
+  assert.match(controller, /context\.item\s*=\s*doc/);
   assert.match(controller, /relativeTo:\s*doc/);
   assert.match(controller, /secrets:\s*doc\.isOwner/);
 
   for (const type of ["item", "simple", "trait", "class", "moot_decision"]) {
     await t.test(type, async () => {
       const template = await read(`templates/items/${type}.html`);
-      assert.match(template, /\{\{editor enrichedDescription target="system\.description"/);
-      assert.doesNotMatch(template, /\{\{editor\s+content=/);
-      assert.match(template, /owner=owner editable=editable/);
+      assert.match(template, /\{\{#if editable\}\}[\s\S]*?<prose-mirror name="system\.description" value="\{\{system\.description\}\}" document-uuid="\{\{item\.uuid\}\}" collaborate toggled>/);
+      assert.match(template, /\{\{else\}\}[\s\S]*?<div class="editor editor-content">\{\{\{enrichedDescription\}\}\}<\/div>/);
+      assert.doesNotMatch(template, /\{\{editor\b/);
     });
   }
 });

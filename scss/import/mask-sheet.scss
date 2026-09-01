@@ -191,14 +191,29 @@
 
   .mask-sheet__layout {
     display: grid;
+    grid-template-areas: "content attributes";
     grid-template-columns: minmax(0, 1fr) 190px;
     gap: 16px;
     align-items: start;
     padding-top: 16px;
   }
 
+  .mask-sheet__layout:has(.mask-sheet__panel[data-tab="mask-notes"].active),
+  .mask-sheet__layout:has(.mask-sheet__panel[data-tab="effects"].active) {
+    grid-template-areas: "content";
+    grid-template-columns: minmax(0, 1fr);
+
+    > .mask-attributes {
+      display: none;
+    }
+  }
+
   .mask-sheet__main {
+    display: grid;
+    grid-area: content;
+    grid-template-rows: auto minmax(0, 1fr);
     min-width: 0;
+    width: 100%;
   }
 
   .mask-sheet__tabs {
@@ -230,7 +245,9 @@
 
   .mask-sheet__panel {
     display: none;
+    min-width: 0;
     padding-top: 12px;
+    width: 100%;
 
     &.active {
       display: block;
@@ -246,9 +263,18 @@
     }
 
     .editor,
-    .editor-content {
+    .editor-content,
+    prose-mirror {
       min-height: 180px;
     }
+  }
+
+  .mask-attributes > h2 {
+    margin: 0 0 10px;
+    color: var(--bw-ink);
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
 
   .mask-sheet__traits {
@@ -287,6 +313,8 @@
   }
 
   .mask-attributes {
+    grid-area: attributes;
+    min-width: 0;
     padding: 10px;
     border: 1px solid var(--bw-rule);
     border-radius: 4px;
@@ -353,6 +381,9 @@
     }
 
     .mask-sheet__layout {
+      grid-template-areas:
+        "content"
+        "attributes";
       grid-template-columns: 1fr;
     }
 

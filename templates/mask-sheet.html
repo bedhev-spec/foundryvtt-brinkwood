@@ -1,4 +1,4 @@
-<form class="{{cssClass}} actor-sheet mask-sheet" autocomplete="off">
+<form class="{{cssClass}} actor-sheet mask-sheet" data-actor-uuid="{{actor.uuid}}" autocomplete="off">
   <header class="mask-sheet__header">
   <img class="mask-sheet__portrait" src="{{img}}" title="{{name}}" alt="{{name}}"{{#if editable}} data-action="editImage" data-edit="img" role="button" tabindex="0" aria-label="{{localize 'BITD.Name'}}: {{name}}"{{/if}}>
 
@@ -36,7 +36,7 @@
         </div>
         <div class="mask-tracker__dots" role="group" aria-label="{{localize system.experience.name}}">
           {{#times_from_1 system.experience.max}}
-          <button type="button" class="dot-value" data-path="experience.value" data-max_value="{{../system.experience.max}}" data-value="{{this}}" aria-label="{{localize ../system.experience.name}} {{this}} of {{../system.experience.max}}"{{#unless ../editable}} disabled{{/unless}}>
+          <button type="button" class="dot-value" data-path="experience.value" data-max_value="{{../system.experience.max}}" data-value="{{this}}" aria-label="{{localize ../system.experience.name}} {{this}} of {{../system.experience.max}}" aria-pressed="{{#if (lt ../system.experience.value this)}}false{{else}}true{{/if}}"{{#unless ../editable}} disabled{{/unless}}>
             {{#if (lt ../system.experience.value this)}}<img src="systems/brinkwood/styles/assets/teeth/stresstooth-halfgrey.png" alt="">{{else}}<img src="systems/brinkwood/styles/assets/teeth/stresstooth-blue.png" alt="">{{/if}}
           </button>
           {{/times_from_1}}
@@ -50,7 +50,7 @@
         </div>
         <div class="mask-tracker__dots" role="group" aria-label="{{localize 'Mask.Essence.Name'}}">
           {{#times_from_1 system.essence.max}}
-          <button type="button" class="dot-value" data-path="essence.value" data-max_value="{{../system.essence.max}}" data-value="{{this}}" aria-label="{{localize 'Mask.Essence.Name'}} {{this}} of {{../system.essence.max}}"{{#unless ../editable}} disabled{{/unless}}>
+          <button type="button" class="dot-value" data-path="essence.value" data-max_value="{{../system.essence.max}}" data-value="{{this}}" aria-label="{{localize 'Mask.Essence.Name'}} {{this}} of {{../system.essence.max}}" aria-pressed="{{#if (lt ../system.essence.value this)}}false{{else}}true{{/if}}"{{#unless ../editable}} disabled{{/unless}}>
             {{#if (lt ../system.essence.value this)}}<img src="systems/brinkwood/styles/assets/teeth/stresstooth-halfgrey.png" alt="">{{else}}<img src="systems/brinkwood/styles/assets/teeth/stresstooth-red.png" alt="">{{/if}}
           </button>
           {{/times_from_1}}
@@ -90,7 +90,11 @@
 
       <section id="mask-{{_id}}-panel-notes" class="tab mask-sheet__panel {{#if (eq tabs.primary "mask-notes")}}active{{/if}}" data-group="primary" data-tab="mask-notes" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-notes">
         <h2>{{localize "BITD.Notes"}}</h2>
-      {{editor system.description target="system.description" button=true owner=owner editable=editable documents=true engine="prosemirror" collaborate=true}}
+      {{#if editable}}
+      <prose-mirror name="system.description" value="{{system.description}}" document-uuid="{{actor.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
+      {{else}}
+      <div class="editor editor-content">{{{enrichedDescription}}}</div>
+      {{/if}}
       </section>
 
       {{#if isGM}}

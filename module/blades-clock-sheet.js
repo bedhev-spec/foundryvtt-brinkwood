@@ -30,7 +30,7 @@ export class BladesClockSheet extends BladesSheet {
     const context = await super._prepareContext(options);
     // v13: {{#select}} block helper removed — feed selectOptions a value map.
     context.clockSizes = { "4": "4", "6": "6", "8": "8" };
-    context.system.description = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+    context.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       context.system.description,
       { async: true, relativeTo: this.document, secrets: this.document.isOwner }
     );

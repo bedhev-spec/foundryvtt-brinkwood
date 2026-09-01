@@ -3,6 +3,37 @@ import { BladesSheet } from "./blades-sheet.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
 import { preloadClockImages } from "./clock-utils.js";
 
+export function updateCharacterTrackerDisplay(element, value) {
+  const tracker = element.parentElement;
+  const color = tracker?.classList.contains("character-xp") ? "blue" : "red";
+
+  tracker?.querySelectorAll(".dot-value").forEach(dot => {
+    const filled = Number(dot.dataset.value) <= value;
+    const tooth = dot.querySelector("img.big-teeth");
+    if (tooth) {
+      dot.setAttribute("aria-pressed", filled ? "true" : "false");
+      tooth.src = `systems/brinkwood/styles/assets/teeth/stresstooth-${filled ? color : "halfgrey"}.png`;
+      return;
+    }
+
+    dot.setAttribute("aria-pressed", filled ? "true" : "false");
+    dot.classList.toggle("dot-value--filled", filled);
+    dot.classList.toggle("dot-value--empty", !filled);
+  });
+
+  const skillLabel = tracker?.querySelector?.(".attribute-skill-label");
+  if (!skillLabel) return;
+  skillLabel.dataset.rollValue = String(value);
+
+  const attribute = tracker.closest?.(".attribute");
+  const attributeLabel = attribute?.querySelector(".attribute-label");
+  if (attributeLabel) {
+    attributeLabel.dataset.rollValue = String(
+      attribute.querySelectorAll('.attributes-container .dot-value[data-value="1"].dot-value--filled').length
+    );
+  }
+}
+
 /**
  * Extend the basic ActorSheet with some very simple modifications
  * @extends {BladesSheet}
@@ -11,7 +42,7 @@ export class BladesActorSheet extends BladesSheet {
 
   static DEFAULT_OPTIONS = {
     classes: ["brinkwood", "sheet", "actor", "pc", "character"],
-    position: { width: 700, height: 970 },
+    position: { width: 700, height: 840 },
     form: { submitOnChange: true },
     tabGroups: { primary: "traits" },
   };
@@ -63,7 +94,7 @@ export class BladesActorSheet extends BladesSheet {
     context.system.load_level  = mule_present ? mule_level[loadout] : load_level[loadout];
     context.system.load_levels = { "BITD.Light": "BITD.Light", "BITD.Normal": "BITD.Normal", "BITD.Heavy": "BITD.Heavy" };
 
-    context.system.description = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+    context.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       context.system.description,
       { async: true, relativeTo: this.document, secrets: this.document.isOwner }
     );
@@ -138,7 +169,12 @@ export class BladesActorSheet extends BladesSheet {
     if (new_value === old_value && new_value === 1) new_value = 0;
     if (Number.isFinite(max_value) && new_value > max_value) new_value = max_value;
 
-    await this.document.update({ [dataset.path]: new_value });
+    await this.document.update({ [dataset.path]: new_value }, { render: false });
+    this._updateTrackerDisplay(element, new_value);
+  }
+
+  _updateTrackerDisplay(element, value) {
+    updateCharacterTrackerDisplay(element, value);
   }
 
   async _onClockClick(event) {

@@ -145,7 +145,8 @@
       line-height: 1.2;
     }
 
-    .editor {
+    .editor,
+    prose-mirror {
       min-height: 210px;
       padding: 10px 12px;
       color: var(--bw-ink);

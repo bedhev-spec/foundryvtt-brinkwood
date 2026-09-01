@@ -8,7 +8,10 @@ globalThis.foundry = {
   abstract: { TypeDataModel: class {} },
   applications: {
     api: { HandlebarsApplicationMixin: Base => Base },
-    sheets: { ActorSheetV2: class { async _onRender() {} } }
+    sheets: {
+      ActorSheetV2: class { async _onRender() {} },
+      ItemSheetV2: class { async _onRender() {} }
+    },
   },
   data: { fields: {} },
   dice: { Roll: {} },
@@ -31,6 +34,10 @@ globalThis.game = { user: { isGM: false }, scenes: { current: null } };
 const { BladesActiveEffect } = await import("../module/blades-active-effect.js");
 const { BladesClockSheet } = await import("../module/blades-clock-sheet.js");
 const { BladesSheet } = await import("../module/blades-sheet.js");
+const { BladesActorSheet } = await import("../module/blades-actor-sheet.js");
+const { BladesItemSheet } = await import("../module/blades-item-sheet.js");
+const { BladesMaskSheet, getMaskTypePresentation } = await import("../module/blades-mask-sheet.js");
+const { syncOpenActorTrackers } = await import("../module/sheet-tracker-sync.js");
 const { BladesRebelionSheet } = await import("../module/blades-rebelion-sheet.js");
 
 function effectEvent(action = "create") {
@@ -148,6 +155,48 @@ test("read-only sheets disable every input type while retaining read-only text a
   assert.equal(textarea["aria-readonly"], "true");
 });
 
+test("read-only item sheets disable form controls while retaining readable text", async () => {
+  const control = () => ({ setAttribute(name, value) { this[name] = value; } });
+  const input = control();
+  const select = control();
+  const textarea = control();
+  const sheet = {
+    isEditable: false,
+    element: {
+      querySelectorAll(selector) {
+        if (selector === "input, select") return [input, select];
+        if (selector === "textarea") return [textarea];
+        return [];
+      }
+    }
+  };
+
+  await BladesItemSheet.prototype._onRender.call(sheet, {}, {});
+
+  assert.ok(input.disabled && select.disabled);
+  assert.equal(input["aria-disabled"], "true");
+  assert.equal(select["aria-disabled"], "true");
+  assert.equal(textarea.readOnly, true);
+  assert.equal(textarea["aria-readonly"], "true");
+});
+
+test("unknown Mask item names use readable generic labels instead of missing localization keys", () => {
+  const attributes = { lies: { skills: { deceive: { value: 0 } } } };
+
+  assert.deepEqual(getMaskTypePresentation("qs", attributes), {
+    attributes: [],
+    label: "BITD.Mask",
+    typeLang: "BITD.Qs",
+    xpKey: null
+  });
+  assert.deepEqual(getMaskTypePresentation("lies", attributes), {
+    attributes: attributes.lies,
+    label: "BITD.LiesShort",
+    typeLang: "BITD.Lies",
+    xpKey: "Mask.XP.Lies"
+  });
+});
+
 test("Rebellion trackers read and update fully-qualified actor paths exactly once", async () => {
   const updates = [];
   const sheet = {
@@ -182,4 +231,200 @@ test("Rebellion trackers reject mutations from a locked sheet", async () => {
     currentTarget: { dataset: { path: "system.tyranny.value", value: "1", max_value: "4" } }
   });
   assert.equal(updated, false);
+});
+
+test("character tracker updates avoid a sheet rerender and refresh the clicked tracker", async () => {
+  const updates = [];
+  const tooth = { src: "" };
+  const dot = {
+    dataset: { value: "2" },
+    setAttribute(name, value) { this[name] = value; },
+    querySelector(selector) { return selector === "img.big-teeth" ? tooth : null; }
+  };
+  const tracker = {
+    classList: { contains: name => name === "character-xp" },
+    querySelectorAll(selector) { return selector === ".dot-value" ? [dot] : []; }
+  };
+  const sheet = {
+    isEditable: true,
+    document: {
+      system: { experience: { value: 1 } },
+      update: async (...args) => updates.push(args)
+    },
+    _updateTrackerDisplay: BladesActorSheet.prototype._updateTrackerDisplay
+  };
+  const event = {
+    prevented: false,
+    preventDefault() { this.prevented = true; },
+    currentTarget: { dataset: { path: "system.experience.value", value: "2", max_value: "4" }, parentElement: tracker }
+  };
+  await BladesActorSheet.prototype._onDotChange.call(sheet, event);
+
+  assert.equal(event.prevented, true);
+  assert.deepEqual(updates, [[{ "system.experience.value": 2 }, { render: false }]]);
+  assert.equal(dot["aria-pressed"], "true");
+  assert.match(tooth.src, /stresstooth-blue\.png$/);
+});
+
+test("character skill updates refresh flat pip state without a sheet rerender", async () => {
+  const updates = [];
+  const classes = new Set(["dot-value", "dot-value--empty"]);
+  const skillLabel = { dataset: { rollValue: "1" } };
+  const attributeLabel = { dataset: { rollValue: "0" } };
+  const attribute = {
+    querySelector(selector) { return selector === ".attribute-label" ? attributeLabel : null; },
+    querySelectorAll() { return classes.has("dot-value--filled") ? [dot] : []; }
+  };
+  const dot = {
+    dataset: { value: "2" },
+    classList: {
+      toggle(name, enabled) { enabled ? classes.add(name) : classes.delete(name); }
+    },
+    setAttribute(name, value) { this[name] = value; },
+    querySelector() { return null; }
+  };
+  const tracker = {
+    classList: { contains: () => false },
+    closest(selector) { return selector === ".attribute" ? attribute : null; },
+    querySelector(selector) { return selector === ".attribute-skill-label" ? skillLabel : null; },
+    querySelectorAll(selector) { return selector === ".dot-value" ? [dot] : []; }
+  };
+  const sheet = {
+    isEditable: true,
+    document: {
+      system: { attributes: { insight: { skills: { hunt: { value: 1 } } } } },
+      update: async (...args) => updates.push(args)
+    },
+    _updateTrackerDisplay: BladesActorSheet.prototype._updateTrackerDisplay
+  };
+  const event = {
+    preventDefault() {},
+    currentTarget: {
+      dataset: {
+        path: "system.attributes.insight.skills.hunt.value",
+        value: "2",
+        max_value: "4"
+      },
+      parentElement: tracker
+    }
+  };
+
+  await BladesActorSheet.prototype._onDotChange.call(sheet, event);
+
+  assert.deepEqual(updates, [[{
+    "system.attributes.insight.skills.hunt.value": 2
+  }, { render: false }]]);
+  assert.equal(dot["aria-pressed"], "true");
+  assert.equal(classes.has("dot-value--filled"), true);
+  assert.equal(classes.has("dot-value--empty"), false);
+  assert.equal(skillLabel.dataset.rollValue, "2");
+  assert.equal(attributeLabel.dataset.rollValue, "1");
+});
+
+test("Mask trackers update without a sheet rerender and refresh their output", async () => {
+  const updates = [];
+  const tooth = { src: "" };
+  const output = { textContent: "0 / 8" };
+  const dot = {
+    dataset: { path: "experience.value", value: "2", max_value: "8" },
+    setAttribute(name, value) { this[name] = value; },
+    querySelector(selector) { return selector === "img" ? tooth : null; }
+  };
+  const tracker = { querySelector: selector => selector === "output" ? output : null };
+  const group = {
+    closest(selector) { return selector === ".mask-tracker" ? tracker : null; },
+    querySelectorAll(selector) { return selector === ".dot-value" ? [dot] : []; }
+  };
+  dot.parentElement = group;
+  const sheet = {
+    isEditable: true,
+    actor: {
+      system: { experience: { value: 1 } },
+      update: async (...args) => updates.push(args)
+    },
+    _updateDotDisplay: BladesMaskSheet.prototype._updateDotDisplay
+  };
+
+  await BladesMaskSheet.prototype._onDotChange.call(sheet, {
+    preventDefault() {},
+    currentTarget: dot
+  });
+
+  assert.deepEqual(updates, [[{ "system.experience.value": 2 }, { render: false }]]);
+  assert.equal(dot["aria-pressed"], "true");
+  assert.equal(output.textContent, "2 / 8");
+  assert.match(tooth.src, /stresstooth-blue\.png$/);
+});
+
+test("actor update synchronization refreshes every open tracker renderer", () => {
+  const createForm = () => {
+    const tooth = { src: "" };
+    const dot = {
+      dataset: { path: "system.experience.value", value: "2", max_value: "8" },
+      setAttribute(name, value) { this[name] = value; },
+      querySelector(selector) { return selector === "img.big-teeth" ? tooth : null; }
+    };
+    const tracker = {
+      classList: { contains: name => name === "character-xp" },
+      querySelectorAll: selector => selector === ".dot-value" ? [dot] : []
+    };
+    dot.parentElement = tracker;
+    return {
+      dot,
+      form: {
+        classList: { contains: name => name === "character-sheet" },
+        dataset: { actorUuid: "Actor.actor-1" },
+        querySelectorAll: selector => selector === ".dot-value" ? [dot] : []
+      },
+      tooth
+    };
+  };
+  const first = createForm();
+  const second = createForm();
+  const root = {
+    querySelectorAll: selector => selector === "form[data-actor-uuid]" ? [first.form, second.form] : []
+  };
+
+  syncOpenActorTrackers({ id: "actor-1", uuid: "Actor.actor-1" }, { system: { experience: { value: 2 } } }, root);
+
+  for (const renderer of [first, second]) {
+    assert.equal(renderer.dot["aria-pressed"], "true");
+    assert.match(renderer.tooth.src, /stresstooth-blue\.png$/);
+  }
+});
+
+test("actor update synchronization isolates synthetic actors sharing a base id", () => {
+  const createForm = actorUuid => {
+    const dot = {
+      dataset: { path: "system.experience.value", value: "2", max_value: "8" },
+      setAttribute(name, value) { this[name] = value; },
+      querySelector() { return null; },
+      classList: { toggle() {} }
+    };
+    dot.parentElement = {
+      classList: { contains: () => false },
+      querySelectorAll: () => [dot],
+      querySelector: () => null
+    };
+    return {
+      dot,
+      classList: { contains: name => name === "character-sheet" },
+      dataset: { actorUuid },
+      querySelectorAll: selector => selector === ".dot-value" ? [dot] : []
+    };
+  };
+  const worldActor = createForm("Actor.actor-1");
+  const syntheticActor = createForm("Scene.scene-1.Token.token-1.Actor.actor-1");
+  const root = {
+    querySelectorAll: selector => selector === "form[data-actor-uuid]" ? [worldActor, syntheticActor] : []
+  };
+
+  syncOpenActorTrackers(
+    { id: "actor-1", uuid: "Scene.scene-1.Token.token-1.Actor.actor-1" },
+    { system: { experience: { value: 2 } } },
+    root
+  );
+
+  assert.equal(worldActor.dot["aria-pressed"], undefined);
+  assert.equal(syntheticActor.dot["aria-pressed"], "true");
 });

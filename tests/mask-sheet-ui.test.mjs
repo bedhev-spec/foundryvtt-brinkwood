@@ -23,6 +23,8 @@ test("Mask sheet uses compact, accessible, controller-compatible markup", async 
   assert.match(sheet, /class="item-select mask-trait-card__select"/);
   assert.doesNotMatch(sheet, /id="mask-\{\{_id\}\}-traits"/);
   assert.doesNotMatch(attributes, /character-\{\{/);
+  assert.match(attributes, /localize maskAttributesLabel/);
+  assert.doesNotMatch(attributes, /concat system\.type_lang 'Short'/);
   assert.match(attributes, /data-path="attributes\.\{\{\.\.\/\.\.\/system\.type\}\}\.skills/);
   assert.match(attributes, /class="attribute-skill-label roll-die-attribute rollable-text"/);
 });
@@ -38,6 +40,12 @@ test("Mask styles are scoped and adapt to the sheet container", async () => {
   assert.match(source, /form\.mask-sheet\s*\{[\s\S]*container-type:\s*inline-size/);
   assert.match(source, /@container \(max-width: 620px\)/);
   assert.match(source, /@container \(max-width: 390px\)/);
+  assert.match(source, /grid-template-areas:\s*"content attributes"/);
+  assert.match(source, /:has\(\.mask-sheet__panel\[data-tab="mask-notes"\]\.active\)[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
+  assert.match(source, /:has\(\.mask-sheet__panel\[data-tab="effects"\]\.active\)[\s\S]*?> \.mask-attributes\s*\{[\s\S]*?display:\s*none/);
+  assert.match(source, /\.mask-sheet__main\s*\{[\s\S]*?grid-area:\s*content[\s\S]*?width:\s*100%/);
+  assert.match(source, /\.editor,[\s\S]*?\.editor-content,[\s\S]*?prose-mirror\s*\{[\s\S]*?min-height:\s*180px/);
+  assert.match(source, /\.mask-attributes > h2\s*\{/);
   assert.match(compiled, /\.brinkwood\.actor\.mask \.mask-sheet__header/);
   assert.match(compiled, /@container \(max-width: 620px\)/);
 });

@@ -20,6 +20,7 @@ import { BladesMaskSheet } from "./blades-mask-sheet.js";
 import { BladesRebelionSheet } from "./blades-rebelion-sheet.js";
 import { showRollStatistics } from "./roll-statistics.js";
 import { clockImagePath, prepareClockLabel } from "./clock-utils.js";
+import { syncOpenActorTrackers } from "./sheet-tracker-sync.js";
 
 
 import * as migrations from "./migration.js";
@@ -35,6 +36,8 @@ import {
 /*  Foundry VTT Initialization                  */
 /* -------------------------------------------- */
 Hooks.once("init", async function() {
+
+  Hooks.on("updateActor", (actor, changes) => syncOpenActorTrackers(actor, changes));
   game.blades = {
     dice: bladesRoll,
     rollStatistics: showRollStatistics

@@ -15,13 +15,13 @@
     <div class="flex-horizontal">
       <div class="attributes-container">
 	{{#times_from_1 4}}
-	<span class="dot-value" data-max_value="4" data-value="{{this}}" data-path="system.attributes.{{attribute_name}}.skills.{{skill_name}}.value">
+	<button type="button" class="dot-value {{#if (lt skill.value this)}}dot-value--empty{{else}}dot-value--filled{{/if}}" data-max_value="4" data-value="{{this}}" data-path="system.attributes.{{attribute_name}}.skills.{{skill_name}}.value" aria-label="{{localize skill.label}} {{this}} of 4" aria-pressed="{{#if (lt skill.value this)}}false{{else}}true{{/if}}"{{#unless @root.editable}} disabled{{/unless}}>
           {{#if (lt skill.value this)}}
           &#9898;
 	  {{else}}
 	  &#9899;
 	  {{/if}}
-	</span>
+	</button>
 	{{/times_from_1}}
             <button type="button" class="attribute-skill-label roll-die-attribute rollable-text tooltip" data-roll-attribute-label="{{skill.label}}" data-roll-attribute="{{skill_name}}" data-roll-value={{skill.value}} data-tooltip="{{skill.desc}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">{{localize skill.label}}</button>
       </div>

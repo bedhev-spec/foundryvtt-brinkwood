@@ -23,11 +23,11 @@ export class BladesNPCSheet extends BladesSheet {
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
 
-    context.system.description = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+    context.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       context.system.description,
       { async: true, relativeTo: this.document, secrets: this.document.isOwner }
     );
-    context.system.notes = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+    context.enrichedNotes = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       context.system.notes,
       { async: true, relativeTo: this.document, secrets: this.document.isOwner }
     );

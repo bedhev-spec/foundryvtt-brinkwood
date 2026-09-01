@@ -166,7 +166,8 @@
       border-bottom: 1px solid var(--bw-rule);
     }
 
-    .editor {
+    .editor,
+    prose-mirror {
       min-height: 160px;
       padding: 10px 12px;
       color: var(--bw-ink);

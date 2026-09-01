@@ -1,4 +1,130 @@
 // ITEM
+.window-content {
+  container-type: inline-size;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.window-content > .loadout-item-sheet {
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.window-content > .legacy-item-sheet {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  padding: 16px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  .sheet-header {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    align-items: center;
+    gap: 16px;
+
+    > img {
+      width: 88px;
+      height: 88px;
+      max-width: 88px;
+      max-height: 88px;
+      object-fit: contain;
+    }
+  }
+
+  .sheet-body {
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .legacy-item-sheet__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(180px, 0.8fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .legacy-item-sheet__primary,
+  .legacy-item-sheet__secondary {
+    display: grid;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .legacy-item-sheet__primary:only-child {
+    grid-column: 1 / -1;
+  }
+
+  .legacy-item-sheet__effects {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+}
+
+form.loadout-item-sheet .loadout-item-sheet__header > img {
+  width: 88px;
+  height: 88px;
+  max-width: 88px;
+  max-height: 88px;
+}
+
+@container (max-width: 480px) {
+  .window-content > .loadout-item-sheet {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .window-content > .legacy-item-sheet {
+    padding: 12px;
+
+    .sheet-header {
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 12px;
+
+      > img {
+        width: 72px;
+        height: 72px;
+        max-width: 72px;
+        max-height: 72px;
+      }
+    }
+  }
+
+  form.loadout-item-sheet .loadout-item-sheet__header {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 12px;
+
+    > img {
+      width: 72px;
+      height: 72px;
+      max-width: 72px;
+      max-height: 72px;
+      padding: 7px;
+    }
+  }
+}
+
+@container (max-width: 440px) {
+  .window-content > .legacy-item-sheet .legacy-item-sheet__body {
+    grid-template-columns: minmax(0, 1fr);
+
+    > * {
+      grid-column: 1;
+    }
+  }
+}
 
 .loadout-item-sheet {
   display: flex;
