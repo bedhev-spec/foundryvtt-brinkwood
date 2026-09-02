@@ -19,18 +19,24 @@ test("clock defaults and schema support an optional visible GM description", asy
 });
 
 test("standalone clock keeps viewer progress public and GM notes permission-aware", async () => {
-  const [sheet, template, translations] = await Promise.all([
+  const [sheet, template, translations, styles] = await Promise.all([
     read("module/blades-clock-sheet.js"),
     read("templates/actors/clock-sheet.html"),
     read("lang/en.json"),
+    read("scss/import/clocks.scss"),
   ]);
 
   assert.match(sheet, /position:\s*\{\s*width:\s*350,\s*height:\s*"auto"\s*\}/);
   assert.match(sheet, /enrichHTML\([\s\S]*relativeTo:\s*this\.document[\s\S]*secrets:\s*this\.document\.isOwner/);
   assert.doesNotMatch(sheet, /input\.disabled = true/);
   assert.match(sheet, /await super\._onRender\(context, options\)/);
+  assert.match(sheet, /querySelector\('select\[name="system\.type"\]'\)[\s\S]*?"change"[\s\S]*?_onClockSizeChange/);
+  assert.doesNotMatch(sheet, /event\.target\?\.name === "system\.type"/);
   assert.match(sheet, /submitData\["prototypeToken\.texture\.src"\] = image_path/);
   assert.match(template, /clock-sheet__progress/);
+  assert.match(styles, /\.clock-sheet__clock[\s\S]*?\.clock-zero-label\s*\{[\s\S]*?display:\s*none/);
+  assert.match(styles, /\.clock-sheet__clock[\s\S]*?\.clocks\s*\{[\s\S]*?justify-items:\s*center[\s\S]*?gap:\s*0/);
+  assert.match(styles, /\.clock-sheet__clock[\s\S]*?\.blades-clock\s*\{[\s\S]*?margin-inline:\s*auto/);
   assert.match(template, /\{\{\{blades-clock "system\.value" system\.type system\.value _id \(localize "Clock\.Progress"\)\}\}\}/);
   assert.match(template, /\{\{#if isGM\}\}/);
   assert.match(template, /\{\{#if editable\}\}[\s\S]*?<prose-mirror name="system\.description" value="\{\{system\.description\}\}" data-document-uuid="\{\{actor\.uuid\}\}" collaborate toggled>/);

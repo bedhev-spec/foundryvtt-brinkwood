@@ -93,24 +93,28 @@ export class BladesActiveEffect extends foundry.documents.ActiveEffect {
         type: "temporary",
         label: "Temporary Effects",
         canCreate: true,
+        visible: true,
         effects: []
       },
       passive: {
         type: "passive",
         label: "Passive Effects",
         canCreate: true,
+        visible: true,
         effects: []
       },
       inactive: {
         type: "inactive",
         label: "Inactive Effects",
         canCreate: true,
+        visible: true,
         effects: []
       },
       suppressed: {
         type: "suppressed",
         label: "Suppressed Effects",
         canCreate: false,
+        visible: false,
         effects: []
       }
 
@@ -123,6 +127,7 @@ export class BladesActiveEffect extends foundry.documents.ActiveEffect {
       else if ( e.disabled ) categories.inactive.effects.push(e);
       else if ( e.isTemporary ) categories.temporary.effects.push(e);
       else categories.passive.effects.push(e);
+    categories.suppressed.visible = categories.suppressed.effects.length > 0;
     }
     return categories;
   }

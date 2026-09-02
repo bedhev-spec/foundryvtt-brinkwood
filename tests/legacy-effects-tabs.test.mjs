@@ -1,0 +1,103 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+
+const root = new URL("../", import.meta.url);
+const read = file => readFile(new URL(file, root), "utf8");
+
+test("native form serialization retains a cleared Alias on the second save", () => {
+  const formData = new FormData();
+  formData.set("system.alias", "SECOND-SAVE");
+  formData.set("system.alias", "");
+  assert.equal(formData.get("system.alias"), "");
+});
+
+test("Legacy Effects use persistent accessible sub-tabs and hide empty suppression", async () => {
+  const [template, actorTemplate, controller, categories, styles, polishStyles, manifest] = await Promise.all([
+    read("templates/parts/active-effects.html"),
+    read("templates/actor-sheet.html"),
+    read("module/blades-actor-sheet.js"),
+    read("module/blades-active-effect.js"),
+    read("styles/legacy-effects-tabs.css"),
+    read("styles/legacy-sheet-polish.css"),
+    read("system.json"),
+  ]);
+
+  assert.match(template, /role="tablist" aria-label="Effect types"/);
+  assert.match(template, /role="tab"[\s\S]*?data-effect-tab="\{\{section\.type\}\}"/);
+  assert.match(template, /data-effect-panel="\{\{section\.type\}\}"[\s\S]*?role="tabpanel"/);
+  assert.match(template, /\{\{#if section\.visible\}\}[\s\S]*?<section class="effects-category"/);
+  assert.match(template, /title="Create effect" aria-label="Create effect"/);
+  assert.match(template, /effects-category__add[\s\S]*?<i class="fas fa-plus" aria-hidden="true"><\/i>[\s\S]*?<\/button>/);
+  assert.doesNotMatch(template, /visually-hidden">Create effect<\/span>/);
+  assert.doesNotMatch(template, /visually-hidden">Create effect<\/span>/);
+  assert.match(controller, /_activeEffectTab/);
+  assert.match(controller, /_getLegacyScrollContainers[\s\S]*?form\.actor-sheet[\s\S]*?\.window-content/);
+  assert.match(controller, /_captureLegacyScrollPosition[\s\S]*?this\.tabGroups\.primary[\s\S]*?_legacyViewState[\s\S]*?scrollPositions[\s\S]*?scrollTop[\s\S]*?scrollLeft[\s\S]*?primaryTab[\s\S]*?effectTab/);
+  assert.match(controller, /_restoreLegacyScrollPosition[\s\S]*?element\.scrollTop[\s\S]*?element\.scrollLeft[\s\S]*?this\._activateEffectTab/);
+  assert.match(controller, /html\.addEventListener\("click"[\s\S]*?_captureLegacyScrollPosition\(\{ primaryTab \}\)[\s\S]*?capture: true/);
+  assert.doesNotMatch(controller, /window\.scroll/);
+  assert.doesNotMatch(controller, /globalThis\.requestAnimationFrame/);
+  assert.match(controller, /form: \{ submitOnChange: false \}/);
+  assert.match(actorTemplate, /name="system\.alias" value="\{\{system\.alias\}\}"/);
+  assert.match(controller, /_persistFormControl/);
+  assert.match(controller, /prose-mirror\[name\]/);
+  assert.match(controller, /type === "checkbox"/);
+  assert.match(controller, /type === "radio" && !control\.checked/);
+  assert.match(controller, /input\[name="system\.scars"\], input\[name="system\.oath"\], \[data-path\]/);
+  assert.match(categories, /suppressed:[\s\S]*?visible: false/);
+  assert.match(categories, /categories\.suppressed\.visible = categories\.suppressed\.effects\.length > 0/);
+  assert.match(styles, /\.brinkwood\.actor\.pc\.character:not\(\.character-v2\) \.effects-tabs/);
+  assert.match(styles, /\.big-teeth-section \.black-label \{[\s\S]*?flex: 0 0 auto[\s\S]*?width: auto/);
+  assert.match(styles, /\.character-xp,[\s\S]*?\.character-stress \{[\s\S]*?width: 100%/);
+  assert.match(styles, /\.effects-category\[data-effect-panel\] \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)[\s\S]*?grid-template-rows: auto auto/);
+  assert.match(styles, /\.effects-category\[data-effect-panel\] > \.effects-category__header,[\s\S]*?\.effects-category__list \{[\s\S]*?grid-column: 1[\s\S]*?width: 100%/);
+  assert.match(styles, /\.character-scars-clock,[\s\S]*?\.character-oath-clock \{[\s\S]*?grid-template-columns: 64px/);
+  assert.match(styles, /\.character-scars-clock \.blades-clock[\s\S]*?grid-column: 1[\s\S]*?grid-row: 1/);
+  assert.match(controller, /_isLegacyCharacterSheet = !this\.constructor\.DEFAULT_OPTIONS\.classes\.includes\("character-v2"\)/);
+  assert.match(manifest, /"styles\/legacy-effects-tabs\.css"/);
+  assert.match(styles, /@import url\("\.\/legacy-sheet-polish\.css"\)/);
+  assert.match(actorTemplate, /character-sheet__workspace[\s\S]*?<nav class="tabs[\s\S]*?<\/nav>[\s\S]*?<div class="tab-content/);
+  assert.equal((actorTemplate.match(/name="system\.selected_load_level"/g) ?? []).length, 1);
+  assert.doesNotMatch(actorTemplate, /id="character-\{\{_id\}\}-traits-tab"[\s\S]*?class="label-stripe"[\s\S]*?id="character-\{\{_id\}\}-traits-list"/);
+  assert.match(styles, /character-sheet__workspace > nav\.tabs \{[\s\S]*?grid-column: 1 \/ -1[\s\S]*?width: 100%[\s\S]*?border-left: 1px solid var\(--bw-rule\)[\s\S]*?border-right: 1px solid var\(--bw-rule\)/);
+  assert.equal((actorTemplate.match(/templates\/parts\/attributes\.html/g) ?? []).length, 1);
+  assert.match(actorTemplate, /data-tab="traits"[\s\S]*?templates\/parts\/attributes\.html/);
+  assert.match(styles, /character-sheet__workspace \.tab\[data-tab=traits\]\.active > \.attributes \{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
+  assert.match(styles, /tab\[data-tab=traits\]\.active > \.attributes \.attributes-exp \{[\s\S]*?margin-top: 0/);
+  assert.match(styles, /@container \(max-width: 620px\) \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(styles, /character-bans table tbody > tr:last-child > td,[\s\S]*?td\[rowspan\] \{[\s\S]*?border-bottom: 0/);
+  assert.equal((actorTemplate.match(/item-delete identity-choice__remove/g) ?? []).length, 4);
+  assert.match(actorTemplate, /title="Remove Upbringing" aria-label="Remove Upbringing"/);
+  assert.match(actorTemplate, /title="Remove Profession" aria-label="Remove Profession"/);
+  assert.match(actorTemplate, /title="Remove Class" aria-label="Remove Class"/);
+  assert.match(actorTemplate, /title="Remove Pact" aria-label="Remove Pact"/);
+  assert.match(controller, /deleteEmbeddedDocuments\("Item", \[element\.dataset\.itemId\]\)/);
+  assert.match(styles, /big-teeth-section \{[\s\S]*?--legacy-tooth-pitch: 14px[\s\S]*?border-top: 1px solid var\(--bw-ink\)[\s\S]*?padding-block: 1\.5px/);
+  assert.match(styles, /big-teeth-section button\.dot-value \{[\s\S]*?flex: 0 0 var\(--legacy-tooth-pitch\)[\s\S]*?width: var\(--legacy-tooth-pitch\)[\s\S]*?height: 26px[\s\S]*?min-height: 26px[\s\S]*?max-height: 26px/);
+  assert.equal((actorTemplate.match(/class="legacy-tracker-segments"/g) ?? []).length, 2);
+  assert.match(styles, /big-teeth-section \.big-teeth \{[\s\S]*?display: flex[\s\S]*?flex-wrap: nowrap[\s\S]*?height: 26px[\s\S]*?min-height: 26px[\s\S]*?max-height: 26px[\s\S]*?overflow: visible/);
+  assert.match(styles, /legacy-tracker-segments \{[\s\S]*?flex: 0 0 auto[\s\S]*?gap: 1px[\s\S]*?justify-content: flex-start[\s\S]*?height: 26px[\s\S]*?width: auto[\s\S]*?overflow: visible/);
+  assert.doesNotMatch(styles, /big-teeth-section \.big-teeth \{[\s\S]*?overflow: hidden/);
+  assert.match(styles, /tab-content > \.tab\[data-tab\] \{[\s\S]*?margin-top: 0[\s\S]*?padding-top: 10px/);
+  assert.match(styles, /character-sheet__workspace \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)[\s\S]*?row-gap: 0/);
+  assert.match(actorTemplate, /class="flex-column character-identity-choices"/);
+  assert.match(polishStyles, /character-identity-choices \{[\s\S]*?grid-template-rows: repeat\(4, 26px\)[\s\S]*?row-gap: 0/);
+  assert.match(polishStyles, /character-identity-choices \.item-block \{[\s\S]*?grid-template-columns: 33% minmax\(0, 1fr\) 18px[\s\S]*?height: 26px[\s\S]*?margin: 0/);
+  assert.match(polishStyles, /character-identity-choices \.item-block > \.item \{[\s\S]*?min-height: 0[\s\S]*?max-height: 26px[\s\S]*?align-self: stretch[\s\S]*?line-height: 1[\s\S]*?overflow: hidden/);
+  assert.match(polishStyles, /character-identity-choices \.item-body \{[\s\S]*?min-height: 0[\s\S]*?max-height: 26px[\s\S]*?line-height: 1[\s\S]*?overflow: hidden/);
+  assert.match(polishStyles, /character-identity-choices \.item-name \{[\s\S]*?line-height: 1[\s\S]*?white-space: nowrap[\s\S]*?overflow: hidden/);
+  assert.match(polishStyles, /character-identity-choices \.item-block::after \{[\s\S]*?grid-column: 3[\s\S]*?width: 18px/);
+  assert.match(styles, /identity-choice__remove \{[\s\S]*?position: absolute[\s\S]*?transform: translateY\(-50%\)[\s\S]*?border: 0[\s\S]*?background: transparent/);
+  assert.match(styles, /attributes \.attributes-container \{[\s\S]*?align-items: center[\s\S]*?min-height: 28px[\s\S]*?line-height: 1/);
+  assert.match(styles, /attributes \.attribute-skill-label \{[\s\S]*?align-items: center[\s\S]*?margin-top: 0/);
+  assert.match(polishStyles, /attributes \.attributes-container \{[\s\S]*?grid-template-columns: repeat\(4, 28px\) minmax\(0, 1fr\)/);
+  assert.match(polishStyles, /attributes \.attributes-container button\.dot-value \{[\s\S]*?transform: none/);
+  assert.match(polishStyles, /attributes \.attributes-container button\.dot-value::before \{[\s\S]*?transform: translateY\(7px\)/);
+  assert.match(polishStyles, /clock-zero-label > \.nullifier[\s\S]*?display: none/);
+  assert.match(polishStyles, /character-armor-uses input\[type="checkbox"\] \{[\s\S]*?appearance: none[\s\S]*?width: 18px[\s\S]*?height: 18px[\s\S]*?background: #fff/);
+  assert.match(polishStyles, /input\[type="checkbox"\]:checked \{[\s\S]*?background: #f39b55/);
+  assert.doesNotMatch(actorTemplate, /data-tab="character-notes"[\s\S]*?class="label-stripe"[\s\S]*?prose-mirror/);
+  assert.doesNotMatch(actorTemplate, /data-tab="effects"[\s\S]*?class="label-stripe"[\s\S]*?active-effects\.html/);
+  assert.doesNotMatch(actorTemplate, /data-tab="downtime"[\s\S]*?class="label-stripe"[\s\S]*?parts\/actor\/downtime\.html/);
+});

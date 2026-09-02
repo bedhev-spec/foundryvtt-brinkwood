@@ -18,7 +18,7 @@
         <input type="text" id="character-{{_id}}-name" class="name" name="name" value="{{name}}">
       </div>
 
-      <div id="character-{{_id}}-traits" class="flex-column">
+      <div id="character-{{_id}}-traits" class="flex-column character-identity-choices">
 
         <div class="item-block flex-horizontal">
           <div class="item-class-label">
@@ -28,8 +28,11 @@
             {{#if (eq item.type "upbringing")}}
 						<div class="item flex-horizontal tooltip" data-item-id="{{item._id}}" data-tooltip="Actor.Upbringings.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
 <div class="item-body flex-horizontal"{{#if editable}} role="button" tabindex="0"{{/if}}>
-									<div class="item-name">{{item.name}}</div>
+								<div class="item-name">{{item.name}}</div>
                 </div>
+                {{#if ../editable}}
+                <button type="button" class="item-delete identity-choice__remove" title="Remove Upbringing" aria-label="Remove Upbringing"><span aria-hidden="true">&times;</span></button>
+                {{/if}}
               </div>
             {{/if}}
           {{/each}}
@@ -45,6 +48,9 @@
 <div class="item-body flex-horizontal"{{#if editable}} role="button" tabindex="0"{{/if}}>
                 <div class="item-name">{{item.name}}</div>
               </div>
+              {{#if ../editable}}
+              <button type="button" class="item-delete identity-choice__remove" title="Remove Profession" aria-label="Remove Profession"><span aria-hidden="true">&times;</span></button>
+              {{/if}}
             </div>
             {{/if}}
           {{/each}}
@@ -58,6 +64,9 @@
 <div class="item-body flex-horizontal"{{#if editable}} role="button" tabindex="0"{{/if}}>
                     <div class="item-name">{{item.name}}</div>
                   </div>
+                  {{#if ../editable}}
+                  <button type="button" class="item-delete identity-choice__remove" title="Remove Class" aria-label="Remove Class"><span aria-hidden="true">&times;</span></button>
+                  {{/if}}
                 </div>
               {{/if}}
             {{/each}}
@@ -71,6 +80,9 @@
 <div class="item-body flex-horizontal"{{#if editable}} role="button" tabindex="0"{{/if}}>
                     <div class="item-name">{{item.name}}</div>
                   </div>
+                  {{#if ../editable}}
+                  <button type="button" class="item-delete identity-choice__remove" title="Remove Pact" aria-label="Remove Pact"><span aria-hidden="true">&times;</span></button>
+                  {{/if}}
                 </div>
               {{/if}}
             {{/each}}
@@ -85,11 +97,12 @@
       </div>
 
       {{!-- XP --}}
-      <div class="section big-teeth-section">
+      <div class="section big-teeth-section character-xp-section">
         <div id="character-{{_id}}-xp" class="big-teeth character-xp tooltip" data-tooltip="Actor.XP.Tooltip" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
           <span class="black-label">
             {{localize system.experience.name}}
           </span>
+          <div class="legacy-tracker-segments">
           {{#with system as | system | }}
           {{#times_from_1 system.experience.max}}
               <button type="button" class="dot-value" data-path="system.experience.value" data-max_value="{{system.experience.max}}" data-value="{{this}}" aria-label="{{localize system.experience.name}} {{this}} of {{system.experience.max}}" aria-pressed="{{#if (lt system.experience.value this)}}false{{else}}true{{/if}}"{{#unless ../../editable}} disabled{{/unless}}>
@@ -101,13 +114,16 @@
               </button>
           {{/times_from_1}}
           {{/with}}
+          </div>
         </div>
+
       </div>
  
       {{!-- Stress --}}
       <div id="character-{{_id}}-stress-trauma" class="section big-teeth-section">
         <div id="character-{{_id}}-stress" class="big-teeth character-stress tooltip" data-tooltip="Actor.Stress.Tooltip" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
           <span class="black-label">{{localize system.stress.name}}</span>
+          <div class="legacy-tracker-segments">
           {{#with system as | system | }}
           {{#times_from_1 system.stress.max}}
               <button type="button" class="dot-value" data-path="system.stress.value" data-max_value="{{system.stress.max}}" data-value="{{this}}" aria-label="{{localize system.stress.name}} {{this}} of {{system.stress.max}}" aria-pressed="{{#if (lt system.stress.value this)}}false{{else}}true{{/if}}"{{#unless ../../editable}} disabled{{/unless}}>
@@ -119,6 +135,7 @@
               </button>
           {{/times_from_1}}
           {{/with}}
+          </div>
         </div>
       </div>
     </div>
@@ -195,8 +212,6 @@
   {{!-- Attributes --}}
 <section class="character-sheet__workspace">
 
-    <div class="tab-content flex-vertical grow-two">
-
       {{!-- Nav menu --}}
 <nav class="tabs flex-horizontal" data-group="primary" role="tablist" aria-label="{{localize "BITD.Traits"}}">
     <button type="button" class="item {{#if (eq tabs.primary "traits")}}active{{/if}}" id="character-{{_id}}-tab-traits" role="tab" tabindex="{{#if (eq tabs.primary "traits")}}0{{else}}-1{{/if}}" aria-controls="character-{{_id}}-traits-tab" aria-selected="{{#if (eq tabs.primary "traits")}}true{{else}}false{{/if}}" data-action="tab" data-group="primary" data-tab="traits">{{localize "BITD.Traits"}}</button>
@@ -208,11 +223,9 @@
         {{/if}}
       </nav>
 
-<div id="character-{{_id}}-traits-tab" class="tab flex-vertical traits {{#if (eq tabs.primary "traits")}}active{{/if}}" role="tabpanel" data-group="primary" data-tab="traits">
-        <div class="label-stripe">
-          <p><label for="character-{{_id}}-experience-0">{{localize "BITD.Traits"}}</label></p>
-        </div>
+    <div class="tab-content flex-vertical grow-two">
 
+<div id="character-{{_id}}-traits-tab" class="tab flex-vertical traits {{#if (eq tabs.primary "traits")}}active{{/if}}" role="tabpanel" data-group="primary" data-tab="traits">
         <div id="character-{{_id}}-traits-list">
           {{#each traits as |trait id|}}
           {{#if (eq trait.type "trait")}}
@@ -232,33 +245,8 @@
           {{/if}}
           {{/each}}
         </div>
-        <div class="label-stripe flex-horizontal">
-           <p>{{localize "BITD.Loadout"}}</p>
-           <p>{{system.loadout}}/{{localize system.load_level}} </p>
-           <div class="dropdown">
-             <select name="system.selected_load_level">
-               {{selectOptions system.load_levels selected=system.selected_load_level localize=true}}
-             </select>
-           </div>
-        </div>
-        <div class="item-list flex-horizontal">
-          {{#each items as |item id|}}
-          {{#if (eq item.type "item")}}
-            <div class="item flex-horizontal item-select" data-item-id="{{item._id}}">
-	      <div class="item-equipped">
-                <input type="checkbox" id="item-{{item._id}}-equipped" class="dot" data-item-id="{{item._id}}" {{#if item.system.equipped }}checked{{/if}}>
-              </div>
-	      <div class="item-name">[{{item.system.load}}] {{item.name}}</div>
-              <div class="item-usage">
-                {{#times_from_1 item.system.uses }}
-                  <span class="dot-value" data-value="1" data-path="">&#9898;</span>
-                {{/times_from_1}}
-              </div>
-            </div>
-          {{/if}}
-          {{/each}}
-        </div>
 
+        {{> "systems/brinkwood/templates/parts/attributes.html" actor=actor}}
       </div>
 
       {{!-- Owned Items Tab --}}
@@ -286,10 +274,7 @@
         </div>
       </div>
 
-      <div id="character-{{_id}}-notes" class="tab flex-vertical {{#if (eq tabs.primary "character-notes")}}active{{/if}}" role="tabpanel" data-group="primary" data-tab="character-notes">
-        <div class="label-stripe">
-          <p>{{localize "BITD.Notes"}}</p>
-        </div>
+<div id="character-{{_id}}-notes" class="tab flex-vertical {{#if (eq tabs.primary "character-notes")}}active{{/if}}" role="tabpanel" data-group="primary" data-tab="character-notes">
         {{#if editable}}
         <prose-mirror name="system.description" value="{{system.description}}" data-document-uuid="{{actor.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
         {{else}}
@@ -298,26 +283,18 @@
       </div>
 
       {{!-- Active Effects --}}
-      <div id="character-{{_id}}-effects" class="tab effects flex-vertical {{#if (eq tabs.primary "effects")}}active{{/if}}" data-group="primary" data-tab="effects">
-        <div class="label-stripe">
-          <p>{{localize "BITD.Effects"}}</p>
-        </div>
+<div id="character-{{_id}}-effects" class="tab effects flex-vertical {{#if (eq tabs.primary "effects")}}active{{/if}}" data-group="primary" data-tab="effects">
         {{> "systems/brinkwood/templates/parts/active-effects.html"}}
       </div>
 
 			{{!-- Downtime actions --}}
 			<div id="character-{{_id}}-downtime" class="tab downtime flex-vertical {{#if (eq tabs.primary "downtime")}}active{{/if}}" data-group="primary" data-tab="downtime">
-				<div class="label-stripe">
-					<p>{{localize "BITD.Downtime"}}</p>
-				</div>
   		  {{> "systems/brinkwood/templates/parts/actor/downtime.html" actor=actor}}
 			</div>
 
 
 
     </div>
-    {{!-- Attributes --}}
-    {{> "systems/brinkwood/templates/parts/attributes.html" actor=actor}}
   </section>
 
 </form>

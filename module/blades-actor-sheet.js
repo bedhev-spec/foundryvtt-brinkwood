@@ -3,9 +3,22 @@ import { BladesSheet } from "./blades-sheet.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
 import { preloadClockImages } from "./clock-utils.js";
 
+export function formControlUpdate(control) {
+  const { name, type } = control ?? {};
+  if (!name || control.disabled || (type === "radio" && !control.checked)) return null;
+  const value = type === "checkbox"
+    ? control.checked
+    : control.multiple
+      ? Array.from(control.selectedOptions, option => option.value)
+      : control.value ?? control.getAttribute?.("value") ?? "";
+  return { [name]: value };
+}
+
 export function updateCharacterTrackerDisplay(element, value) {
   const group = element.parentElement;
-  const tracker = element.closest?.(".character-tracker") ?? group;
+  const tracker = element.closest?.(".character-tracker")
+    ?? element.closest?.(".character-xp, .character-stress")
+    ?? group;
   const color = tracker?.classList.contains("character-xp") ? "blue" : "red";
 
   group?.querySelectorAll(".dot-value").forEach(dot => {
@@ -47,8 +60,11 @@ export class BladesActorSheet extends BladesSheet {
 
   static DEFAULT_OPTIONS = {
     classes: ["brinkwood", "sheet", "actor", "pc", "character"],
-    position: { width: 700, height: 840 },
-    form: { submitOnChange: true },
+    // ApplicationV2 accepts "auto" (also used by BladesClockSheet), allowing
+    // the Legacy sheet to fit its rendered Traits content within Foundry's
+    // viewport-constrained window instead of imposing a fixed 840px viewport.
+    position: { width: 700, height: "auto" },
+    form: { submitOnChange: false },
     tabGroups: { primary: "traits" },
   };
 
@@ -65,6 +81,15 @@ export class BladesActorSheet extends BladesSheet {
 
     // Prepare active effects
     context.effects = BladesActiveEffect.prepareActiveEffectCategories(this.actor.effects);
+    this._isLegacyCharacterSheet = !this.constructor.DEFAULT_OPTIONS.classes.includes("character-v2");
+    context.isCharacterSheet = this._isLegacyCharacterSheet;
+    const visibleEffectTabs = Object.values(context.effects)
+      .filter(section => section.visible)
+      .map(section => section.type);
+    if (!visibleEffectTabs.includes(this._activeEffectTab)) {
+      this._activeEffectTab = visibleEffectTabs[0] ?? "temporary";
+    }
+    context.activeEffectTab = this._activeEffectTab;
 
     this.setAttrLabels(context.system.attributes);
 
@@ -109,15 +134,94 @@ export class BladesActorSheet extends BladesSheet {
 
   /* -------------------------------------------- */
 
-  /** @override */
-  async _onRender(context, options) {
+  /** Reset transient Legacy navigation when the sheet is genuinely closed. */
+  async close(options = {}) {
+    const isLegacy = !this.constructor.DEFAULT_OPTIONS.classes.includes("character-v2");
+    if (isLegacy) {
+      this._legacyViewState = undefined;
+      this.tabGroups.primary = "traits";
+    }
+    return super.close(options);
+  }
+
+  /* -------------------------------------------- */
+
+  /**
+  * The legacy actor sheet owns its viewport on the form, not on Foundry's
+  * .window-content wrapper.  The wrapper can also scroll in older Foundry
+  * themes, so retain both independently instead of guessing one owner.
+  */
+ _getLegacyScrollContainers() {
+ const root = this.element;
+ const form = root?.matches?.("form.actor-sheet") ? root : root?.querySelector?.("form.actor-sheet");
+ const windowContent = root?.closest?.(".window-content") ?? root?.querySelector?.(".window-content");
+ return [
+ ["form", form],
+ ["window", windowContent],
+ ].filter(([, element]) => element);
+ }
+
+ _captureLegacyScrollPosition({ primaryTab } = {}) {
+ if (!this._isLegacyCharacterSheet) return;
+ const activePanel = this.element?.querySelector?.('.tab[data-group="primary"].active');
+ const selectedPrimaryTab = primaryTab ?? activePanel?.dataset.tab ?? this.tabGroups.primary;
+ this._legacyViewState = {
+ primaryTab: selectedPrimaryTab,
+ effectTab: this._activeEffectTab,
+ scrollPositions: Object.fromEntries(this._getLegacyScrollContainers().map(([name, element]) => [name, {
+ scrollTop: element.scrollTop,
+ scrollLeft: element.scrollLeft,
+ }])),
+ };
+ }
+
+ _restoreLegacyScrollPosition() {
+ if (!this._isLegacyCharacterSheet || !this._legacyViewState) return;
+ const state = this._legacyViewState;
+ if (state.primaryTab) this.tabGroups.primary = state.primaryTab;
+ for (const [name, element] of this._getLegacyScrollContainers()) {
+ const position = state.scrollPositions?.[name];
+ if (!position) continue;
+ element.scrollTop = position.scrollTop;
+ element.scrollLeft = position.scrollLeft;
+ }
+ if (state.effectTab) this._activateEffectTab(state.effectTab);
+ }
+
+ /** @override */
+ async _onRender(context, options) {
     await super._onRender(context, options);
     const html = this.element;
 
-    this._characterSheetListenerController?.abort();
-    if (!this.isEditable) return;
+ this._characterSheetListenerController?.abort();
+ this._restoreLegacyScrollPosition();
+ if (!this.isEditable) return;
     this._characterSheetListenerController = new AbortController();
     const listenerOptions = { signal: this._characterSheetListenerController.signal };
+
+ if (this._isLegacyCharacterSheet) {
+ this._getLegacyScrollContainers().forEach(([, container]) => {
+ container.addEventListener("scroll", () => this._captureLegacyScrollPosition(), listenerOptions);
+ });
+ html.addEventListener("click", event => {
+ const action = event.target.closest?.(
+ '[data-group="primary"][data-action="tab"], [data-effect-tab], .effect-control, .item-select, .item-add-popup, .item-delete'
+ );
+ if (!action) return;
+ const primaryTab = action.matches('[data-group="primary"][data-action="tab"]') ? action.dataset.tab : undefined;
+ this._captureLegacyScrollPosition({ primaryTab });
+ }, { ...listenerOptions, capture: true });
+ html.querySelectorAll("[data-effect-tab]").forEach(tab => {
+        tab.addEventListener("click", event => this._onEffectTabClick(event), listenerOptions);
+        tab.addEventListener("keydown", event => this._onEffectTabKeydown(event), listenerOptions);
+      });
+      html.querySelectorAll('input[name], select[name], textarea[name], prose-mirror[name]').forEach(control => {
+        control.addEventListener("change", event => this._persistFormControl(event), listenerOptions);
+        if (!control.matches("prose-mirror[name]")) {
+          control.addEventListener("focusout", event => this._persistFormControl(event), listenerOptions);
+        }
+      });
+    }
 
     // Open Inventory Item sheet
     html.querySelectorAll(".item-body").forEach(el =>
@@ -153,13 +257,69 @@ export class BladesActorSheet extends BladesSheet {
       el.addEventListener("click", this._onClockClick.bind(this), listenerOptions)
     );
 
-    // Active effect controls – use data-effect-action to avoid AppV2 action dispatch
-    html.querySelectorAll(".effect-control").forEach(el =>
-      el.addEventListener("click", ev => BladesActiveEffect.onManageActiveEffect(ev, this.actor, { gmOnly: true }), listenerOptions)
-    );
+    // Active effect controls - use data-effect-action to avoid AppV2 action dispatch
+ html.querySelectorAll(".effect-control").forEach(el =>
+ el.addEventListener("click", ev => {
+ if (!this._isLegacyCharacterSheet) {
+ return BladesActiveEffect.onManageActiveEffect(ev, this.actor, { gmOnly: true });
+ }
+ this._captureLegacyScrollPosition();
+ const action = BladesActiveEffect.onManageActiveEffect(ev, this.actor, { gmOnly: true });
+ Promise.resolve(action).finally(() => this._restoreLegacyScrollPosition());
+ }, listenerOptions)
+ );
   }
 
   /* -------------------------------------------- */
+
+  _onEffectTabClick(event) {
+    event.preventDefault();
+    this._activateEffectTab(event.currentTarget.dataset.effectTab);
+  }
+
+  _onEffectTabKeydown(event) {
+    const tabs = Array.from(
+      event.currentTarget.closest('[role="tablist"]')?.querySelectorAll("[data-effect-tab]") ?? []
+    );
+    const current = tabs.indexOf(event.currentTarget);
+    const target = event.key === "Home" ? tabs[0]
+      : event.key === "End" ? tabs.at(-1)
+      : event.key === "ArrowRight" || event.key === "ArrowDown" ? tabs[(current + 1) % tabs.length]
+      : event.key === "ArrowLeft" || event.key === "ArrowUp" ? tabs[(current - 1 + tabs.length) % tabs.length]
+      : null;
+    if (!target) return;
+    event.preventDefault();
+    target.focus();
+    this._activateEffectTab(target.dataset.effectTab);
+  }
+
+  _activateEffectTab(type) {
+    const html = this.element;
+    const nextTab = html.querySelector(`[data-effect-tab="${type}"]`);
+    if (!nextTab) return;
+    this._activeEffectTab = type;
+    html.querySelectorAll("[data-effect-tab]").forEach(tab => {
+      const active = tab === nextTab;
+      tab.classList.toggle("active", active);
+      tab.setAttribute("aria-selected", String(active));
+      tab.tabIndex = active ? 0 : -1;
+    });
+    html.querySelectorAll("[data-effect-panel]").forEach(panel => {
+      panel.hidden = panel.dataset.effectPanel !== type;
+    });
+  }
+
+  async _persistFormControl(event) {
+    if (!this.isEditable) return;
+    const control = event.currentTarget;
+    // Clock radios have toggle-to-zero semantics in _onClockClick; a later
+    // generic focus/change save would otherwise restore the selected segment.
+    if (control.matches('input[name="system.scars"], input[name="system.oath"], [data-path]')) return;
+    const update = formControlUpdate(control);
+    if (update) {
+      await this.document.update(update, { render: control.matches("prose-mirror[name]") });
+    }
+  }
 
   async _onDotChange(event) {
     event.preventDefault();

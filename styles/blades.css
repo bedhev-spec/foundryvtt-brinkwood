@@ -3768,4 +3768,31 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   border-top: 1px solid rgba(247, 244, 237, 0.2);
 }
 
+/* Legacy tabs need their final grid before optional polish styles load. */
+.brinkwood.actor.clock .clock-sheet__clock .clocks {
+  width: 100%;
+  justify-items: center;
+  gap: 0;
+}
+.brinkwood.actor.clock .clock-sheet__clock .clock-zero-label {
+  display: none;
+}
+.brinkwood.actor.clock .clock-sheet__clock .blades-clock {
+  margin-inline: auto;
+}
+
+.brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace {
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 0;
+}
+.brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace > nav.tabs {
+  grid-column: 1 / -1;
+  width: 100%;
+  box-sizing: border-box;
+}
+.brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace > nav.tabs .item {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
 /*# sourceMappingURL=blades.css.map */

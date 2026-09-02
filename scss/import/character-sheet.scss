@@ -251,7 +251,7 @@
     min-width: 0;
   }
 
-  nav.tabs {
+nav.tabs {
     min-height: 36px;
     margin-bottom: 0;
     border-top: 1px solid rgba($almost_black, 0.6);
@@ -417,6 +417,46 @@
   .loadout .item-add-popup {
     margin-left: 10px;
   }
+}
+
+/* Legacy tabs need their final grid before optional polish styles load. */
+&:not(.character-v2) .character-sheet__workspace {
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 0;
+}
+
+&:not(.character-v2) .character-sheet__workspace > nav.tabs {
+  grid-column: 1 / -1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+&:not(.character-v2) .character-sheet__workspace > nav.tabs .item {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Legacy content expands naturally; the outer sheet viewport owns scrolling. */
+&:not(.character-v2) form.actor-sheet {
+  overflow: visible;
+}
+
+&:not(.character-v2) form.actor-sheet > .name-alias,
+&:not(.character-v2) form.actor-sheet > .bans-armor,
+&:not(.character-v2) form.actor-sheet > .character-sheet__workspace {
+  flex: 0 0 auto;
+}
+
+&:not(.character-v2) form.actor-sheet > .bans-armor {
+  overflow: visible;
+}
+
+&:not(.character-v2) .character-sheet__workspace,
+&:not(.character-v2) .character-sheet__workspace > .tab-content,
+&:not(.character-v2) .character-sheet__workspace > .tab-content > .tab[data-tab] {
+  height: auto;
+  max-height: none;
+  overflow: visible;
 }
 
 // Character-sheet redesign layer: keep tokens local to the ApplicationV2 sheet

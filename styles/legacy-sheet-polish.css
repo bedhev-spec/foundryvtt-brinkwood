@@ -1,0 +1,178 @@
+/* Final Legacy-only layout corrections. Loaded after legacy-effects-tabs.css. */
+
+/* Keep identity rows stable whether their optional item is empty or selected. */
+.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices {
+  display: grid;
+  grid-template-rows: repeat(4, 26px);
+  row-gap: 0;
+}
+
+.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices .item-block {
+  position: relative;
+  display: grid;
+  grid-template-columns: 33% minmax(0, 1fr) 18px;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 26px;
+  min-height: 26px;
+  max-height: 26px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices .item-class-label {
+  grid-column: 1;
+  min-width: 0;
+  margin: 0;
+  line-height: 26px;
+}
+
+.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices .item-block > .item {
+  position: static;
+  display: flex;
+  grid-column: 2;
+  align-items: center;
+  box-sizing: border-box;
+  min-width: 0;
+  height: 26px;
+  min-height: 0;
+  max-height: 26px;
+  margin: 0;
+  padding: 0;
+  gap: 4px;
+  line-height: 1;
+  align-self: stretch;
+  overflow: hidden;
+}
+
+.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices .item-block::after {
+  content: "";
+  grid-column: 3;
+  grid-row: 1;
+  width: 18px;
+  height: 18px;
+}
+
+.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices .item-body {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-width: 0;
+  height: 26px;
+  min-height: 0;
+  max-height: 26px;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  overflow: hidden;
+}
+
+.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices .item-name {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices .identity-choice__remove {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin: 0;
+  padding: 0;
+  transform: translateY(-50%);
+}
+
+/* Stable action rows: labels stay fixed while only the circle artwork is optically aligned. */
+.brinkwood.actor.pc.character:not(.character-v2) .attributes .attributes-container {
+  display: grid;
+  grid-template-columns: repeat(4, 28px) minmax(0, 1fr);
+  align-items: center;
+  min-height: 28px;
+}
+
+.brinkwood.actor.pc.character:not(.character-v2) .attributes .attributes-container button.dot-value {
+  align-self: center;
+  transform: none;
+}
+
+.brinkwood.actor.pc.character:not(.character-v2) .attributes .attributes-container button.dot-value::before {
+  transform: translateY(7px);
+}
+
+.brinkwood.actor.pc.character:not(.character-v2) .attributes .attribute-skill-label {
+  align-self: center;
+  min-height: 28px;
+  margin-top: 0;
+}
+
+/* Hide the zero/nullifier glyph while retaining the clock and progress text. */
+.brinkwood.actor.pc.character:not(.character-v2) .character-scars-clock .clock-zero-label,
+.brinkwood.actor.pc.character:not(.character-v2) .character-oath-clock .clock-zero-label {
+  display: contents;
+}
+
+.brinkwood.actor.pc.character:not(.character-v2) .character-scars-clock .clock-zero-label > .nullifier,
+.brinkwood.actor.pc.character:not(.character-v2) .character-oath-clock .clock-zero-label > .nullifier {
+  display: none;
+}
+
+.brinkwood.actor.pc.character:not(.character-v2) .character-scars-clock span.clock-label,
+.brinkwood.actor.pc.character:not(.character-v2) .character-oath-clock span.clock-label {
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: center;
+  margin: 0;
+  text-align: center;
+}
+
+/* Deterministic Armor checkbox: same footprint, white empty, existing orange/tick when checked. */
+.brinkwood.actor.pc.character:not(.character-v2) .character-armor-uses input[type="checkbox"] {
+  appearance: none;
+  display: inline-grid;
+  place-content: center;
+  box-sizing: border-box;
+  width: 18px;
+  min-width: 18px;
+  max-width: 18px;
+  height: 18px;
+  min-height: 18px;
+  max-height: 18px;
+  margin: 0;
+  border: 1px solid var(--bw-ink-soft);
+  border-radius: 2px;
+  background: #fff;
+}
+
+.brinkwood.actor.pc.character:not(.character-v2) .character-armor-uses input[type="checkbox"]:checked {
+  border-color: #f39b55;
+  background: #f39b55;
+}
+
+.brinkwood.actor.pc.character:not(.character-v2) .character-armor-uses input[type="checkbox"]:checked::after {
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  content: "";
+  transform: translateY(-1px) rotate(45deg);
+}
+
+.brinkwood.actor.pc.character:not(.character-v2) .character-armor-uses input[type="checkbox"]:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 2px;
+}
+
+.brinkwood.actor.pc.character:not(.character-v2) .character-armor-uses input[type="checkbox"]:disabled {
+  cursor: default;
+  opacity: 0.65;
+}

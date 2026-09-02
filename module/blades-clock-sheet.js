@@ -52,6 +52,21 @@ export class BladesClockSheet extends BladesSheet {
     this.element.querySelectorAll('input[name="system.value"]').forEach(input =>
       input.addEventListener("click", this._onClockSegmentClick.bind(this), listenerOptions)
     );
+    this.element.querySelector('select[name="system.type"]')?.addEventListener(
+      "change",
+      this._onClockSizeChange.bind(this),
+      listenerOptions
+    );
+  }
+
+  async _onClockSizeChange(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!this.isEditable) return;
+
+    const type = Number.parseInt(event.currentTarget.value, 10);
+    if (![4, 6, 8].includes(type)) return;
+    await this._updateClock({ "system.type": type, "system.value": 0 });
   }
 
   async _onClockSegmentClick(event) {
@@ -82,7 +97,6 @@ export class BladesClockSheet extends BladesSheet {
    */
   async _processSubmitData(event, form, submitData, options) {
     if (!this.isEditable) return;
-    if (event.target?.name === "system.type") return this._updateClock(submitData);
     return super._processSubmitData(event, form, submitData, options);
   }
 

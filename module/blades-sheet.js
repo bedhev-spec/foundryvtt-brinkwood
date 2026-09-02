@@ -20,6 +20,16 @@ export function lockSheetFormControls(html) {
   });
 }
 
+/** Read checked item picker inputs from either DialogV2 callback root. */
+export function readItemPickerSelection(button, dialog) {
+  const roots = [button?.form, dialog?.element?.querySelector("form")].filter(Boolean);
+  for (const root of roots) {
+    const selected = root.querySelectorAll(".items-to-add input:checked");
+    if (root.querySelector(".items-to-add")) return Array.from(selected, input => input.value);
+  }
+  return [];
+}
+
 export class BladesSheet extends foundry.applications.api.HandlebarsApplicationMixin(
   foundry.applications.sheets.ActorSheetV2
 ) {
@@ -124,7 +134,7 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
 
     const items = await BladesHelpers.getAllItemsByType(item_type, game);
 
-    let htmlContent = `<div class="items-to-add">`;
+    let htmlContent = `<form><div class="items-to-add">`;
     items.forEach(e => {
       let addition_price_load = ``;
       if (typeof e.system.load !== "undefined") {
@@ -147,15 +157,14 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
           data-tooltip-direction="RIGHT"></i>
       </div>`;
     });
-    htmlContent += `</div>`;
+    htmlContent += `</div></form>`;
 
     const selectedIds = await foundry.applications.api.DialogV2.prompt({
       window: { title: `${game.i18n.localize("Add")} ${item_type}` },
       content: htmlContent,
       ok: {
         label: game.i18n.localize("Add"),
-        callback: (_event, button) =>
-          Array.from(button.form?.querySelectorAll(".items-to-add input:checked") ?? []).map(input => input.value),
+        callback: (_event, button, dialog) => readItemPickerSelection(button, dialog),
       },
       rejectClose: false,
     });

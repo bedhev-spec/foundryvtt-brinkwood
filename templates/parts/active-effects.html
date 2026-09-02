@@ -1,13 +1,29 @@
 <div class="effects-groups">
+  {{#if isCharacterSheet}}
+  <div class="effects-tabs" role="tablist" aria-label="Effect types">
+    {{#each effects as |section sid|}}
+      {{#if section.visible}}
+      <button type="button" class="effects-tab {{#if (eq section.type ../activeEffectTab)}}active{{/if}}"
+        id="effects-{{../_id}}-{{section.type}}-tab" role="tab"
+        aria-controls="effects-{{../_id}}-{{section.type}}-panel"
+        aria-selected="{{#if (eq section.type ../activeEffectTab)}}true{{else}}false{{/if}}"
+        tabindex="{{#if (eq section.type ../activeEffectTab)}}0{{else}}-1{{/if}}"
+        data-effect-tab="{{section.type}}">{{localize section.label}}</button>
+      {{/if}}
+    {{/each}}
+  </div>
+  {{/if}}
+
   {{#each effects as |section sid|}}
-    <section class="effects-category" data-effect-type="{{section.type}}" aria-labelledby="effects-{{../_id}}-{{section.type}}">
+    {{#if section.visible}}
+    <section class="effects-category" data-effect-type="{{section.type}}"
+      {{#if ../isCharacterSheet}}data-effect-panel="{{section.type}}" role="tabpanel" id="effects-{{../_id}}-{{section.type}}-panel" aria-labelledby="effects-{{../_id}}-{{section.type}}-tab"{{#unless (eq section.type ../activeEffectTab)}} hidden{{/unless}}{{else}}aria-labelledby="effects-{{../_id}}-{{section.type}}"{{/if}}>
       <header class="effects-category__header">
-        <h3 id="effects-{{../_id}}-{{section.type}}">{{localize section.label}}</h3>
+        <h3{{#unless ../isCharacterSheet}} id="effects-{{../_id}}-{{section.type}}"{{/unless}}>{{localize section.label}}</h3>
         {{#if section.canCreate}}
           {{#if ../editable}}
-          <button type="button" class="effect-control effects-category__add" data-effect-action="create" title="{{localize 'BITD.EffectCreate'}}">
+          <button type="button" class="effect-control effects-category__add" data-effect-action="create" title="Create effect" aria-label="Create effect">
             <i class="fas fa-plus" aria-hidden="true"></i>
-            <span>{{localize "BITD.EffectCreate"}}</span>
           </button>
           {{/if}}
         {{/if}}
@@ -49,5 +65,6 @@
         {{/each}}
       </div>
     </section>
+    {{/if}}
   {{/each}}
 </div>

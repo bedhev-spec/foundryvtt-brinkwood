@@ -93,6 +93,20 @@
     border: 1px solid var(--bw-rule);
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.28);
+
+    .clocks {
+      width: 100%;
+      justify-items: center;
+      gap: 0;
+    }
+
+    .clock-zero-label {
+      display: none;
+    }
+
+    .blades-clock {
+      margin-inline: auto;
+    }
   }
 
   .clocks {

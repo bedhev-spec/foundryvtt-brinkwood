@@ -167,7 +167,7 @@ test("clock size changes suppress the stale document render and force one fresh 
   assert.deepEqual(renders, [{ force: true }]);
 });
 
-test("clock submit dispatch rerenders only for clock size changes", async () => {
+test("clock size selection resets progress and owns the change event", async () => {
   const clockUpdates = [];
   const sheet = {
     isEditable: true,
@@ -176,13 +176,17 @@ test("clock submit dispatch rerenders only for clock size changes", async () => 
   const form = { id: "clock-form" };
   const options = { render: false };
 
-  await BladesClockSheet.prototype._processSubmitData.call(
-    sheet,
-    { target: { name: "system.type" } },
-    form,
-    { "system.type": "8" }
-  );
-  assert.deepEqual(clockUpdates, [{ "system.type": "8" }]);
+  const sizeEvent = {
+    prevented: false,
+    stopped: false,
+    currentTarget: { value: "8" },
+    preventDefault() { this.prevented = true; },
+    stopPropagation() { this.stopped = true; }
+  };
+  await BladesClockSheet.prototype._onClockSizeChange.call(sheet, sizeEvent);
+  assert.equal(sizeEvent.prevented, true);
+  assert.equal(sizeEvent.stopped, true);
+  assert.deepEqual(clockUpdates, [{ "system.type": 8, "system.value": 0 }]);
 
   const result = await BladesClockSheet.prototype._processSubmitData.call(
     sheet,
@@ -191,7 +195,7 @@ test("clock submit dispatch rerenders only for clock size changes", async () => 
     { "system.description": "Updated notes" },
     options
   );
-  assert.deepEqual(clockUpdates, [{ "system.type": "8" }]);
+  assert.deepEqual(clockUpdates, [{ "system.type": 8, "system.value": 0 }]);
   assert.deepEqual(result, {
     event: { target: { name: "system.description" } },
     form,
@@ -245,6 +249,91 @@ test("read-only item sheets disable form controls while retaining readable text"
   assert.equal(select["aria-disabled"], "true");
   assert.equal(textarea.readOnly, true);
   assert.equal(textarea["aria-readonly"], "true");
+});
+
+test("legacy actor sheets retain the form viewport, wrapper viewport, and selected tabs across a render", () => {
+  const makeRoot = (form, windowContent, activePanel = null) => ({
+    matches: () => false,
+    closest: () => null,
+    querySelector(selector) {
+      if (selector === "form.actor-sheet") return form;
+      if (selector === ".window-content") return windowContent;
+      if (selector === '.tab[data-group="primary"].active') return activePanel;
+      return null;
+    }
+  });
+  const originalForm = { scrollTop: 248, scrollLeft: 17 };
+  const originalWindow = { scrollTop: 31, scrollLeft: 5 };
+  const sheet = {
+    _isLegacyCharacterSheet: true,
+    _activeEffectTab: "passive",
+    tabGroups: { primary: "traits" },
+    element: makeRoot(originalForm, originalWindow, { dataset: { tab: "traits" } }),
+    _getLegacyScrollContainers: BladesActorSheet.prototype._getLegacyScrollContainers,
+    _captureLegacyScrollPosition: BladesActorSheet.prototype._captureLegacyScrollPosition,
+    _restoreLegacyScrollPosition: BladesActorSheet.prototype._restoreLegacyScrollPosition,
+    _activateEffectTab(type) { this.restoredEffectTab = type; }
+  };
+
+  sheet._captureLegacyScrollPosition({ primaryTab: "effects" });
+  const rerenderedForm = { scrollTop: 0, scrollLeft: 0 };
+  const rerenderedWindow = { scrollTop: 0, scrollLeft: 0 };
+  sheet.element = makeRoot(rerenderedForm, rerenderedWindow);
+  sheet._restoreLegacyScrollPosition();
+
+  assert.deepEqual(rerenderedForm, { scrollTop: 248, scrollLeft: 17 });
+  assert.deepEqual(rerenderedWindow, { scrollTop: 31, scrollLeft: 5 });
+  assert.equal(sheet.tabGroups.primary, "effects");
+  assert.equal(sheet.restoredEffectTab, "passive");
+});
+
+test("legacy scroll capture forwards main-tab clicks for immediate native activation", async () => {
+  const listeners = new Map();
+  const form = { scrollTop: 248, scrollLeft: 17, addEventListener() {} };
+  const windowContent = { scrollTop: 31, scrollLeft: 5, addEventListener() {} };
+  const html = {
+    matches: () => false,
+    closest: () => null,
+    querySelector(selector) {
+      if (selector === "form.actor-sheet") return form;
+      if (selector === ".window-content") return windowContent;
+      if (selector === '.tab[data-group="primary"].active') return { dataset: { tab: "traits" } };
+      return null;
+    },
+    querySelectorAll: () => [],
+    addEventListener(type, listener, options) { listeners.set(type, { listener, options }); }
+  };
+  const sheet = {
+    _isLegacyCharacterSheet: true,
+    _activeEffectTab: "passive",
+    isEditable: true,
+    tabGroups: { primary: "traits" },
+    element: html,
+    _getLegacyScrollContainers: BladesActorSheet.prototype._getLegacyScrollContainers,
+    _captureLegacyScrollPosition: BladesActorSheet.prototype._captureLegacyScrollPosition,
+    _restoreLegacyScrollPosition: BladesActorSheet.prototype._restoreLegacyScrollPosition
+  };
+  await BladesActorSheet.prototype._onRender.call(sheet, {}, {});
+
+  const tab = {
+    dataset: { tab: "effects" },
+    matches: selector => selector === '[data-group="primary"][data-action="tab"]'
+  };
+  const event = {
+    defaultPrevented: false,
+    preventDefault() { this.defaultPrevented = true; },
+    target: { closest: () => tab }
+  };
+  listeners.get("click").listener(event);
+
+  assert.equal(event.defaultPrevented, false);
+  assert.equal(sheet.tabGroups.primary, "traits");
+  assert.equal(sheet._legacyViewState.primaryTab, "effects");
+
+  // This models Foundry's delegated action handler, which now receives the
+  // untouched click and can activate the panel in the same event turn.
+  if (!event.defaultPrevented) sheet.tabGroups.primary = tab.dataset.tab;
+  assert.equal(sheet.tabGroups.primary, "effects");
 });
 
 test("unknown Mask item names use readable generic labels instead of missing localization keys", () => {
