@@ -177,15 +177,15 @@
             <td rowspan="3" id="character-{{_id}}-armor-uses" class="character-armor-uses">
               <div>
                 <label for="character-{{_id}}-armor-uses-armor">{{localize "BITD.Armor"}}</label>
-                <input id="character-{{_id}}-armor-uses-armor" type="checkbox" name="system.armor-uses.armor" {{checked system.armor-uses.armor}}>
+                <input id="character-{{_id}}-armor-uses-armor" class="bw-checkbox-x" type="checkbox" name="system.armor-uses.armor" {{checked system.armor-uses.armor}}>
               </div>
               <div>
                 <label for="character-{{_id}}-armor-uses-heavy">{{localize "BITD.Heavy"}}</label>
-                <input id="character-{{_id}}-armor-uses-heavy" type="checkbox" name="system.armor-uses.heavy" {{checked system.armor-uses.heavy}}>
+                <input id="character-{{_id}}-armor-uses-heavy" class="bw-checkbox-x" type="checkbox" name="system.armor-uses.heavy" {{checked system.armor-uses.heavy}}>
               </div>
               <div>
                 <label for="character-{{_id}}-armor-uses-special">{{localize "BITD.Special"}}</label>
-                <input id="character-{{_id}}-armor-uses-special" type="checkbox" name="system.armor-uses.special" {{checked system.armor-uses.special}}>
+                <input id="character-{{_id}}-armor-uses-special" class="bw-checkbox-x" type="checkbox" name="system.armor-uses.special" {{checked system.armor-uses.special}}>
               </div>
             </td>
           </tr>
@@ -235,16 +235,7 @@
         <div id="character-{{_id}}-traits-list">
           {{#each traits as |trait id|}}
           {{#if (eq trait.type "trait")}}
-            <article class="trait-card" data-item-id="{{trait._id}}">
-<header class="trait-card__header">
-	      <h3 class="trait-card__title">
-<input type="checkbox" id="item-{{trait._id}}-purchased" class="trait-card__purchase" data-item-id="{{trait._id}}" aria-label="Purchased / Learned: {{trait.name}}" title="Purchased / Learned" {{#if trait.system.purchased}}checked{{/if}}{{#unless ../editable}} disabled{{/unless}}>
-{{trait.name}}
-</h3>
-</header>
-<div class="trait-card__separator" aria-hidden="true"></div>
-<div class="trait-card__description">{{{trait.system.description}}}</div>
-            </article>
+            {{> "systems/brinkwood/templates/parts/actor/trait-card.html" itemId=trait._id title=trait.name description=trait.system.description purchased=trait.system.purchased editable=../editable canDelete=trait.canDelete}}
           {{/if}}
           {{/each}}
         </div>

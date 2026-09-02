@@ -36,13 +36,12 @@ test("Legacy Notes rerender their enriched closed state after save", async () =>
   assert.match(controller, /render:\s*control\.matches\("prose-mirror\[name\]"\)/);
 });
 
-test("Legacy tall tabs leave scrolling to the sheet viewport", async () => {
-  const styles = await read("scss/import/legacy-character-effects.scss");
+test("Legacy tall tabs scroll inside the bounded tab viewport", async () => {
+ const styles = await read("scss/import/character-sheet.scss");
 
-  assert.match(styles, /form\.actor-sheet\s*\{[\s\S]*?overflow:\s*visible/);
-  assert.match(styles, /form\.actor-sheet > \.bans-armor[\s\S]*?flex:\s*0 0 auto/);
-  assert.match(styles, /form\.actor-sheet > \.bans-armor\s*\{[\s\S]*?overflow:\s*visible/);
-  assert.match(styles, /tab-content > \.tab\[data-tab\][\s\S]*?height:\s*auto[\s\S]*?max-height:\s*none[\s\S]*?overflow:\s*visible/);
+ assert.match(styles, /form\.actor-sheet\s*\{[\s\S]*?height:\s*100%[\s\S]*?grid-template-rows:\s*auto auto auto auto minmax\(0, 1fr\)[\s\S]*?overflow:\s*hidden/);
+ assert.match(styles, /character-sheet__workspace\s*\{[\s\S]*?min-height:\s*0[\s\S]*?grid-template-rows:\s*auto minmax\(0, 1fr\)[\s\S]*?overflow:\s*hidden/);
+  assert.match(styles, /character-sheet__workspace > \.tab-content\s*\{[\s\S]*?min-height:\s*0[\s\S]*?overflow-y:\s*auto[\s\S]*?scrollbar-gutter:\s*auto[\s\S]*?scrollbar-width:\s*thin/);
 });
 
 test("Legacy sheets reset to Traits only when genuinely closed", async () => {

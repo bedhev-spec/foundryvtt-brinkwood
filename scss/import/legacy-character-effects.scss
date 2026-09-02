@@ -6,16 +6,11 @@
   gap: 4px;
   margin-bottom: 8px;
   padding: 4px;
-  border: 1px solid var(--bw-rule);
- background: var(--bw-paper-deep);
 }
 .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs {
  grid-column: 1 / -1;
  width: 100%;
  box-sizing: border-box;
- border-left: 1px solid var(--bw-rule);
- border-right: 1px solid var(--bw-rule);
- border-radius: 3px;
 }
 .brinkwood.actor.pc.character .character-sheet__workspace > .tab-content {
  grid-column: 1;
@@ -72,23 +67,7 @@
   border: 1px solid transparent;
   border-bottom: 3px solid transparent;
   border-radius: 3px;
-  color: var(--bw-ink-soft);
-  background: transparent;
-  cursor: pointer;
-  font: inherit;
-  font-weight: 700;
 }
-.brinkwood.actor.pc.character .effects-tab:hover,
-.brinkwood.actor.pc.character .effects-tab:focus-visible,
-.brinkwood.actor.pc.character .effects-tab.active {
-  border-color: var(--bw-rule);
-  border-bottom-color: var(--bw-accent);
-  color: var(--bw-ink);
-}
-.brinkwood.actor.pc.character .effects-tab.active {
-  background: rgba(255, 255, 255, 0.42);
-}
-.brinkwood.actor.pc.character .effects-tab:focus-visible,
 .brinkwood.actor.pc.character .effects-category__add:focus-visible {
   outline: 3px solid var(--bw-focus);
   outline-offset: 1px;
@@ -317,29 +296,6 @@
     grid-template-columns: minmax(0, 1fr);
   }
   .brinkwood.actor.pc.character .effects-tab { flex-basis: 100%; }
-}
-
-/* Keep header/state regions at natural height; only the sheet viewport scrolls. */
-.brinkwood.actor.pc.character form.actor-sheet {
-  overflow: visible;
-}
-
-.brinkwood.actor.pc.character form.actor-sheet > .name-alias,
-.brinkwood.actor.pc.character form.actor-sheet > .bans-armor,
-.brinkwood.actor.pc.character form.actor-sheet > .character-sheet__workspace {
-  flex: 0 0 auto;
-}
-
-.brinkwood.actor.pc.character form.actor-sheet > .bans-armor {
-  overflow: visible;
-}
-
-.brinkwood.actor.pc.character .character-sheet__workspace,
-.brinkwood.actor.pc.character .character-sheet__workspace > .tab-content,
-.brinkwood.actor.pc.character .character-sheet__workspace > .tab-content > .tab[data-tab] {
-  height: auto;
-  max-height: none;
-  overflow: visible;
 }
 
 /* This file loads after blades.css. Keep the effect disclosure control's

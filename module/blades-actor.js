@@ -2,6 +2,48 @@ import { bladesRoll } from "./blades-roll.js";
 import { readRollDialogValues } from "./roll-resolution.js";
 import { BladesHelpers } from "./blades-helpers.js";
 
+const TRAIT_SOURCE_TYPES = new Set(["upbringing", "profession", "mask"]);
+const ACTION_POINT_SOURCE_TYPES = new Set([...TRAIT_SOURCE_TYPES, "class"]);
+const isTraitSource = item => TRAIT_SOURCE_TYPES.has(item?.type);
+
+function compendiumSourceMetadata(item) {
+  return [
+    item.uuid,
+    item.flags?.core?.sourceId,
+    item._stats?.compendiumSource,
+    item.getFlag?.("core", "sourceId")
+  ].filter(value => typeof value === "string" && value.length);
+}
+
+function traitHasCompendiumProvenance(embeddedTrait, compendiumTrait) {
+  const compendiumId = compendiumTrait.id ?? compendiumTrait._id;
+  const expectedSources = new Set(compendiumSourceMetadata(compendiumTrait));
+  if (compendiumId) expectedSources.add(compendiumId);
+  return compendiumSourceMetadata(embeddedTrait).some(source =>
+    expectedSources.has(source) || (compendiumId && source.endsWith(`.${compendiumId}`)));
+}
+
+// Multiple document callbacks can request the same grant before the first
+// embedded-document create has synchronized back to this actor. Serialize that
+// read/check/create sequence per actor and source item so a later request sees
+// the first request's authoritative embedded documents.
+const traitGrantQueues = new WeakMap();
+function serializeTraitGrant(actor, sourceItemId, operation) {
+  let queues = traitGrantQueues.get(actor);
+  if (!queues) {
+    queues = new Map();
+    traitGrantQueues.set(actor, queues);
+  }
+
+  const prior = queues.get(sourceItemId) ?? Promise.resolve();
+  const next = prior.catch(() => undefined).then(operation);
+  queues.set(sourceItemId, next);
+  return next.finally(() => {
+    if (queues.get(sourceItemId) === next) queues.delete(sourceItemId);
+    if (!queues.size) traitGrantQueues.delete(actor);
+  });
+}
+
 /**
  * Extend the basic Actor
  * @extends {Actor}
@@ -177,11 +219,38 @@ export class BladesActor extends foundry.documents.Actor {
 
   /* -------------------------------------------- */
 
+  /**
+   * Create source items, then synchronize their grants. Once Foundry has
+   * committed the source, a grant failure is recoverable through
+   * repairTraitGrantsForSourceIds and must not make callers recreate it.
+   */
+  async createEmbeddedDocuments(embeddedName, data, operation={}) {
+    const created = await super.createEmbeddedDocuments(embeddedName, data, operation);
+    const traitSources = embeddedName === "Item"
+      ? Array.from(created ?? []).filter(isTraitSource)
+      : [];
+    if (!traitSources.length) return created;
+
+    try {
+      await this.syncTraitGrantsForSources(traitSources);
+    } catch (error) {
+      const sourceIds = traitSources.map(source => source.id ?? source._id).filter(Boolean);
+      console.error("Brinkwood trait grant synchronization failed after source creation", {
+        actorId: this.id,
+        sourceIds,
+        error
+      });
+      globalThis.ui?.notifications?.warn?.(
+        "The selected source was saved, but its traits could not be loaded. Please retry the trait repair."
+      );
+    }
+    return created;
+  }
+
   async _onCreateEmbeddedDocuments( name, ...args ) {
     await super._onCreateEmbeddedDocuments(name, ...args);
     for (const newItem of args[0] ?? []) {
-      if (["profession", "upbringing", "mask"].includes(newItem.type)) await this._addTraits(newItem);
-      if (["profession", "upbringing", "mask", "class"].includes(newItem.type)) {
+      if (ACTION_POINT_SOURCE_TYPES.has(newItem.type)) {
         await this._modActionPoints(newItem);
       }
     }
@@ -193,7 +262,7 @@ export class BladesActor extends foundry.documents.Actor {
         ?? this.items.find?.(entry => (entry.id ?? entry._id) === id)).filter(Boolean)
       : [];
     const sourceKeys = new Set(removedItems
-      .filter(item => ["profession", "upbringing", "mask"].includes(item.type))
+      .filter(isTraitSource)
       .map(item => `${item.type}:${item.id ?? item._id}`));
     const grantIds = embeddedName === "Item"
       ? this.items.filter(item => {
@@ -209,7 +278,7 @@ export class BladesActor extends foundry.documents.Actor {
     // second asynchronous deletion from a post-delete lifecycle callback.
     const result = await super.deleteEmbeddedDocuments(embeddedName, deleteIds, operation);
     for (const removedItem of removedItems) {
-      if (["profession", "upbringing", "mask", "class"].includes(removedItem.type)) {
+      if (ACTION_POINT_SOURCE_TYPES.has(removedItem.type)) {
         await this._modActionPoints(removedItem, true);
       }
     }
@@ -232,20 +301,64 @@ export class BladesActor extends foundry.documents.Actor {
 		await this.update(system);
 	}
 
-  async _addTraits(data) {
+  async _addTraits(data, compendiumTraits = null, adoptLegacyTraits = false) {
     const traitPack = game.packs.get("brinkwood.trait");
     if (!traitPack) return;
 
-    // Compendium queries are indexed-field dependent in v13.  Hydrate then
-    // filter so every mapped upbringing/profession works consistently.
-    const traits = (await traitPack.getDocuments())
-      .filter(trait => trait.type === "trait" && trait.system.class === data.name);
     const sourceItemId = data.id ?? data._id;
+    const queueKey = sourceItemId ?? `${data.type}:${data.name}`;
+    return serializeTraitGrant(this, queueKey, async () => {
+
+    // Compendium queries are indexed-field dependent in v13. Hydrate then
+    // filter so every mapped automatic trait source works consistently.
+    const traits = (compendiumTraits ?? await traitPack.getDocuments())
+      .filter(trait => trait.type === "trait" && trait.system.class === data.name);
     const alreadyGranted = new Set(this.items
       .filter(item => item.type === "trait" && item.flags?.brinkwood?.traitGrant?.sourceItemId === sourceItemId)
       .map(item => item.flags.brinkwood.traitGrant.traitSourceId));
+
+    // Pre-v13 grants were embedded without our source tag. Only repair a
+    // legacy trait when the compendium source proves it, or its exact name and
+    // class leave a single possible match. Ambiguous candidates are left alone
+    // and suppress creation, so reconciliation can never duplicate a trait.
+    const legacyTraits = this.items.filter(item =>
+      item.type === "trait" && !item.flags?.brinkwood?.traitGrant);
+    const adoptedTraitIds = new Set();
+    const uncertainTraitSourceIds = new Set();
+    const traitUpdates = [];
+    if (adoptLegacyTraits) {
+      for (const trait of traits) {
+        const traitSourceId = trait.id ?? trait._id;
+        if (alreadyGranted.has(traitSourceId)) continue;
+        const provenanceMatches = legacyTraits.filter(item =>
+          !adoptedTraitIds.has(item.id ?? item._id)
+          && traitHasCompendiumProvenance(item, trait));
+        const exactMatches = provenanceMatches.length ? [] : legacyTraits.filter(item =>
+          !adoptedTraitIds.has(item.id ?? item._id)
+          && item.name === trait.name && item.system?.class === data.name);
+        const matches = provenanceMatches.length ? provenanceMatches : exactMatches;
+        if (matches.length === 1) {
+          const legacyTrait = matches[0];
+          const legacyTraitId = legacyTrait.id ?? legacyTrait._id;
+          adoptedTraitIds.add(legacyTraitId);
+          alreadyGranted.add(traitSourceId);
+          traitUpdates.push({
+            _id: legacyTraitId,
+            "flags.brinkwood.traitGrant": {
+              sourceItemId,
+              sourceItemType: data.type,
+              traitSourceId
+            }
+          });
+        } else if (matches.length > 1) {
+          uncertainTraitSourceIds.add(traitSourceId);
+        }
+      }
+      if (traitUpdates.length) await this.updateEmbeddedDocuments("Item", traitUpdates);
+    }
     const createdTraits = traits
-      .filter(trait => !alreadyGranted.has(trait.id ?? trait._id))
+      .filter(trait => !alreadyGranted.has(trait.id ?? trait._id)
+        && !uncertainTraitSourceIds.has(trait.id ?? trait._id))
       .map(trait => {
         const traitData = trait.toObject();
         const traitSourceId = trait.id ?? trait._id;
@@ -261,27 +374,40 @@ export class BladesActor extends foundry.documents.Actor {
       });
 
     if (createdTraits.length) await this.createEmbeddedDocuments("Item", createdTraits);
+    });
   }
 
-  async _deleteTraits(data) {
-    const sourceItemId = data.id ?? data._id;
-    const charTraits = this.items
-      .filter(item => item.type === "trait"
-        && item.flags?.brinkwood?.traitGrant?.sourceItemId === sourceItemId
-        && item.flags.brinkwood.traitGrant.sourceItemType === data.type)
-      .map(item => item.id ?? item._id);
-    if (charTraits.length) await this.deleteEmbeddedDocuments("Item", charTraits);
+  /** Synchronize traits for newly embedded source choices through the actor. */
+  async syncTraitGrantsForSources(sources, adoptLegacyTraits = false) {
+    const traitSources = Array.from(sources ?? []).filter(isTraitSource);
+    if (!traitSources.length) return;
+    const traitPack = game.packs.get("brinkwood.trait");
+    if (!traitPack) return;
+    const compendiumTraits = await traitPack.getDocuments();
+    for (const source of traitSources) {
+      await this._addTraits(source, compendiumTraits, adoptLegacyTraits);
+    }
+  }
+
+  /** Retry trait synchronization for source documents already saved on this actor. */
+  async repairTraitGrantsForSourceIds(sourceIds, adoptLegacyTraits = false) {
+    const requestedIds = new Set(
+      (Array.isArray(sourceIds) ? sourceIds : [sourceIds]).filter(Boolean)
+    );
+    const sources = this.items.filter(item =>
+      requestedIds.has(item.id ?? item._id) && isTraitSource(item));
+    return this.syncTraitGrantsForSources(sources, adoptLegacyTraits);
   }
 
   /**
    * Backfill grants for choices embedded before the v13 trait sync repair.
-   * This only adds missing, source-tagged traits; untagged manual/shared
-   * traits are never inferred to belong to a source or deleted.
+   * Tagged traits are deleted with their source by deleteEmbeddedDocuments.
+   * Untagged traits are adopted only when their compendium provenance, or a
+   * unique exact name/class match, establishes that relationship.
    */
   async reconcileTraitGrants() {
-    const traitSources = this.items.filter(item =>
-      item.type === "upbringing" || item.type === "profession");
-    for (const source of traitSources) await this._addTraits(source);
+    await (this.syncTraitGrantsForSources
+      ?? BladesActor.prototype.syncTraitGrantsForSources).call(this, this.items, true);
   }
 
   async _loadBasicItems() {

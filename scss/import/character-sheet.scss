@@ -7,6 +7,10 @@
  */
 
 & {
+  // Keep the preferred Notes footprint on desktop while allowing Foundry's
+  // application frame to fit entirely inside smaller viewports.
+  max-height: calc(100vh - 32px);
+
   .character-identity-choices {
     padding-right: 0;
   }
@@ -74,10 +78,13 @@
   .window-content {
     min-height: 0;
     min-width: 0;
+    height: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
     padding: 0;
     overflow-x: hidden;
-    overflow-y: auto;
-    scrollbar-gutter: stable;
+    overflow-y: hidden;
     background-color: #eeeee8;
     color: $almost_black;
     container-type: inline-size;
@@ -89,6 +96,9 @@
     min-width: 0;
     max-width: 100%;
     min-height: 0;
+    height: 100%;
+    max-height: 100%;
+    flex: 1 1 auto;
     padding: 20px;
     container-type: inline-size;
     color: $almost_black;
@@ -305,8 +315,10 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 24px;
-    align-items: start;
+    align-items: stretch;
     min-width: 0;
+    min-height: 0;
+    height: 100%;
   }
 
   .character-sheet__workspace > .tab-content {
@@ -479,36 +491,32 @@ nav.tabs {
       min-width: 0;
     }
 
-    .trait-card {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 6px;
-      min-width: 0;
-      padding: 9px 10px;
-      border: 1px solid var(--bw-rule);
-      background: var(--bw-paper);
-      color: var(--bw-ink);
-      overflow: visible;
-    }
+  .trait-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    align-self: start;
+    align-content: start;
+    overflow: visible;
+  }
 
     .trait-card__header {
       display: grid;
-      grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
       min-width: 0;
     }
 
-    .trait-card__title {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      min-width: 0;
-      margin: 0;
-      color: inherit;
-      font-size: 1.05rem;
-      font-weight: 700;
-      line-height: 1.2;
-      overflow-wrap: anywhere;
-    }
+  .trait-card__title {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+  }
 
     .trait-card__purchase {
       flex: 0 0 auto;
@@ -538,22 +546,39 @@ nav.tabs {
       }
     }
 
-    .trait-card__separator {
-      width: 75%;
-      max-width: 100%;
-      border-top: 1px solid rgba(141, 98, 93, 0.55);
+  .trait-card__remove {
+    width: 26px;
+    min-width: 26px;
+    height: 26px;
+    min-height: 26px;
+    margin: -3px -4px -3px 8px;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    color: var(--bw-ink-soft);
+    font-size: 1.35rem;
+    line-height: 1;
+
+    &:hover,
+    &:focus-visible {
+      background: rgba(141, 98, 93, 0.16);
+      color: var(--bw-ink);
     }
 
-    .trait-card__description {
-      min-width: 0;
-      max-width: 100%;
-      height: auto;
-      max-height: none;
-      margin: 0;
-      color: var(--bw-ink-soft);
-      font-size: 0.95rem;
-      line-height: 1.45;
-      overflow: visible;
+    &:focus-visible {
+      outline: 3px solid var(--bw-focus);
+      outline-offset: 1px;
+    }
+  }
+
+  .trait-card__description {
+    min-width: 0;
+    max-width: 100%;
+    height: auto;
+    max-height: none;
+    color: var(--bw-ink);
+    align-self: start;
+    overflow: visible;
       overflow-wrap: anywhere;
     }
 
@@ -584,29 +609,6 @@ nav.tabs {
   min-width: 0;
 }
 
-/* Legacy content expands naturally; the outer sheet viewport owns scrolling. */
-& form.actor-sheet {
-  overflow: visible;
-}
-
-& form.actor-sheet > .name-alias,
-& form.actor-sheet > .bans-armor,
-& form.actor-sheet > .character-sheet__workspace {
-  flex: 0 0 auto;
-}
-
-& form.actor-sheet > .bans-armor {
-  overflow: visible;
-}
-
-& .character-sheet__workspace,
-& .character-sheet__workspace > .tab-content,
-& .character-sheet__workspace > .tab-content > .tab[data-tab] {
-  height: auto;
-  max-height: none;
-  overflow: visible;
-}
-
 // Character-sheet redesign layer: keep tokens local to the ApplicationV2 sheet
 // so Foundry's light/dark theme cannot wash out the parchment UI.
 & {
@@ -629,9 +631,40 @@ nav.tabs {
     background-color: transparent;
     color: var(--bw-ink);
     display: grid;
-    gap: 14px;
+    grid-template-rows: auto auto auto auto minmax(0, 1fr);
+    column-gap: 14px;
+    row-gap: 10px;
     overflow: hidden;
     scrollbar-color: var(--bw-rule) transparent;
+  }
+
+  .character-sheet__workspace {
+    min-height: 0;
+    grid-template-rows: auto minmax(0, 1fr);
+    overflow: hidden;
+  }
+
+  form.actor-sheet > .name-alias,
+  form.actor-sheet > .character-attributes,
+  form.actor-sheet > .bans-armor {
+    min-height: 0;
+    height: auto;
+    align-self: start;
+    flex: 0 0 auto;
+    margin: 0;
+  }
+
+  .character-sheet__workspace > nav.tabs {
+    min-height: 0;
+  }
+
+  .character-sheet__workspace > .tab-content {
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: auto;
+    scrollbar-width: thin;
   }
 
   input[type="text"],
@@ -937,32 +970,7 @@ nav.tabs {
     min-width: 0;
     max-width: 100%;
     overflow: hidden;
-    border: 1px solid var(--bw-rule);
-    border-left: 5px solid var(--bw-accent);
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.3);
 
-    h3 {
-      margin: 0;
-      padding: 9px 12px;
-      background: var(--bw-paper-deep);
-      color: var(--bw-ink);
-      font-family: "Crimson Text", serif;
-      font-size: 1.2rem;
-      font-weight: 700;
-      line-height: 1.25;
-      text-transform: none;
-      overflow-wrap: anywhere;
-    }
-
-    p {
-      margin: 0;
-      padding: 11px 12px 13px;
-      color: var(--bw-ink);
-      font-size: 1rem;
-      line-height: 1.45;
-      overflow-wrap: anywhere;
-    }
   }
 
   @container (max-width: 760px) {

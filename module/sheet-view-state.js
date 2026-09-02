@@ -5,6 +5,11 @@
  */
 
 export function getSheetScrollContainers(root) {
+  const characterViewport = root?.querySelector?.(".character-sheet__workspace > .tab-content");
+  // Character sheets have a fixed header and one explicit tab viewport. Do not
+  // preserve the outer scroll positions: restoring either moves the header.
+  if (characterViewport) return [["tab", characterViewport]];
+
   const form = root?.matches?.("form.actor-sheet") ? root : root?.querySelector?.("form.actor-sheet");
   const windowContent = root?.closest?.(".window-content") ?? root?.querySelector?.(".window-content");
   return [["form", form], ["window", windowContent]].filter(([, element]) => element);
@@ -30,6 +35,17 @@ export function restoreSheetViewState(root, state, { setPrimaryTab, activateEffe
     if (!position) continue;
     element.scrollTop = position.scrollTop;
     element.scrollLeft = position.scrollLeft;
+  }
+  // A character viewport can replace the inner tab pane during a rerender.
+  // Ensure stale outer positions cannot shift the fixed header into view.
+  if (root?.querySelector?.(".character-sheet__workspace > .tab-content")) {
+    const form = root.matches?.("form.actor-sheet") ? root : root.querySelector?.("form.actor-sheet");
+    const windowContent = root.closest?.(".window-content") ?? root.querySelector?.(".window-content");
+    for (const element of [form, windowContent]) {
+      if (!element) continue;
+      element.scrollTop = 0;
+      element.scrollLeft = 0;
+    }
   }
   if (state.effectTab) activateEffectTab?.(state.effectTab);
 }

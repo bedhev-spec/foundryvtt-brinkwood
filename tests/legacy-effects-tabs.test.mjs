@@ -13,13 +13,14 @@ test("native form serialization retains a cleared Alias on the second save", () 
 });
 
 test("Legacy Effects use persistent accessible sub-tabs and hide empty suppression", async () => {
-  const [template, actorTemplate, controller, categories, styles, polishStyles, characterStyles, stylesheet, manifest] = await Promise.all([
+  const [template, actorTemplate, controller, categories, styles, polishStyles, generalStyles, characterStyles, stylesheet, manifest] = await Promise.all([
     read("templates/parts/active-effects.html"),
     read("templates/actor-sheet.html"),
     read("module/blades-actor-sheet.js"),
     read("module/blades-active-effect.js"),
     read("scss/import/legacy-character-effects.scss"),
     read("scss/import/legacy-character-sheet-polish.scss"),
+    read("scss/import/general-styles.scss"),
     read("scss/import/character-sheet.scss"),
     read("scss/style.scss"),
     read("system.json"),
@@ -69,7 +70,7 @@ test("Legacy Effects use persistent accessible sub-tabs and hide empty suppressi
   assert.match(actorTemplate, /character-sheet__workspace[\s\S]*?<nav class="tabs[\s\S]*?<\/nav>[\s\S]*?<div class="tab-content/);
   assert.equal((actorTemplate.match(/name="system\.selected_load_level"/g) ?? []).length, 1);
   assert.doesNotMatch(actorTemplate, /id="character-\{\{_id\}\}-traits-tab"[\s\S]*?class="label-stripe"[\s\S]*?id="character-\{\{_id\}\}-traits-list"/);
-  assert.match(styles, /character-sheet__workspace > nav\.tabs \{[\s\S]*?grid-column: 1 \/ -1[\s\S]*?width: 100%[\s\S]*?border-left: 1px solid var\(--bw-rule\)[\s\S]*?border-right: 1px solid var\(--bw-rule\)/);
+  assert.match(styles, /character-sheet__workspace > nav\.tabs \{[\s\S]*?grid-column: 1 \/ -1[\s\S]*?width: 100%[\s\S]*?box-sizing: border-box/);
   assert.equal((actorTemplate.match(/templates\/parts\/attributes\.html/g) ?? []).length, 1);
   assert.match(actorTemplate, /class="character-attributes"[\s\S]*?templates\/parts\/attributes\.html/);
  assert.match(styles, /character-attributes > \.attributes \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)[\s\S]*?box-sizing: border-box/);
@@ -94,7 +95,7 @@ test("Legacy Effects use persistent accessible sub-tabs and hide empty suppressi
   assert.match(styles, /character-sheet__workspace \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)[\s\S]*?row-gap: 0/);
   assert.match(actorTemplate, /class="flex-column character-identity-choices"/);
   assert.match(polishStyles, /character-identity-choices \{[\s\S]*?grid-template-rows: repeat\(4, minmax\(26px, auto\)\)[\s\S]*?row-gap: 0[\s\S]*?padding-right: 0/);
- assert.match(polishStyles, /character-identity-choices \.item-block \{[\s\S]*?height: auto[\s\S]*?max-height: none[\s\S]*?margin: 0/);
+  assert.match(polishStyles, /character-identity-choices \.item-block \{[\s\S]*?height: auto[\s\S]*?max-height: none[\s\S]*?margin: 0[\s\S]*?padding: 0 0 1\.5px/);
   assert.match(polishStyles, /character-identity-choices \.item-block > \.item \{[\s\S]*?min-height: 26px[\s\S]*?max-height: none[\s\S]*?align-self: stretch[\s\S]*?overflow: visible/);
   assert.match(polishStyles, /character-identity-choices \.item-name \{[\s\S]*?white-space: normal[\s\S]*?text-overflow: clip[\s\S]*?overflow-wrap: anywhere/);
   assert.match(polishStyles, /character-identity-choices \.item-body \{[\s\S]*?min-height: 26px[\s\S]*?max-height: none[\s\S]*?line-height: 1[\s\S]*?overflow: visible/);
@@ -108,10 +109,11 @@ assert.match(characterStyles, /character-identity-choices \.identity-choice__act
   assert.match(polishStyles, /attributes \.attributes-container button\.dot-value \{[\s\S]*?transform: none/);
   assert.match(polishStyles, /attributes \.attributes-container button\.dot-value::before \{[\s\S]*?transform: translateY\(7px\)/);
   assert.match(polishStyles, /clock-zero-label > \.nullifier[\s\S]*?display: none/);
-  assert.match(polishStyles, /character-armor-uses input\[type="checkbox"\] \{[\s\S]*?appearance: none !important[\s\S]*?-webkit-appearance: none !important[\s\S]*?width: 18px[\s\S]*?height: 18px[\s\S]*?background: #fff/);
-  assert.match(polishStyles, /input\[type="checkbox"\]:checked \{[\s\S]*?background-color: #fff[\s\S]*?background-image:[\s\S]*?linear-gradient\(45deg[\s\S]*?linear-gradient\(-45deg/);
-  assert.match(polishStyles, /trait-card__purchase::before,[\s\S]*?trait-card__purchase::after,[\s\S]*?character-armor-uses input\[type="checkbox"\]::before,[\s\S]*?character-armor-uses input\[type="checkbox"\]::after \{[\s\S]*?content: none !important[\s\S]*?display: none !important/);
-  assert.match(polishStyles, /trait-card__purchase:checked,[\s\S]*?character-armor-uses input\[type="checkbox"\]:checked \{[\s\S]*?background-color: #fff !important[\s\S]*?background-image:[\s\S]*?linear-gradient\(45deg[\s\S]*?linear-gradient\(-45deg/);
+  assert.match(actorTemplate, /class="bw-checkbox-x" type="checkbox" name="system\.armor-uses\.armor"/);
+ assert.match(actorTemplate, /parts\/actor\/trait-card\.html/);
+  assert.match(generalStyles, /\.bw-checkbox-x \{[\s\S]*?appearance: none !important[\s\S]*?-webkit-appearance: none !important[\s\S]*?background-color: #fff !important/);
+  assert.match(generalStyles, /\.bw-checkbox-x::before,[\s\S]*?\.bw-checkbox-x::after \{[\s\S]*?content: none !important[\s\S]*?display: none !important/);
+  assert.match(generalStyles, /\.bw-checkbox-x:checked \{[\s\S]*?background-color: #fff !important[\s\S]*?background-image:[\s\S]*?linear-gradient\(45deg[\s\S]*?linear-gradient\(-45deg/);
   assert.doesNotMatch(polishStyles, /background: #f39b55|border: solid #fff/);
   assert.doesNotMatch(actorTemplate, /data-tab="character-notes"[\s\S]*?class="label-stripe"[\s\S]*?prose-mirror/);
   assert.doesNotMatch(actorTemplate, /data-tab="effects"[\s\S]*?class="label-stripe"[\s\S]*?active-effects\.html/);

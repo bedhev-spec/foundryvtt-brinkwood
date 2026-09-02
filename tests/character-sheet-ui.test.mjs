@@ -56,13 +56,10 @@ test("character traits are static purchased cards", async () => {
   const traitsStart = template.indexOf('<div id="character-{{_id}}-traits-list">');
   const loadoutStart = template.indexOf('id="character-{{_id}}-loadout"');
   const traitMarkup = template.slice(traitsStart, loadoutStart);
-  assert.match(traitMarkup, /<article class="trait-card" data-item-id="\{\{trait\._id\}\}">/);
-assert.match(traitMarkup, /<header class="trait-card__header">/);
-  assert.match(traitMarkup, /<input type="checkbox" id="item-\{\{trait\._id\}\}-purchased" class="trait-card__purchase" data-item-id="\{\{trait\._id\}\}" aria-label="Purchased \/ Learned: \{\{trait\.name\}\}" title="Purchased \/ Learned" \{\{#if trait\.system\.purchased\}\}checked\{\{\/if\}\}\{\{#unless \.\.\/editable\}\} disabled\{\{\/unless\}\}>/);
-assert.match(traitMarkup, /<h3 class="trait-card__title">[\s\S]*?\{\{trait\.name\}\}/);
-assert.match(traitMarkup, /<div class="trait-card__separator" aria-hidden="true"><\/div>/);
-  assert.match(traitMarkup, /<div class="trait-card__description">\{\{\{trait\.system\.description\}\}\}<\/div>/);
-  assert.doesNotMatch(traitMarkup, /data-effect-|effect-control|<details|item-delete|item-add-popup|<img/);
+  assert.match(traitMarkup, /parts\/actor\/trait-card\.html/);
+  assert.match(traitMarkup, /canDelete=trait\.canDelete/);
+  assert.doesNotMatch(traitMarkup, /data-effect-|effect-control|<details|item-add-popup|<img/);
+  assert.doesNotMatch(traitMarkup, /\{\{#if \.\.\/isGM\}\}|trait\.flags\.brinkwood\.traitGrant/);
   assert.doesNotMatch(traitMarkup, /parts\/attributes\.html/);
   assert.equal((template.match(/parts\/attributes\.html/g) ?? []).length, 1);
   assert.ok(template.indexOf('<section class="character-attributes" aria-label="Attributes">') < template.indexOf('id="character-{{_id}}-bans-armor"'));
@@ -108,13 +105,14 @@ test("Character tabs retain a valid selection and contain Downtime within the fi
   assert.match(styles, /form\.actor-sheet\s*\{[\s\S]*?width:\s*100%[\s\S]*?min-width:\s*0[\s\S]*?max-width:\s*100%/);
   assert.match(styles, /\.downtime-actions\s*\{[\s\S]*?width:\s*100%[\s\S]*?min-width:\s*0/);
   assert.match(styles, /\.tab\.downtime\s*\{[\s\S]*?max-width:\s*100%/);
-  assert.match(styles, /\.downtime-action\s*\{[\s\S]*?border-left:\s*5px solid var\(--bw-accent\)/);
+  assert.doesNotMatch(styles, /\.downtime-action\s*\{[\s\S]*?border(?:-left)?:/);
   assert.doesNotMatch(styles, /\.tab\.downtime,[\s\S]*?\.downtime-action\s*\{[\s\S]*?border-left/);
-  assert.match(styles, /\.downtime-action[\s\S]*?overflow-wrap:\s*anywhere/);
-  assert.match(styles, /\.window-content\s*\{[\s\S]*?overflow-y:\s*auto[\s\S]*?scrollbar-gutter:\s*stable/);
+  assert.doesNotMatch(styles, /\.downtime-action\s*\{[\s\S]*?(?:padding|font-family|overflow-wrap):/);
+  assert.match(styles, /\.window-content\s*\{[^}]*overflow-y:\s*hidden/);
+  assert.match(styles, /character-sheet__workspace > \.tab-content\s*\{[^}]*overflow-y:\s*auto[^}]*scrollbar-gutter:\s*auto[^}]*scrollbar-width:\s*thin/);
   assert.match(styles, /form\.actor-sheet\s*\{[\s\S]*?overflow:\s*visible/);
-  assert.match(compiled, /\.brinkwood\.actor\.pc\.character \.window-content\s*\{[\s\S]*?scrollbar-gutter:\s*stable/);
-  assert.match(compiled, /\.brinkwood\.actor\.pc\.character \.downtime-action\s*\{[\s\S]*?border-left:\s*5px solid var\(--bw-accent\)/);
+  assert.match(compiled, /\.brinkwood\.actor\.pc\.character \.character-sheet__workspace > \.tab-content\s*\{[^}]*scrollbar-gutter:\s*auto[^}]*scrollbar-width:\s*thin/);
+  assert.match(compiled, /\.brinkwood \.bw-ruled-card\s*\{[\s\S]*?border-left:\s*5px solid var\(--bw-accent\)/);
 });
 
 test("Character sheet commits generic controls once and completes tab-panel contracts", async () => {

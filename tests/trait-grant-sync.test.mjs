@@ -31,6 +31,7 @@ const { BladesActor } = await import("../module/blades-actor.js");
 function compendiumTrait(id, name, sourceName) {
   return {
     id,
+    name,
     type: "trait",
     system: { class: sourceName },
     toObject: () => ({ _id: id, name, type: "trait", system: { class: sourceName } })
@@ -59,59 +60,39 @@ test("upbringing/profession traits are found without an indexed compendium query
   assert.equal(creates[0].data[0]._id, undefined);
 });
 
-test("trait grants are idempotent and removal preserves untagged/manual traits", async () => {
+test("new grants are idempotent and do not adopt an existing manual trait", async () => {
   const trait = compendiumTrait("trait-apprentice", "Keen Eye", "Apprentice");
   game.packs.set("brinkwood.trait", { getDocuments: async () => [trait] });
   const creates = [];
-  const deletes = [];
   const actor = {
     items: [
       { id: "granted", type: "trait", flags: { brinkwood: { traitGrant: { sourceItemId: "upbringing-1", sourceItemType: "upbringing", traitSourceId: "trait-apprentice" } } } },
       { id: "manual", type: "trait", system: { class: "Apprentice" }, flags: {} },
       { id: "profession-grant", type: "trait", flags: { brinkwood: { traitGrant: { sourceItemId: "profession-1", sourceItemType: "profession", traitSourceId: "trait-apprentice" } } } }
     ],
-    createEmbeddedDocuments: async (...args) => creates.push(args),
-    deleteEmbeddedDocuments: async (...args) => deletes.push(args)
+    createEmbeddedDocuments: async (...args) => creates.push(args)
   };
   const source = { id: "upbringing-1", type: "upbringing", name: "Apprentice" };
 
   await BladesActor.prototype._addTraits.call(actor, source);
-  await BladesActor.prototype._deleteTraits.call(actor, source);
 
   assert.equal(creates.length, 0);
-  assert.deepEqual(deletes, [["Item", ["granted"]]]);
 });
 
-test("batch removal deletes only grants belonging to each removed upbringing or profession", async () => {
-  const deletes = [];
-  const actor = {
-    items: [
-      { id: "upbringing-grant", type: "trait", flags: { brinkwood: { traitGrant: { sourceItemId: "upbringing-1", sourceItemType: "upbringing" } } } },
-      { id: "profession-grant", type: "trait", flags: { brinkwood: { traitGrant: { sourceItemId: "profession-1", sourceItemType: "profession" } } } },
-      { id: "other-upbringing-grant", type: "trait", flags: { brinkwood: { traitGrant: { sourceItemId: "upbringing-2", sourceItemType: "upbringing" } } } },
-      { id: "manual-shared-trait", type: "trait", flags: {} }
-    ],
-    deleteEmbeddedDocuments: async (...args) => deletes.push(args)
-  };
-
-  await BladesActor.prototype._deleteTraits.call(actor, { id: "upbringing-1", type: "upbringing" });
-  await BladesActor.prototype._deleteTraits.call(actor, { id: "profession-1", type: "profession" });
-
-  assert.deepEqual(deletes, [
-    ["Item", ["upbringing-grant"]],
-    ["Item", ["profession-grant"]]
-  ]);
-});
-
-test("the sheet's public deletion path awaits removal of only the source's granted traits", async () => {
+test("reconciliation adopts provenance-tagged legacy grants and public deletion removes them in one batch", async () => {
   const upbringing = { id: "upbringing-1", type: "upbringing", name: "Apprentice", system: { logic: "" } };
+  const compendiumTrait = {
+    id: "trait-apprentice",
+    type: "trait",
+    name: "Keen Eye",
+    system: { class: "Apprentice" }
+  };
+  game.packs.set("brinkwood.trait", { getDocuments: async () => [compendiumTrait] });
   const actor = new BladesActor([
     upbringing,
-    { id: "granted", type: "trait", flags: { brinkwood: { traitGrant: {
-      sourceItemId: upbringing.id,
-      sourceItemType: upbringing.type,
-      traitSourceId: "trait-apprentice"
-    } } } },
+    { id: "legacy", name: "Keen Eye", type: "trait", flags: { core: {
+      sourceId: "Compendium.brinkwood.trait.trait-apprentice"
+    } } },
     { id: "manual", name: "Keen Eye", type: "trait", system: { class: "Apprentice" }, flags: {} },
     { id: "other-grant", type: "trait", flags: { brinkwood: { traitGrant: {
       sourceItemId: "profession-1",
@@ -120,17 +101,72 @@ test("the sheet's public deletion path awaits removal of only the source's grant
     } } } }
   ]);
   actor._modActionPoints = async () => {};
+  actor.updateEmbeddedDocuments = async (embeddedName, updates) => {
+    assert.equal(embeddedName, "Item");
+    for (const update of updates) {
+      const item = actor.items.find(entry => entry.id === update._id);
+      item.flags.brinkwood ??= {};
+      item.flags.brinkwood.traitGrant = update["flags.brinkwood.traitGrant"];
+    }
+  };
+  actor.createEmbeddedDocuments = assert.fail;
+
+  await actor.reconcileTraitGrants();
+  assert.deepEqual(actor.items.find(item => item.id === "legacy").flags.brinkwood.traitGrant, {
+    sourceItemId: upbringing.id,
+    sourceItemType: upbringing.type,
+    traitSourceId: "trait-apprentice"
+  });
 
   // This is the exact API and identifier payload used by the sheet click.
   await actor.deleteEmbeddedDocuments("Item", [upbringing.id]);
 
   assert.deepEqual(actor.databaseDeletes.map(([, ids]) => ids), [
-    [upbringing.id, "granted"]
+    [upbringing.id, "legacy"]
   ]);
   assert.deepEqual(actor.items.map(item => item.id), ["manual", "other-grant"]);
 });
 
-test("reconciliation backfills only existing upbringing and profession choices", async () => {
+test("reconciliation uses only a unique exact name/class fallback and never creates a duplicate", async () => {
+  const trait = compendiumTrait("trait-apprentice", "Keen Eye", "Apprentice");
+  game.packs.set("brinkwood.trait", { getDocuments: async () => [trait] });
+  const legacy = { id: "legacy", name: "Keen Eye", type: "trait", system: { class: "Apprentice" }, flags: {} };
+  const updates = [];
+  const actor = {
+    items: [{ id: "upbringing-1", type: "upbringing", name: "Apprentice" }, legacy],
+    _addTraits: BladesActor.prototype._addTraits,
+    updateEmbeddedDocuments: async (...args) => updates.push(args),
+    createEmbeddedDocuments: assert.fail
+  };
+
+  await BladesActor.prototype.reconcileTraitGrants.call(actor);
+  assert.deepEqual(updates[0][1][0]["flags.brinkwood.traitGrant"], {
+    sourceItemId: "upbringing-1", sourceItemType: "upbringing", traitSourceId: "trait-apprentice"
+  });
+});
+
+test("ambiguous legacy matches are neither adopted nor duplicated", async () => {
+  const trait = compendiumTrait("trait-apprentice", "Keen Eye", "Apprentice");
+  game.packs.set("brinkwood.trait", { getDocuments: async () => [trait] });
+  const updates = [];
+  const creates = [];
+  const actor = {
+    items: [
+      { id: "upbringing-1", type: "upbringing", name: "Apprentice" },
+      { id: "legacy-a", name: "Keen Eye", type: "trait", system: { class: "Apprentice" }, flags: {} },
+      { id: "legacy-b", name: "Keen Eye", type: "trait", system: { class: "Apprentice" }, flags: {} }
+    ],
+    _addTraits: BladesActor.prototype._addTraits,
+    updateEmbeddedDocuments: async (...args) => updates.push(args),
+    createEmbeddedDocuments: async (...args) => creates.push(args)
+  };
+
+  await BladesActor.prototype.reconcileTraitGrants.call(actor);
+  assert.deepEqual(updates, []);
+  assert.deepEqual(creates, []);
+});
+
+test("reconciliation backfills existing upbringing, profession, and mask choices", async () => {
   const sources = [
     { type: "upbringing", name: "Apprentice" },
     { type: "profession", name: "Ascetic" },
@@ -145,5 +181,24 @@ test("reconciliation backfills only existing upbringing and profession choices",
 
   await BladesActor.prototype.reconcileTraitGrants.call(actor);
 
-  assert.deepEqual(added, ["Apprentice", "Ascetic"]);
+  assert.deepEqual(added, ["Apprentice", "Ascetic", "The Fox"]);
+});
+
+test("removing Class or Pact never removes traits", async () => {
+  for (const source of [
+    { id: "class-1", type: "class" },
+    { id: "pact-1", type: "pact" }
+  ]) {
+    const actor = new BladesActor([
+      source,
+      { id: "trait", type: "trait", flags: { brinkwood: { traitGrant: {
+        sourceItemId: source.id, sourceItemType: source.type, traitSourceId: "trait-source"
+      } } } }
+    ]);
+    actor._modActionPoints = async () => {};
+
+    await actor.deleteEmbeddedDocuments("Item", [source.id]);
+    assert.deepEqual(actor.databaseDeletes[0][1], [source.id]);
+    assert.equal(actor.items.some(item => item.id === "trait"), true);
+  }
 });

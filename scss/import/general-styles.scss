@@ -31,6 +31,53 @@
   color: var(--bw-ink);
 }
 
+/* Shared checkbox visual. Individual sheets own size and placement. */
+form .bw-checkbox-x {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  accent-color: transparent !important;
+  box-sizing: border-box;
+  border: 1px solid var(--bw-ink-soft) !important;
+  border-radius: 2px;
+  background-color: #fff !important;
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+  box-shadow: none !important;
+  color: transparent !important;
+  --checkbox-background-color: #fff;
+  --checkbox-checkmark-color: transparent;
+}
+
+form .bw-checkbox-x::before,
+form .bw-checkbox-x::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+form .bw-checkbox-x:checked {
+  background-color: #fff !important;
+  background-image:
+    linear-gradient(45deg, transparent 45%, var(--bw-ink) 46%, var(--bw-ink) 54%, transparent 55%),
+    linear-gradient(-45deg, transparent 45%, var(--bw-ink) 46%, var(--bw-ink) 54%, transparent 55%) !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% 100% !important;
+}
+
+form .bw-checkbox-x:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 2px;
+}
+
+form .bw-checkbox-x:disabled {
+  cursor: default;
+  opacity: 0.65;
+}
+
 textarea {
   margin-top: 10px;
   margin-bottom: 20px;
@@ -319,6 +366,55 @@ button.effects-category__add {
   display: grid;
   gap: 1px;
   background: var(--bw-rule);
+}
+
+// A compact parchment card shared by static character-sheet records. Consumers
+// own layout; this primitive owns only the visible paper-and-rule language.
+.bw-ruled-card {
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid var(--bw-rule);
+  border-left: 5px solid var(--bw-accent);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.3);
+  color: var(--bw-ink);
+}
+
+.bw-ruled-card__title-band {
+  min-width: 0;
+  margin: 0;
+  padding: 9px 12px;
+  border-radius: 0 5px 0 0;
+  background: var(--bw-paper-deep);
+}
+
+.bw-ruled-card__title {
+  color: var(--bw-ink);
+  font-family: "Crimson Text", serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+
+.bw-ruled-card__body {
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: 11px 12px 13px;
+  color: var(--bw-ink);
+  font-size: 1rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.bw-ruled-card__body > :first-child {
+  margin-top: 0;
+}
+
+.bw-ruled-card__body > :last-child {
+  margin-bottom: 0;
 }
 
 .effect-card {

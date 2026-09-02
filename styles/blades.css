@@ -123,6 +123,48 @@
 .brinkwood .window-content form {
   color: var(--bw-ink);
 }
+.brinkwood {
+  /* Shared checkbox visual. Individual sheets own size and placement. */
+}
+.brinkwood form .bw-checkbox-x {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  accent-color: transparent !important;
+  box-sizing: border-box;
+  border: 1px solid var(--bw-ink-soft) !important;
+  border-radius: 2px;
+  background-color: #fff !important;
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+  box-shadow: none !important;
+  color: transparent !important;
+  --checkbox-background-color: #fff;
+  --checkbox-checkmark-color: transparent;
+}
+.brinkwood form .bw-checkbox-x::before,
+.brinkwood form .bw-checkbox-x::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.brinkwood form .bw-checkbox-x:checked {
+  background-color: #fff !important;
+  background-image: linear-gradient(45deg, transparent 45%, var(--bw-ink) 46%, var(--bw-ink) 54%, transparent 55%), linear-gradient(-45deg, transparent 45%, var(--bw-ink) 46%, var(--bw-ink) 54%, transparent 55%) !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: 100% 100% !important;
+}
+.brinkwood form .bw-checkbox-x:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 2px;
+}
+.brinkwood form .bw-checkbox-x:disabled {
+  cursor: default;
+  opacity: 0.65;
+}
 .brinkwood textarea {
   margin-top: 10px;
   margin-bottom: 20px;
@@ -370,6 +412,47 @@
   display: grid;
   gap: 1px;
   background: var(--bw-rule);
+}
+.brinkwood .bw-ruled-card {
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid var(--bw-rule);
+  border-left: 5px solid var(--bw-accent);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.3);
+  color: var(--bw-ink);
+}
+.brinkwood .bw-ruled-card__title-band {
+  min-width: 0;
+  margin: 0;
+  padding: 9px 12px;
+  border-radius: 0 5px 0 0;
+  background: var(--bw-paper-deep);
+}
+.brinkwood .bw-ruled-card__title {
+  color: var(--bw-ink);
+  font-family: "Crimson Text", serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+.brinkwood .bw-ruled-card__body {
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: 11px 12px 13px;
+  color: var(--bw-ink);
+  font-size: 1rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.brinkwood .bw-ruled-card__body > :first-child {
+  margin-top: 0;
+}
+.brinkwood .bw-ruled-card__body > :last-child {
+  margin-bottom: 0;
 }
 .brinkwood .effect-card {
   display: grid;
@@ -771,7 +854,7 @@
 }
 .brinkwood .sheet-tabs, .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs, .brinkwood.actor.mask .mask-sheet__tabs {
   --bw-tab-surface: rgba(255, 255, 255, 0.28);
-  --bw-tab-active: rgba(255, 255, 255, 0.56);
+  --bw-tab-active: rgba(255, 255, 255, 0.52);
   --bw-tab-transition: 120ms ease;
 }
 .brinkwood .sheet-tabs .item, .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item, .brinkwood.actor.mask .mask-sheet__tabs .item {
@@ -789,11 +872,43 @@
   color: var(--bw-ink);
   background-color: var(--bw-tab-active);
   border-bottom-color: var(--bw-accent);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.58), 0 1px 3px rgba(33, 27, 29, 0.12);
+  box-shadow: inset 0 -3px 0 var(--bw-accent), 0 1px 3px rgba(33, 27, 29, 0.12);
 }
 .brinkwood .sheet-tabs .item:focus-visible, .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item:focus-visible, .brinkwood.actor.mask .mask-sheet__tabs .item:focus-visible {
   outline: 3px solid var(--bw-focus);
   outline-offset: -3px;
+}
+.brinkwood {
+  /* The legacy character sheet shares the same effect-tab state language. */
+}
+.brinkwood.actor.pc.character .effects-tabs {
+  border: 1px solid var(--bw-rule);
+  background: var(--bw-paper-deep);
+}
+.brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs {
+  border-left: 1px solid var(--bw-rule);
+  border-right: 1px solid var(--bw-rule);
+  border-radius: 3px;
+}
+.brinkwood.actor.pc.character .effects-tab {
+  color: var(--bw-ink-soft);
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  transition: color var(--bw-tab-transition), background-color var(--bw-tab-transition), border-color var(--bw-tab-transition);
+}
+.brinkwood.actor.pc.character .effects-tab:hover, .brinkwood.actor.pc.character .effects-tab:focus-visible, .brinkwood.actor.pc.character .effects-tab.active {
+  color: var(--bw-ink);
+  border-color: var(--bw-rule);
+  border-bottom-color: var(--bw-accent);
+}
+.brinkwood.actor.pc.character .effects-tab.active {
+  background: rgba(255, 255, 255, 0.42);
+}
+.brinkwood.actor.pc.character .effects-tab:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 1px;
 }
 .brinkwood .sheet-panel, .brinkwood.actor.mask .mask-sheet__panel {
   background: rgba(255, 255, 255, 0.16);
@@ -841,7 +956,7 @@
   background: var(--bw-ink);
 }
 @media (prefers-reduced-motion: reduce) {
-  .brinkwood .sheet-tabs .item, .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item, .brinkwood.actor.mask .mask-sheet__tabs .item, .brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab {
+  .brinkwood .sheet-tabs .item, .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item, .brinkwood.actor.pc.character .effects-tab, .brinkwood.actor.mask .mask-sheet__tabs .item, .brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab {
     transition-duration: 0.01ms;
   }
 }
@@ -853,6 +968,9 @@
    * rooted at the PC sheet so they never leak into Mask, NPC, or rebellion
    * sheets, and avoid the former `& *` selector which skipped those wrappers.
    */
+}
+.brinkwood.actor.pc.character {
+  max-height: calc(100vh - 32px);
 }
 .brinkwood.actor.pc.character .character-identity-choices {
   padding-right: 0;
@@ -918,10 +1036,13 @@
 .brinkwood.actor.pc.character .window-content {
   min-height: 0;
   min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
   padding: 0;
   overflow-x: hidden;
-  overflow-y: auto;
-  scrollbar-gutter: stable;
+  overflow-y: hidden;
   background-color: #eeeee8;
   color: #191813;
   container-type: inline-size;
@@ -932,6 +1053,9 @@
   min-width: 0;
   max-width: 100%;
   min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  flex: 1 1 auto;
   padding: 20px;
   container-type: inline-size;
   color: #191813;
@@ -1182,8 +1306,10 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 24px;
-  align-items: start;
+  align-items: stretch;
   min-width: 0;
+  min-height: 0;
+  height: 100%;
 }
 .brinkwood.actor.pc.character .character-sheet__workspace > .tab-content {
   min-width: 0;
@@ -1328,17 +1454,17 @@
 .brinkwood.actor.pc.character form.actor-sheet .tab[data-tab=traits] .trait-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 6px;
   min-width: 0;
-  padding: 9px 10px;
-  border: 1px solid var(--bw-rule);
-  background: var(--bw-paper);
-  color: var(--bw-ink);
+  min-height: 0;
+  height: auto;
+  align-self: start;
+  align-content: start;
   overflow: visible;
 }
 .brinkwood.actor.pc.character form.actor-sheet .tab[data-tab=traits] .trait-card__header {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
   min-width: 0;
 }
 .brinkwood.actor.pc.character form.actor-sheet .tab[data-tab=traits] .trait-card__title {
@@ -1347,11 +1473,7 @@
   gap: 8px;
   min-width: 0;
   margin: 0;
-  color: inherit;
-  font-size: 1.05rem;
-  font-weight: 700;
-  line-height: 1.2;
-  overflow-wrap: anywhere;
+  padding: 0;
 }
 .brinkwood.actor.pc.character form.actor-sheet .tab[data-tab=traits] .trait-card__purchase {
   flex: 0 0 auto;
@@ -1376,20 +1498,34 @@
   cursor: default;
   opacity: 0.65;
 }
-.brinkwood.actor.pc.character form.actor-sheet .tab[data-tab=traits] .trait-card__separator {
-  width: 75%;
-  max-width: 100%;
-  border-top: 1px solid rgba(141, 98, 93, 0.55);
+.brinkwood.actor.pc.character form.actor-sheet .tab[data-tab=traits] .trait-card__remove {
+  width: 26px;
+  min-width: 26px;
+  height: 26px;
+  min-height: 26px;
+  margin: -3px -4px -3px 8px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--bw-ink-soft);
+  font-size: 1.35rem;
+  line-height: 1;
+}
+.brinkwood.actor.pc.character form.actor-sheet .tab[data-tab=traits] .trait-card__remove:hover, .brinkwood.actor.pc.character form.actor-sheet .tab[data-tab=traits] .trait-card__remove:focus-visible {
+  background: rgba(141, 98, 93, 0.16);
+  color: var(--bw-ink);
+}
+.brinkwood.actor.pc.character form.actor-sheet .tab[data-tab=traits] .trait-card__remove:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 1px;
 }
 .brinkwood.actor.pc.character form.actor-sheet .tab[data-tab=traits] .trait-card__description {
   min-width: 0;
   max-width: 100%;
   height: auto;
   max-height: none;
-  margin: 0;
-  color: var(--bw-ink-soft);
-  font-size: 0.95rem;
-  line-height: 1.45;
+  color: var(--bw-ink);
+  align-self: start;
   overflow: visible;
   overflow-wrap: anywhere;
 }
@@ -1416,23 +1552,6 @@
   min-width: 0;
 }
 .brinkwood.actor.pc.character {
-  /* Legacy content expands naturally; the outer sheet viewport owns scrolling. */
-}
-.brinkwood.actor.pc.character form.actor-sheet {
-  overflow: visible;
-}
-.brinkwood.actor.pc.character form.actor-sheet > .name-alias, .brinkwood.actor.pc.character form.actor-sheet > .bans-armor, .brinkwood.actor.pc.character form.actor-sheet > .character-sheet__workspace {
-  flex: 0 0 auto;
-}
-.brinkwood.actor.pc.character form.actor-sheet > .bans-armor {
-  overflow: visible;
-}
-.brinkwood.actor.pc.character .character-sheet__workspace, .brinkwood.actor.pc.character .character-sheet__workspace > .tab-content, .brinkwood.actor.pc.character .character-sheet__workspace > .tab-content > .tab[data-tab] {
-  height: auto;
-  max-height: none;
-  overflow: visible;
-}
-.brinkwood.actor.pc.character {
   --bw-paper: #eeeae0;
   --bw-paper-deep: #e0d7c5;
   --bw-ink: #211b1d;
@@ -1450,9 +1569,36 @@
   background-color: transparent;
   color: var(--bw-ink);
   display: grid;
-  gap: 14px;
+  grid-template-rows: auto auto auto auto minmax(0, 1fr);
+  column-gap: 14px;
+  row-gap: 10px;
   overflow: hidden;
   scrollbar-color: var(--bw-rule) transparent;
+}
+.brinkwood.actor.pc.character .character-sheet__workspace {
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+.brinkwood.actor.pc.character form.actor-sheet > .name-alias,
+.brinkwood.actor.pc.character form.actor-sheet > .character-attributes,
+.brinkwood.actor.pc.character form.actor-sheet > .bans-armor {
+  min-height: 0;
+  height: auto;
+  align-self: start;
+  flex: 0 0 auto;
+  margin: 0;
+}
+.brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs {
+  min-height: 0;
+}
+.brinkwood.actor.pc.character .character-sheet__workspace > .tab-content {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: auto;
+  scrollbar-width: thin;
 }
 .brinkwood.actor.pc.character input[type=text],
 .brinkwood.actor.pc.character select,
@@ -1778,30 +1924,6 @@
   min-width: 0;
   max-width: 100%;
   overflow: hidden;
-  border: 1px solid var(--bw-rule);
-  border-left: 5px solid var(--bw-accent);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.3);
-}
-.brinkwood.actor.pc.character .downtime-action h3 {
-  margin: 0;
-  padding: 9px 12px;
-  background: var(--bw-paper-deep);
-  color: var(--bw-ink);
-  font-family: "Crimson Text", serif;
-  font-size: 1.2rem;
-  font-weight: 700;
-  line-height: 1.25;
-  text-transform: none;
-  overflow-wrap: anywhere;
-}
-.brinkwood.actor.pc.character .downtime-action p {
-  margin: 0;
-  padding: 11px 12px 13px;
-  color: var(--bw-ink);
-  font-size: 1rem;
-  line-height: 1.45;
-  overflow-wrap: anywhere;
 }
 @container (max-width: 760px) {
   .brinkwood.actor.pc.character .bans-armor {
@@ -3709,7 +3831,7 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   min-height: 26px;
   max-height: none;
   margin: 0;
-  padding: 0;
+  padding: 0 0 1.5px;
   overflow: visible;
 }
 
@@ -3846,41 +3968,6 @@ aside#tooltip.brinkwood-item-tooltip-shell {
 /* Foundry v13 paints a checkbox through its own checked pseudo-elements.  The
  * native control must be completely neutralised before the sheet can draw one
  * consistent white square and, when selected, one CSS X. */
-.brinkwood.actor.pc.character form.actor-sheet .trait-card__purchase,
-.brinkwood.actor.pc.character form.actor-sheet .character-armor-uses input[type=checkbox] {
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  accent-color: transparent !important;
-  background-color: #fff !important;
-  background-image: none !important;
-  background-repeat: no-repeat !important;
-  box-shadow: none !important;
-  color: transparent !important;
-  --checkbox-background-color: #fff;
-  --checkbox-checkmark-color: transparent;
-}
-
-.brinkwood.actor.pc.character form.actor-sheet .trait-card__purchase::before,
-.brinkwood.actor.pc.character form.actor-sheet .trait-card__purchase::after,
-.brinkwood.actor.pc.character form.actor-sheet .character-armor-uses input[type=checkbox]::before,
-.brinkwood.actor.pc.character form.actor-sheet .character-armor-uses input[type=checkbox]::after {
-  content: none !important;
-  display: none !important;
-  background: none !important;
-  border: 0 !important;
-  box-shadow: none !important;
-}
-
-.brinkwood.actor.pc.character form.actor-sheet .trait-card__purchase:checked,
-.brinkwood.actor.pc.character form.actor-sheet .character-armor-uses input[type=checkbox]:checked {
-  background-color: #fff !important;
-  background-image: linear-gradient(45deg, transparent 45%, var(--bw-ink) 46%, var(--bw-ink) 54%, transparent 55%), linear-gradient(-45deg, transparent 45%, var(--bw-ink) 46%, var(--bw-ink) 54%, transparent 55%) !important;
-  background-repeat: no-repeat !important;
-  background-position: center !important;
-  background-size: 100% 100% !important;
-}
-
 /* Restrained legacy character-sheet depth and hierarchy. */
 .brinkwood.actor.pc.character form.actor-sheet {
   background: radial-gradient(circle at 16% 0%, rgba(255, 255, 255, 0.48), transparent 38%), linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(224, 215, 197, 0.14));
@@ -3971,12 +4058,6 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.48), 0 1px 2px rgba(33, 27, 29, 0.08);
 }
 
-.brinkwood.actor.pc.character form.actor-sheet .character-sheet__workspace > nav.tabs .item.active {
-  color: var(--bw-ink);
-  background: rgba(255, 255, 255, 0.52);
-  box-shadow: inset 0 -3px 0 var(--bw-accent), 0 1px 3px rgba(33, 27, 29, 0.12);
-}
-
 /* Legacy character sheet only; V2 owns a separate Effects layout. */
 .brinkwood.actor.pc.character .effects-tabs {
   display: flex;
@@ -3984,17 +4065,12 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   gap: 4px;
   margin-bottom: 8px;
   padding: 4px;
-  border: 1px solid var(--bw-rule);
-  background: var(--bw-paper-deep);
 }
 
 .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs {
   grid-column: 1/-1;
   width: 100%;
   box-sizing: border-box;
-  border-left: 1px solid var(--bw-rule);
-  border-right: 1px solid var(--bw-rule);
-  border-radius: 3px;
 }
 
 .brinkwood.actor.pc.character .character-sheet__workspace > .tab-content {
@@ -4060,26 +4136,8 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   border: 1px solid transparent;
   border-bottom: 3px solid transparent;
   border-radius: 3px;
-  color: var(--bw-ink-soft);
-  background: transparent;
-  cursor: pointer;
-  font: inherit;
-  font-weight: 700;
 }
 
-.brinkwood.actor.pc.character .effects-tab:hover,
-.brinkwood.actor.pc.character .effects-tab:focus-visible,
-.brinkwood.actor.pc.character .effects-tab.active {
-  border-color: var(--bw-rule);
-  border-bottom-color: var(--bw-accent);
-  color: var(--bw-ink);
-}
-
-.brinkwood.actor.pc.character .effects-tab.active {
-  background: rgba(255, 255, 255, 0.42);
-}
-
-.brinkwood.actor.pc.character .effects-tab:focus-visible,
 .brinkwood.actor.pc.character .effects-category__add:focus-visible {
   outline: 3px solid var(--bw-focus);
   outline-offset: 1px;
@@ -4365,29 +4423,6 @@ aside#tooltip.brinkwood-item-tooltip-shell {
     flex-basis: 100%;
   }
 }
-/* Keep header/state regions at natural height; only the sheet viewport scrolls. */
-.brinkwood.actor.pc.character form.actor-sheet {
-  overflow: visible;
-}
-
-.brinkwood.actor.pc.character form.actor-sheet > .name-alias,
-.brinkwood.actor.pc.character form.actor-sheet > .bans-armor,
-.brinkwood.actor.pc.character form.actor-sheet > .character-sheet__workspace {
-  flex: 0 0 auto;
-}
-
-.brinkwood.actor.pc.character form.actor-sheet > .bans-armor {
-  overflow: visible;
-}
-
-.brinkwood.actor.pc.character .character-sheet__workspace,
-.brinkwood.actor.pc.character .character-sheet__workspace > .tab-content,
-.brinkwood.actor.pc.character .character-sheet__workspace > .tab-content > .tab[data-tab] {
-  height: auto;
-  max-height: none;
-  overflow: visible;
-}
-
 /* This file loads after blades.css. Keep the effect disclosure control's
  * neutral toolbar state intact when it is hosted on the legacy character sheet. */
 .brinkwood.actor.pc.character .effect-card__actions button.effect-control.effect-card__details-toggle,

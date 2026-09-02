@@ -245,10 +245,7 @@ Hooks.once("init", async function() {
  * Once the entire VTT framework is initialized, check to see if we should perform a data migration
  */
 Hooks.once("ready", async function() {
-  const currentVersion = game.settings.get("brinkwood", "systemMigrationVersion") || "0";
-  const needsMigration = foundry.utils.isNewerVersion(game.system.version, currentVersion);
-
-  if (needsMigration && game.user.isGM) {
+  if (game.user.isGM && migrations.isMigrationAuthority()) {
     await migrations.migrateWorld();
   }
 });

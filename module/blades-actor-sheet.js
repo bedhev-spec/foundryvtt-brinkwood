@@ -60,10 +60,9 @@ export class BladesActorSheet extends BladesSheet {
 
   static DEFAULT_OPTIONS = {
     classes: ["brinkwood", "sheet", "actor", "pc", "character"],
-    // ApplicationV2 accepts "auto" (also used by BladesClockSheet), allowing
-    // the Legacy sheet to fit its rendered Traits content within Foundry's
-    // viewport-constrained window instead of imposing a fixed 840px viewport.
-    position: { width: 700, height: "auto" },
+// A stable ApplicationV2 frame prevents a long tab from resizing and moving
+// the window. The character sheet's active tab owns overflow inside it.
+position: { width: 700, height: 1170 },
     form: { submitOnChange: false },
     tabGroups: { primary: "traits" },
   };
@@ -76,9 +75,6 @@ export class BladesActorSheet extends BladesSheet {
 
   /** @override */
   async _prepareContext(options) {
-    // Existing characters did not receive source-tagged traits before the v13
-    // repair. Reconcile only while an owner opens their sheet.
-    if (this.actor.isOwner) await this.actor.reconcileTraitGrants();
     const context = await super._prepareContext(options);
     await preloadClockImages(4);
 
@@ -90,7 +86,12 @@ export class BladesActorSheet extends BladesSheet {
 
     this.setAttrLabels(context.system.attributes);
 
-    context.traits = context.items.filter(i => i.type === "trait");
+    context.traits = context.items
+      .filter(i => i.type === "trait")
+      .map(trait => {
+        const canDelete = context.isGM && !trait.flags?.brinkwood?.traitGrant;
+        return { ...trait, canDelete };
+      });
 
     Object.entries(context.system.attributes).forEach(([name, attr]) => {
       context.system.attributes[name].value = Object.values(attr.skills).filter(s => s.value > 0).length;
@@ -184,6 +185,10 @@ export class BladesActorSheet extends BladesSheet {
     html.querySelectorAll(".item-delete").forEach(el =>
       el.addEventListener("click", async ev => {
         const element = ev.currentTarget.closest(".item");
+        if (!element) return;
+        const item = this.actor.items.get(element.dataset.itemId);
+        if (!item) return;
+        if (item.type === "trait" && (!game.user.isGM || item.flags?.brinkwood?.traitGrant)) return;
         await this.actor.deleteEmbeddedDocuments("Item", [element.dataset.itemId]);
         element.remove();
       }, listenerOptions)

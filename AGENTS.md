@@ -1,0 +1,16 @@
+# Brinkwood sheet and CSS guidance
+
+- Give each visual concern one owner. Put repeated controls and tab states in shared SCSS primitives; keep sheet files focused on sheet-specific geometry, scrolling, and variables.
+- Treat `scss/` as the source of truth. After changing SCSS, rebuild `styles/blades.css` and verify parity with the commands in `scss/README.md`.
+- Keep legacy compatibility overrides narrow, scoped, and documented; do not use them as a broad late-cascade repair layer.
+- Preserve Foundry v13 `ApplicationV2` sheet, template, tab, form, and view-state contracts. Use the existing Foundry v13 sheet-migration and sheet-CSS cascade-audit skills for relevant work.
+
+See `scss/README.md` for ownership and build details.
+
+## Automatic trait loading boundaries
+
+- A sheet or controller delegates automatic trait loading through one actor command; it does not reproduce grant logic, call migration code, or persist traits itself.
+- `BladesActor` owns trait grant invariants: provenance tagging and adoption, per-source serialization, idempotent embedded-document creation, and deletion of source-tagged grants.
+- Migration owns elected-GM authority and migration-version orchestration. It calls the actor command and records the version only after successful completion.
+- Templates are presentation only. They render prepared `canDelete` state and do not decide permissions or invoke persistence paths.
+- Regression coverage for automatic trait loading must include idempotency, concurrent requests, permission/authority behavior, and a failed migration retry.
