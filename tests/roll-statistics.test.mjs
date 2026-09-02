@@ -83,6 +83,28 @@ test("statistics dialog is focused and escapes player names", () => {
   assert.doesNotMatch(content, /Most rolled action/i);
 });
 
+test("statistics render percentages as whole numbers while retaining average-pool precision", () => {
+  const content = renderRollStatisticsContent({
+    total: 10,
+    totalDicePool: 10,
+    zeroDice: 0,
+    outcomes: { "critical-success": 0, success: 1, "partial-success": 0, failure: 9 }
+  }, "Player", key => key);
+  const perfectContent = renderRollStatisticsContent(
+    addActionRollToStatistics(undefined, { outcome: "success", dicePool: 1 }),
+    "Player",
+    key => key
+  );
+
+  assert.match(content, />10%<\/strong>/);
+  assert.match(content, />90%<\/strong>/);
+  assert.match(content, />0%<\/strong>/);
+  assert.match(content, />1\.0d<\/dd>/);
+  assert.doesNotMatch(content, />\d+\.\d+%</);
+  assert.match(perfectContent, />100%<\/strong>/);
+  assert.match(perfectContent, />100%<\/dd>/);
+});
+
 test("player statistics can be sent as a public chat card", async () => {
   let message;
   globalThis.game = { i18n: { localize: key => key } };

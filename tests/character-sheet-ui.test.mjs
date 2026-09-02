@@ -47,6 +47,31 @@ test("effect management is grouped and uses markup-independent controls", async 
   assert.match(compiledStyles, /\.brinkwood \.effect-card__metadata/);
 });
 
+test("character traits are static purchased cards", async () => {
+  const [template, controller] = await Promise.all([
+    read("templates/actor-sheet.html"),
+    read("module/blades-sheet.js"),
+  ]);
+
+  const traitsStart = template.indexOf('<div id="character-{{_id}}-traits-list">');
+  const loadoutStart = template.indexOf('id="character-{{_id}}-loadout"');
+  const traitMarkup = template.slice(traitsStart, loadoutStart);
+  assert.match(traitMarkup, /<article class="trait-card" data-item-id="\{\{trait\._id\}\}">/);
+assert.match(traitMarkup, /<header class="trait-card__header">/);
+  assert.match(traitMarkup, /<input type="checkbox" id="item-\{\{trait\._id\}\}-purchased" class="trait-card__purchase" data-item-id="\{\{trait\._id\}\}" aria-label="Purchased \/ Learned: \{\{trait\.name\}\}" title="Purchased \/ Learned" \{\{#if trait\.system\.purchased\}\}checked\{\{\/if\}\}\{\{#unless \.\.\/editable\}\} disabled\{\{\/unless\}\}>/);
+assert.match(traitMarkup, /<h3 class="trait-card__title">[\s\S]*?\{\{trait\.name\}\}/);
+assert.match(traitMarkup, /<div class="trait-card__separator" aria-hidden="true"><\/div>/);
+  assert.match(traitMarkup, /<div class="trait-card__description">\{\{\{trait\.system\.description\}\}\}<\/div>/);
+  assert.doesNotMatch(traitMarkup, /data-effect-|effect-control|<details|item-delete|item-add-popup|<img/);
+  assert.doesNotMatch(traitMarkup, /parts\/attributes\.html/);
+  assert.equal((template.match(/parts\/attributes\.html/g) ?? []).length, 1);
+  assert.ok(template.indexOf('<section class="character-attributes" aria-label="Attributes">') < template.indexOf('id="character-{{_id}}-bans-armor"'));
+assert.match(controller, /html\.querySelectorAll\("\.item-select"\)[\s\S]*?_onItemSelect/);
+assert.match(controller, /html\.querySelectorAll\("\.trait-card__purchase"\)[\s\S]*?_onTraitPurchaseChange/);
+assert.match(controller, /async _onTraitPurchaseChange\(event\)[\s\S]*?"system\.purchased": event\.currentTarget\.checked/);
+  assert.match(controller, /case "trait":\s*update_data = \{ "system\.purchased": !item\.system\.purchased \}/);
+});
+
 test("every Brinkwood sheet uses the shared parchment texture", async () => {
   const styles = await read("scss/import/general-styles.scss");
 
@@ -90,4 +115,41 @@ test("Character tabs retain a valid selection and contain Downtime within the fi
   assert.match(styles, /form\.actor-sheet\s*\{[\s\S]*?overflow:\s*visible/);
   assert.match(compiled, /\.brinkwood\.actor\.pc\.character \.window-content\s*\{[\s\S]*?scrollbar-gutter:\s*stable/);
   assert.match(compiled, /\.brinkwood\.actor\.pc\.character \.downtime-action\s*\{[\s\S]*?border-left:\s*5px solid var\(--bw-accent\)/);
+});
+
+test("Character sheet commits generic controls once and completes tab-panel contracts", async () => {
+  const [controller, template] = await Promise.all([
+    read("module/blades-actor-sheet.js"),
+    read("templates/actor-sheet.html"),
+  ]);
+
+  assert.match(controller, /control\.addEventListener\("change", event => this\._persistFormControl\(event\), listenerOptions\)/);
+  assert.doesNotMatch(controller, /control\.addEventListener\("focusout", event => this\._persistFormControl\(event\), listenerOptions\)/);
+  assert.match(controller, /input\[name="system\.scars"\], input\[name="system\.oath"\], \[data-path\]/);
+  assert.match(controller, /control\.matches\("prose-mirror\[name\]"\)/);
+
+  assert.match(template, /<thead>\s*<tr>[\s\S]*?<\/tr>\s*<\/thead>/);
+  for (const [tab, panel] of [
+    ["traits", "traits-tab"],
+    ["loadout", "loadout"],
+    ["notes", "notes"],
+    ["downtime", "downtime"],
+    ["effects", "effects"],
+  ]) {
+    assert.match(template, new RegExp(`id="character-\\{\\{_id\\}\\}-tab-${tab}"[\\s\\S]*?aria-controls="character-\\{\\{_id\\}\\}-${panel}"`));
+    assert.match(template, new RegExp(`id="character-\\{\\{_id\\}\\}-${panel}"[\\s\\S]*?role="tabpanel"[\\s\\S]*?aria-labelledby="character-\\{\\{_id\\}\\}-tab-${tab}"`));
+  }
+  assert.match(template, /\{\{#if isGM\}\}[\s\S]*?id="character-\{\{_id\}\}-tab-effects"[\s\S]*?\{\{\/if\}\}[\s\S]*?\{\{#if isGM\}\}[\s\S]*?id="character-\{\{_id\}\}-effects"[\s\S]*?\{\{\/if\}\}/);
+});
+
+test("attribute groups use the Bans width in horizontal, responsive columns", async () => {
+  const styles = await read("scss/import/legacy-character-effects.scss");
+
+ assert.match(styles, /\.character-attributes > \.attributes\s*\{[\s\S]*?grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)[\s\S]*?width:\s*100%[\s\S]*?max-width:\s*100%[\s\S]*?box-sizing:\s*border-box[\s\S]*?flex:\s*1 1 100%/);
+ assert.match(styles, /\.character-attributes\s*\{[\s\S]*?align-self:\s*stretch[\s\S]*?width:\s*100%[\s\S]*?flex:\s*0 0 auto/);
+ assert.match(styles, /\.attribute > \.flex-horizontal\s*\{[\s\S]*?display:\s*block[\s\S]*?width:\s*100%/);
+ assert.match(styles, /\.attributes \.attributes-container\s*\{[\s\S]*?display:\s*grid[\s\S]*?grid-template-columns:\s*repeat\(4, 28px\) minmax\(0, 1fr\)[\s\S]*?width:\s*100%[\s\S]*?min-width:\s*0/);
+ assert.match(styles, /\.attributes \.attribute-skill-label\s*\{[\s\S]*?min-width:\s*0[\s\S]*?text-overflow:\s*ellipsis[\s\S]*?white-space:\s*nowrap/);
+ assert.match(styles, /@container \(max-width: 570px\)\s*\{[\s\S]*?\.character-attributes > \.attributes\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+ assert.match(styles, /@container \(max-width: 410px\)\s*\{[\s\S]*?\.character-attributes > \.attributes\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
 });

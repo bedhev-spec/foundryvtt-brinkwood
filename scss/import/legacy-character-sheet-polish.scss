@@ -1,4 +1,4 @@
-/* Final Legacy-only layout corrections. Loaded after legacy-effects-tabs.css. */
+/* Final character-sheet layout corrections. Emitted before the effects layer. */
 
 /* Keep identity rows stable whether their optional item is empty or selected. */
 .brinkwood.actor.pc.character .character-identity-choices {
@@ -9,9 +9,6 @@
 }
 
 .brinkwood.actor.pc.character .character-identity-choices .item-block {
-  position: relative;
-  display: grid;
-  grid-template-columns: 33% minmax(0, 1fr) 18px;
   align-items: center;
   box-sizing: border-box;
   width: 100%;
@@ -32,7 +29,6 @@
 
 .brinkwood.actor.pc.character .character-identity-choices .item-block > .item {
   position: static;
-  display: flex;
   grid-column: 2;
   align-items: center;
   box-sizing: border-box;
@@ -46,14 +42,6 @@
   line-height: 1;
   align-self: stretch;
   overflow: visible;
-}
-
-.brinkwood.actor.pc.character .character-identity-choices .item-block::after {
-  content: "";
-  grid-column: 3;
-  grid-row: 1;
-  width: 18px;
-  height: 18px;
 }
 
 .brinkwood.actor.pc.character .character-identity-choices .item-body {
@@ -83,42 +71,6 @@
 
 /* The value ends beside the fixed × column; width remains available for
  * multi-line identities rather than being shortened by the action. */
-.brinkwood.actor.pc.character .character-identity-choices .identity-choice__value {
-	justify-content: flex-end;
-	text-align: right;
-}
-
-.brinkwood.actor.pc.character .character-identity-choices .identity-choice__value .item-body,
-.brinkwood.actor.pc.character .character-identity-choices .identity-choice__value .item-name {
-	width: 100%;
-	justify-content: flex-end;
-	text-align: right;
-}
-
-.brinkwood.actor.pc.character .character-identity-choices .identity-choice__action {
-  grid-column: 3;
-  grid-row: 1;
-  display: grid;
-  place-items: center;
-  width: 18px;
-  min-width: 18px;
-  height: 18px;
-  justify-self: end;
-}
-
-.brinkwood.actor.pc.character .character-identity-choices .identity-choice__remove {
-  position: static;
-  grid-column: auto;
-  grid-row: auto;
-  width: 18px;
-  min-width: 18px;
-  height: 18px;
-  min-height: 18px;
-  margin: 0;
-  padding: 0;
-  transform: none;
-}
-
 /* Stable action rows: labels stay fixed while only the circle artwork is optically aligned. */
 .brinkwood.actor.pc.character .attributes .attributes-container {
   display: grid;
@@ -162,11 +114,13 @@
   text-align: center;
 }
 
-/* Deterministic Armor checkbox: same footprint, white empty, existing orange/tick when checked. */
+/* Deterministic Armor checkbox: a white square in both states, with a black X
+ * when selected. Background drawing avoids unsupported pseudo-elements on a
+ * native input and suppresses the browser's duplicate checked indicator. */
 .brinkwood.actor.pc.character .character-armor-uses input[type="checkbox"] {
-  appearance: none;
-  display: inline-grid;
-  place-content: center;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  accent-color: auto;
   box-sizing: border-box;
   width: 18px;
   min-width: 18px;
@@ -181,17 +135,11 @@
 }
 
 .brinkwood.actor.pc.character .character-armor-uses input[type="checkbox"]:checked {
-  border-color: #f39b55;
-  background: #f39b55;
-}
-
-.brinkwood.actor.pc.character .character-armor-uses input[type="checkbox"]:checked::after {
-  width: 4px;
-  height: 8px;
-  border: solid #fff;
-  border-width: 0 2px 2px 0;
-  content: "";
-  transform: translateY(-1px) rotate(45deg);
+  border-color: var(--bw-ink-soft);
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, transparent 45%, var(--bw-ink) 46%, var(--bw-ink) 54%, transparent 55%),
+    linear-gradient(-45deg, transparent 45%, var(--bw-ink) 46%, var(--bw-ink) 54%, transparent 55%);
 }
 
 .brinkwood.actor.pc.character .character-armor-uses input[type="checkbox"]:focus-visible {
@@ -202,6 +150,46 @@
 .brinkwood.actor.pc.character .character-armor-uses input[type="checkbox"]:disabled {
   cursor: default;
   opacity: 0.65;
+}
+
+/* Foundry v13 paints a checkbox through its own checked pseudo-elements.  The
+ * native control must be completely neutralised before the sheet can draw one
+ * consistent white square and, when selected, one CSS X. */
+.brinkwood.actor.pc.character form.actor-sheet .trait-card__purchase,
+.brinkwood.actor.pc.character form.actor-sheet .character-armor-uses input[type="checkbox"] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  accent-color: transparent !important;
+  background-color: #fff !important;
+  background-image: none !important;
+  background-repeat: no-repeat !important;
+  box-shadow: none !important;
+  color: transparent !important;
+  --checkbox-background-color: #fff;
+  --checkbox-checkmark-color: transparent;
+}
+
+.brinkwood.actor.pc.character form.actor-sheet .trait-card__purchase::before,
+.brinkwood.actor.pc.character form.actor-sheet .trait-card__purchase::after,
+.brinkwood.actor.pc.character form.actor-sheet .character-armor-uses input[type="checkbox"]::before,
+.brinkwood.actor.pc.character form.actor-sheet .character-armor-uses input[type="checkbox"]::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.brinkwood.actor.pc.character form.actor-sheet .trait-card__purchase:checked,
+.brinkwood.actor.pc.character form.actor-sheet .character-armor-uses input[type="checkbox"]:checked {
+  background-color: #fff !important;
+  background-image:
+    linear-gradient(45deg, transparent 45%, var(--bw-ink) 46%, var(--bw-ink) 54%, transparent 55%),
+    linear-gradient(-45deg, transparent 45%, var(--bw-ink) 46%, var(--bw-ink) 54%, transparent 55%) !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 100% 100% !important;
 }
 
 /* Restrained legacy character-sheet depth and hierarchy. */
@@ -241,8 +229,6 @@
 .brinkwood.actor.pc.character form.actor-sheet .character-identity-choices .item-block {
   /* Keep labels in their existing track, while giving selected values a
    * quieter gutter before the fixed × affordance. */
-  grid-template-columns: max-content minmax(0, 1fr) 18px;
-  column-gap: 4px;
   margin: 0;
   box-shadow: inset 0 -1px 0 rgba(141, 98, 93, 0.3);
 }
@@ -255,6 +241,28 @@
 .brinkwood.actor.pc.character form.actor-sheet .character-identity-choices .item-class-label a {
   color: var(--bw-ink-soft);
   font-weight: 700;
+}
+
+/* This compact menu keeps its value and native option list centered without
+ * inheriting the generic character-control focus frame. */
+.brinkwood.actor.pc.character form.actor-sheet .loadout .dropdown > select[name="system.selected_load_level"] {
+  padding-inline: 20px;
+  text-align: center;
+  text-align-last: center;
+  border-color: transparent;
+  box-shadow: none;
+  outline: none;
+}
+
+.brinkwood.actor.pc.character form.actor-sheet .loadout .dropdown > select[name="system.selected_load_level"]:focus,
+.brinkwood.actor.pc.character form.actor-sheet .loadout .dropdown > select[name="system.selected_load_level"]:focus-visible {
+  border-color: transparent;
+  box-shadow: none;
+  outline: none;
+}
+
+.brinkwood.actor.pc.character form.actor-sheet .loadout .dropdown > select[name="system.selected_load_level"] option {
+  text-align: center;
 }
 
 .brinkwood.actor.pc.character form.actor-sheet > .bans-armor {

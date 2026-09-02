@@ -122,6 +122,9 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
       html.querySelectorAll(".item-select").forEach(el =>
         el.addEventListener("click", this._onItemSelect.bind(this), listenerOptions)
       );
+      html.querySelectorAll(".trait-card__purchase").forEach(el =>
+        el.addEventListener("change", this._onTraitPurchaseChange.bind(this), listenerOptions)
+      );
     }
     html.querySelectorAll(".roll-die-attribute").forEach(el =>
       el.addEventListener("click", this._onRollAttributeDieClick.bind(this), listenerOptions)
@@ -322,6 +325,13 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
         break;
     }
     await item.update(update_data);
+  }
+
+  async _onTraitPurchaseChange(event) {
+    if (!this.isEditable) return;
+    const item = this.actor.getEmbeddedDocument("Item", event.currentTarget.dataset.itemId);
+    if (!item || item.type !== "trait") return;
+    await item.update({ "system.purchased": event.currentTarget.checked });
   }
 
   /* -------------------------------------------- */

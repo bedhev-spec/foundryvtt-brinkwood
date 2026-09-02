@@ -1,0 +1,3 @@
+allowBuilds:
+  # Sass compiles synchronously; its optional filesystem watcher is unused.
+  '@parcel/watcher': false

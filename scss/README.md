@@ -1,5 +1,16 @@
-# How to build CSS
+# CSS build
 
-Install nodeJS: https://nodejs.org/en/
-Install sass (https://www.npmjs.com/package/sass): npm install -g sass
-Open a shell in this folder and run: sass style.scss ../styles/blades.css
+Install the pinned local dependencies from the repository root:
+
+    pnpm install --frozen-lockfile
+
+Build the committed stylesheet:
+
+    pnpm run build:css
+
+Verify that the committed stylesheet exactly matches the SCSS source:
+
+    pnpm run check:css
+
+`@parcel/watcher` is an optional Sass filesystem watcher. Its build is explicitly
+disabled in `pnpm-workspace.yaml`; Brinkwood's one-shot CSS build does not use it.

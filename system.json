@@ -21,8 +21,7 @@
     "module/blades.js"
   ],
   "styles": [
-    "styles/blades.css",
-    "styles/legacy-effects-tabs.css"
+    "styles/blades.css"
   ],
   "languages": [
     {

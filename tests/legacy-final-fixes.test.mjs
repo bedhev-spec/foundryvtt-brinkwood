@@ -8,7 +8,7 @@ test("Legacy XP updates and framing remain blue", async () => {
   const [controller, template, styles] = await Promise.all([
     read("module/blades-actor-sheet.js"),
     read("templates/actor-sheet.html"),
-    read("styles/legacy-effects-tabs.css")
+    read("scss/import/legacy-character-effects.scss")
   ]);
 
   assert.match(controller, /closest\?\.\("\.character-xp, \.character-stress"\)/);
@@ -37,7 +37,7 @@ test("Legacy Notes rerender their enriched closed state after save", async () =>
 });
 
 test("Legacy tall tabs leave scrolling to the sheet viewport", async () => {
-  const styles = await read("styles/legacy-effects-tabs.css");
+  const styles = await read("scss/import/legacy-character-effects.scss");
 
   assert.match(styles, /form\.actor-sheet\s*\{[\s\S]*?overflow:\s*visible/);
   assert.match(styles, /form\.actor-sheet > \.bans-armor[\s\S]*?flex:\s*0 0 auto/);

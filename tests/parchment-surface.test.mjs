@@ -14,7 +14,7 @@ test("shared parchment uses an ivory wash over subdued grain", async () => {
     read("scss/import/mask-sheet.scss"),
     read("scss/import/npc-sheet.scss"),
     read("scss/import/rebelion-sheet.scss"),
-    read("styles/legacy-sheet-polish.css"),
+    read("scss/import/legacy-character-sheet-polish.scss"),
     read("styles/blades.css"),
   ]);
 

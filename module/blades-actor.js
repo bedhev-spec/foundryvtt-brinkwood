@@ -179,33 +179,41 @@ export class BladesActor extends foundry.documents.Actor {
 
   async _onCreateEmbeddedDocuments( name, ...args ) {
     await super._onCreateEmbeddedDocuments(name, ...args);
-     const newItem = args[0][0];
-
-     switch ( newItem.type ) {
-      case "profession":
-      case "upbringing":
-      case "mask":
-			case "class":
-        await this._addTraits( newItem );
-				await this._modActionPoints( newItem );
-      break;
+    for (const newItem of args[0] ?? []) {
+      if (["profession", "upbringing", "mask"].includes(newItem.type)) await this._addTraits(newItem);
+      if (["profession", "upbringing", "mask", "class"].includes(newItem.type)) {
+        await this._modActionPoints(newItem);
+      }
     }
-
   }
 
-  async _onDeleteEmbeddedDocuments( name, ...args ) {
-    await super._onDeleteEmbeddedDocuments(name, ...args);
-    const removedItem = args[0][0];
+  async deleteEmbeddedDocuments(embeddedName, ids, operation={}) {
+    const removedItems = embeddedName === "Item" && Array.isArray(ids)
+      ? ids.map(id => this.items.get?.(id)
+        ?? this.items.find?.(entry => (entry.id ?? entry._id) === id)).filter(Boolean)
+      : [];
+    const sourceKeys = new Set(removedItems
+      .filter(item => ["profession", "upbringing", "mask"].includes(item.type))
+      .map(item => `${item.type}:${item.id ?? item._id}`));
+    const grantIds = embeddedName === "Item"
+      ? this.items.filter(item => {
+        const grant = item.flags?.brinkwood?.traitGrant;
+        return item.type === "trait"
+          && sourceKeys.has(`${grant?.sourceItemType}:${grant?.sourceItemId}`);
+      }).map(item => item.id ?? item._id)
+      : [];
+    const deleteIds = [...new Set([...ids, ...grantIds])];
 
-    switch ( removedItem.type ){
-      case "profession":
-      case "upbringing":
-      case "mask":
-			case "class":
-        await this._deleteTraits(removedItem);
-				await this._modActionPoints( removedItem, true );
-      break;
+    // The sheet awaits this public deletion path. Include exact source-tagged
+    // grants in the same Foundry database operation instead of starting a
+    // second asynchronous deletion from a post-delete lifecycle callback.
+    const result = await super.deleteEmbeddedDocuments(embeddedName, deleteIds, operation);
+    for (const removedItem of removedItems) {
+      if (["profession", "upbringing", "mask", "class"].includes(removedItem.type)) {
+        await this._modActionPoints(removedItem, true);
+      }
     }
+    return result;
   }
 
   async _modActionPoints(data, remove=false) {
@@ -225,13 +233,55 @@ export class BladesActor extends foundry.documents.Actor {
 	}
 
   async _addTraits(data) {
-    const traits = await game.packs.get("brinkwood.trait").getDocuments({'system.class': data.name});
-    await this.createEmbeddedDocuments("Item", traits.map(item => item.toObject()));
+    const traitPack = game.packs.get("brinkwood.trait");
+    if (!traitPack) return;
+
+    // Compendium queries are indexed-field dependent in v13.  Hydrate then
+    // filter so every mapped upbringing/profession works consistently.
+    const traits = (await traitPack.getDocuments())
+      .filter(trait => trait.type === "trait" && trait.system.class === data.name);
+    const sourceItemId = data.id ?? data._id;
+    const alreadyGranted = new Set(this.items
+      .filter(item => item.type === "trait" && item.flags?.brinkwood?.traitGrant?.sourceItemId === sourceItemId)
+      .map(item => item.flags.brinkwood.traitGrant.traitSourceId));
+    const createdTraits = traits
+      .filter(trait => !alreadyGranted.has(trait.id ?? trait._id))
+      .map(trait => {
+        const traitData = trait.toObject();
+        const traitSourceId = trait.id ?? trait._id;
+        delete traitData._id;
+        traitData.flags ??= {};
+        traitData.flags.brinkwood ??= {};
+        traitData.flags.brinkwood.traitGrant = {
+          sourceItemId,
+          sourceItemType: data.type,
+          traitSourceId
+        };
+        return traitData;
+      });
+
+    if (createdTraits.length) await this.createEmbeddedDocuments("Item", createdTraits);
   }
 
   async _deleteTraits(data) {
-    const charTraits = this.items.filter(i => i.type == "trait" && i.system.class == data.name).map(i => i._id);
-    await this.deleteEmbeddedDocuments( "Item", charTraits );
+    const sourceItemId = data.id ?? data._id;
+    const charTraits = this.items
+      .filter(item => item.type === "trait"
+        && item.flags?.brinkwood?.traitGrant?.sourceItemId === sourceItemId
+        && item.flags.brinkwood.traitGrant.sourceItemType === data.type)
+      .map(item => item.id ?? item._id);
+    if (charTraits.length) await this.deleteEmbeddedDocuments("Item", charTraits);
+  }
+
+  /**
+   * Backfill grants for choices embedded before the v13 trait sync repair.
+   * This only adds missing, source-tagged traits; untagged manual/shared
+   * traits are never inferred to belong to a source or deleted.
+   */
+  async reconcileTraitGrants() {
+    const traitSources = this.items.filter(item =>
+      item.type === "upbringing" || item.type === "profession");
+    for (const source of traitSources) await this._addTraits(source);
   }
 
   async _loadBasicItems() {

@@ -77,7 +77,7 @@ export async function recordActionRoll(roll, user = game.user) {
 }
 
 function formatPercentage(value) {
-  return `${value.toFixed(1)}%`;
+  return `${Math.round(value)}%`;
 }
 
 export function listStatisticsUsers(users) {

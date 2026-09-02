@@ -1,4 +1,5 @@
 /.idea/*
 /brinkwood.lock
+/node_modules/
 
 .claude/

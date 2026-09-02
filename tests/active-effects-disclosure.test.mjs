@@ -11,7 +11,7 @@ test("active effect cards use native compact disclosure with safe prepared detai
     read("module/blades-active-effect.js"),
     read("module/blades-sheet.js"),
     read("scss/import/general-styles.scss"),
-    read("styles/legacy-effects-tabs.css"),
+    read("scss/import/legacy-character-effects.scss"),
     read("module/blades-actor-sheet.js"),
     read("module/blades-mask-sheet.js"),
     read("module/blades-item-sheet.js"),

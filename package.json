@@ -3,6 +3,11 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "validate": "node scripts/validate-system.mjs"
+    "validate": "node scripts/validate-system.mjs",
+    "build:css": "sass --no-source-map scss/style.scss styles/blades.css",
+    "check:css": "node scripts/check-css-build.mjs"
+  },
+  "devDependencies": {
+    "sass": "1.93.2"
   }
 }

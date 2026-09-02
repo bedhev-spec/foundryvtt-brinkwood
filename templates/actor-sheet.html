@@ -144,13 +144,19 @@
   </section>
 
   {{!-- Bans, consequence clocks, and armor --}}
-  <section id="character-{{_id}}-bans-armor" class="bans-armor" aria-label="{{localize 'BITD.BansArmor'}}">
+<section class="character-attributes" aria-label="Attributes">
+  {{> "systems/brinkwood/templates/parts/attributes.html" actor=actor}}
+</section>
+
+<section id="character-{{_id}}-bans-armor" class="bans-armor" aria-label="{{localize 'BITD.BansArmor'}}">
     <div id="character-{{_id}}-character-bans" class="character-bans">
       <table>
         <thead>
+				<tr>
 					<th class="black-white" colspan="4"><span class="tooltip" data-tooltip="Actor.Bans.Tooltip" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">{{localize "BITD.Bans"}}</span></th>
-	   		  <th class="black-white"><label></label></th>
+			  <th class="black-white"><label></label></th>
           <th class="black-white">{{localize "BITD.Armor"}}</th>
+				</tr>
         </thead>
         <tbody>
           <tr data-ban-level="3">
@@ -225,32 +231,28 @@
 
     <div class="tab-content flex-vertical grow-two">
 
-<div id="character-{{_id}}-traits-tab" class="tab flex-vertical traits {{#if (eq tabs.primary "traits")}}active{{/if}}" role="tabpanel" data-group="primary" data-tab="traits">
+<div id="character-{{_id}}-traits-tab" class="tab flex-vertical traits {{#if (eq tabs.primary "traits")}}active{{/if}}" role="tabpanel" aria-labelledby="character-{{_id}}-tab-traits" data-group="primary" data-tab="traits">
         <div id="character-{{_id}}-traits-list">
           {{#each traits as |trait id|}}
           {{#if (eq trait.type "trait")}}
-            <div class="item flex-horizontal">
-              <div class="item-select" data-item-id="{{trait._id}}" data-item-list="traits">
- 	      <div class="item-name">
-		<h3>
-		  <input type="checkbox" id="item-{{trait._id}}-purchased" class="dot" data-item-id="{{trait._id}}" {{#if trait.system.purchased }}checked{{/if}}>
-                  {{trait.name}}
-		</h3>
-	      </div>
-                <div class="flex-horizontal trait">
-                  <div class="item-description">{{{trait.system.description}}}</div>
-                </div>
-              </div>
-            </div>
+            <article class="trait-card" data-item-id="{{trait._id}}">
+<header class="trait-card__header">
+	      <h3 class="trait-card__title">
+<input type="checkbox" id="item-{{trait._id}}-purchased" class="trait-card__purchase" data-item-id="{{trait._id}}" aria-label="Purchased / Learned: {{trait.name}}" title="Purchased / Learned" {{#if trait.system.purchased}}checked{{/if}}{{#unless ../editable}} disabled{{/unless}}>
+{{trait.name}}
+</h3>
+</header>
+<div class="trait-card__separator" aria-hidden="true"></div>
+<div class="trait-card__description">{{{trait.system.description}}}</div>
+            </article>
           {{/if}}
           {{/each}}
         </div>
 
-        {{> "systems/brinkwood/templates/parts/attributes.html" actor=actor}}
       </div>
 
       {{!-- Owned Items Tab --}}
-      <div id="character-{{_id}}-loadout" class="tab flex-vertical loadout {{#if (eq tabs.primary "loadout")}}active{{/if}}" data-group="primary" data-tab="loadout">
+      <div id="character-{{_id}}-loadout" class="tab flex-vertical loadout {{#if (eq tabs.primary "loadout")}}active{{/if}}" role="tabpanel" aria-labelledby="character-{{_id}}-tab-loadout" data-group="primary" data-tab="loadout">
         <div class="label-stripe flex-horizontal">
            <p>{{localize "BITD.Loadout"}} <a class="item-add-popup" data-item-type="item"><i class="fas fa-plus-square"></i></a></p>
            <p>{{system.loadout}}/{{localize system.load_level}} </p>
@@ -274,7 +276,7 @@
         </div>
       </div>
 
-<div id="character-{{_id}}-notes" class="tab flex-vertical {{#if (eq tabs.primary "character-notes")}}active{{/if}}" role="tabpanel" data-group="primary" data-tab="character-notes">
+<div id="character-{{_id}}-notes" class="tab flex-vertical {{#if (eq tabs.primary "character-notes")}}active{{/if}}" role="tabpanel" aria-labelledby="character-{{_id}}-tab-notes" data-group="primary" data-tab="character-notes">
         {{#if editable}}
         <prose-mirror name="system.description" value="{{system.description}}" data-document-uuid="{{actor.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
         {{else}}
@@ -283,12 +285,14 @@
       </div>
 
       {{!-- Active Effects --}}
-<div id="character-{{_id}}-effects" class="tab effects flex-vertical {{#if (eq tabs.primary "effects")}}active{{/if}}" data-group="primary" data-tab="effects">
-        {{> "systems/brinkwood/templates/parts/active-effects.html"}}
-      </div>
+      {{#if isGM}}
+<div id="character-{{_id}}-effects" class="tab effects flex-vertical {{#if (eq tabs.primary "effects")}}active{{/if}}" role="tabpanel" aria-labelledby="character-{{_id}}-tab-effects" data-group="primary" data-tab="effects">
+{{> "systems/brinkwood/templates/parts/active-effects.html"}}
+</div>
+      {{/if}}
 
 			{{!-- Downtime actions --}}
-			<div id="character-{{_id}}-downtime" class="tab downtime flex-vertical {{#if (eq tabs.primary "downtime")}}active{{/if}}" data-group="primary" data-tab="downtime">
+<div id="character-{{_id}}-downtime" class="tab downtime flex-vertical {{#if (eq tabs.primary "downtime")}}active{{/if}}" role="tabpanel" aria-labelledby="character-{{_id}}-tab-downtime" data-group="primary" data-tab="downtime">
   		  {{> "systems/brinkwood/templates/parts/actor/downtime.html" actor=actor}}
 			</div>
 

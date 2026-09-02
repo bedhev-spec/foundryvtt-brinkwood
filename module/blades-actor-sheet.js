@@ -76,6 +76,9 @@ export class BladesActorSheet extends BladesSheet {
 
   /** @override */
   async _prepareContext(options) {
+    // Existing characters did not receive source-tagged traits before the v13
+    // repair. Reconcile only while an owner opens their sheet.
+    if (this.actor.isOwner) await this.actor.reconcileTraitGrants();
     const context = await super._prepareContext(options);
     await preloadClockImages(4);
 
@@ -87,9 +90,7 @@ export class BladesActorSheet extends BladesSheet {
 
     this.setAttrLabels(context.system.attributes);
 
-    context.traits = context.items
-      .filter(i => i.type === "trait")
-      .sort((a, b) => (a.system.purchased > b.system.purchased ? -1 : 1));
+    context.traits = context.items.filter(i => i.type === "trait");
 
     Object.entries(context.system.attributes).forEach(([name, attr]) => {
       context.system.attributes[name].value = Object.values(attr.skills).filter(s => s.value > 0).length;
@@ -160,7 +161,6 @@ export class BladesActorSheet extends BladesSheet {
        html.querySelectorAll('input[name], select[name], textarea[name], prose-mirror[name]').forEach(control => {
         control.addEventListener("change", event => this._persistFormControl(event), listenerOptions);
         if (!control.matches("prose-mirror[name]")) {
-          control.addEventListener("focusout", event => this._persistFormControl(event), listenerOptions);
         }
       });
 
