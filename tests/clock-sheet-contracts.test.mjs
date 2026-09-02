@@ -33,7 +33,8 @@ test("standalone clock keeps viewer progress public and GM notes permission-awar
   assert.match(sheet, /querySelector\('select\[name="system\.type"\]'\)[\s\S]*?"change"[\s\S]*?_onClockSizeChange/);
   assert.doesNotMatch(sheet, /event\.target\?\.name === "system\.type"/);
   assert.match(sheet, /submitData\["prototypeToken\.texture\.src"\] = image_path/);
-  assert.match(template, /clock-sheet__progress/);
+  assert.doesNotMatch(template, /clock-sheet__progress/);
+  assert.doesNotMatch(styles, /\.clock-sheet__progress/);
   assert.match(styles, /\.clock-sheet__clock[\s\S]*?\.clock-zero-label\s*\{[\s\S]*?display:\s*none/);
   assert.match(styles, /\.clock-sheet__clock[\s\S]*?\.clocks\s*\{[\s\S]*?justify-items:\s*center[\s\S]*?gap:\s*0/);
   assert.match(styles, /\.clock-sheet__clock[\s\S]*?\.blades-clock\s*\{[\s\S]*?margin-inline:\s*auto/);

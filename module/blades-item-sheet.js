@@ -55,7 +55,7 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
     context.owner    = doc.isOwner;
     context.editable = this.isEditable;
     context.cssClass = this.isEditable ? "editable" : "locked";
-    context.effects  = BladesActiveEffect.prepareActiveEffectCategories(doc.effects);
+    context.effects  = await BladesActiveEffect.prepareActiveEffectCategories(doc.effects, { owner: doc });
     context.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       context.system.description,
       { async: true, relativeTo: doc, secrets: doc.isOwner }
@@ -87,7 +87,7 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
     );
 
     // Active effect controls – use data-effect-action to avoid AppV2 action dispatch
-    html.querySelectorAll(".effect-control").forEach(el =>
+    html.querySelectorAll(".effect-control[data-effect-action]").forEach(el =>
       el.addEventListener("click", ev => {
         if (this.document.isEmbedded) return ui.notifications.warn(game.i18n.localize("BITD.EffectWarning"));
         BladesActiveEffect.onManageActiveEffect(ev, this.document, { gmOnly: true });

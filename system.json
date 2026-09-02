@@ -2,7 +2,7 @@
   "id": "brinkwood",
   "title": "Brinkwood",
   "description": "Brinkwood game system.",
-  "version": "0.6.11",
+  "version": "0.6.12",
   "compatibility": {
     "minimum": "13",
     "verified": "13.351",

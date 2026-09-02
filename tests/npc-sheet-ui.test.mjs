@@ -31,17 +31,24 @@ test("NPC dossier styles are scoped, responsive, and keyboard visible", async ()
 
   assert.match(styles, /^\/\*[\s\S]*?\n& \{/);
   assert.match(styles, /container-type:\s*inline-size/);
-  assert.match(styles, /@container \(max-width: 620px\)/);
+  assert.match(styles, /@container \(max-width: 560px\)/);
   assert.match(styles, /@container \(max-width: 430px\)/);
   assert.match(styles, /var\(--bw-(?:paper|ink|rule|focus)\)/);
   assert.match(styles, /&:focus-visible/);
   assert.match(styles, /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
-  assert.match(styles, /\.editor,[\s\S]*?prose-mirror\s*\{[\s\S]*?min-height:\s*210px/);
+  assert.match(styles, /\.editor,[\s\S]*?prose-mirror\s*\{[\s\S]*?min-height:\s*160px/);
+  assert.match(styles, /max-width:\s*640px/);
+  assert.match(styles, /grid-template-columns:\s*72px minmax\(0, 1fr\)/);
+  assert.match(styles, /width:\s*72px/);
+  assert.match(styles, /height:\s*72px/);
   assert.match(stylesheet, /&\.actor\.npc\s*\{\s*@import 'import\/npc-sheet\.scss';/);
 });
 
 test("NPC controller opts into the scoped dossier class without a redundant render hook", async () => {
   const source = await read("module/blades-npc-sheet.js");
   assert.match(source, /classes:\s*\[[^\]]*"npc"[^\]]*\]/);
+  assert.match(source, /position:\s*\{\s*width:\s*640\s*\}/);
+  assert.match(source, /static PARTS\s*=/);
+  assert.doesNotMatch(source, /defaultOptions|activateListeners|render\(true\)/);
   assert.doesNotMatch(source, /async _onRender\(context, options\)/);
 });

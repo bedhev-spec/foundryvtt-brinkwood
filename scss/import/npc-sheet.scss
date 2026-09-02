@@ -5,7 +5,7 @@
 
   .window-content {
     padding: 0;
-    background: var(--bw-paper);
+    background-color: var(--bw-paper);
   }
 
   .npc-dossier {
@@ -14,7 +14,7 @@
     box-sizing: border-box;
     min-height: 0;
     padding: 16px;
-    background: var(--bw-paper);
+    background: transparent;
     container-type: inline-size;
   }
 
@@ -181,6 +181,69 @@
     .npc-dossier__portrait {
       width: 96px;
       height: 96px;
+    }
+  }
+}
+
+// Pocket Dossier: compact, naturally sized NPC presentation.
+// Keep the dossier's semantic structure and editor bindings unchanged.
+.npc-dossier {
+  max-width: 640px;
+
+  .npc-dossier__header {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 12px;
+    padding: 10px;
+    border: 1px solid var(--bw-rule);
+    border-radius: 7px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.12)),
+      var(--bw-paper-deep);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.48), 0 1px 3px rgba(33, 27, 29, 0.08);
+  }
+
+  .npc-dossier__portrait {
+    width: 72px;
+    height: 72px;
+    border-radius: 4px;
+  }
+
+  .npc-dossier__identity {
+    gap: 6px;
+  }
+
+  .npc-dossier__profile {
+    padding: 8px 10px;
+  }
+
+  .npc-dossier__profile-fields {
+    gap: 8px;
+  }
+
+  .npc-dossier__editors {
+    gap: 10px;
+  }
+
+  .npc-dossier__editor-panel {
+    > h2 {
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--bw-rule);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
+    }
+
+    .editor,
+    prose-mirror {
+      min-height: 160px;
+      padding: 9px 10px;
+    }
+  }
+}
+
+@container (max-width: 560px) {
+  .npc-dossier {
+    .npc-dossier__profile-fields,
+    .npc-dossier__editors {
+      grid-template-columns: 1fr;
     }
   }
 }

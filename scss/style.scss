@@ -24,8 +24,9 @@ $hover-brightness: 0.8;
 
 //namespacing to avoid conflicts with other modules
 .brinkwood{
-  --bw-paper: #eeeae0;
-  --bw-paper-deep: #e0d7c5;
+  --bw-paper: #f7f4ed;
+  --bw-paper-deep: #ece5d9;
+  --bw-paper-overlay: rgba(247, 244, 237, 0.72);
   --bw-ink: #211b1d;
   --bw-ink-soft: #51464a;
   --bw-inverse: #f7f4ed;
@@ -38,10 +39,6 @@ $hover-brightness: 0.8;
 
   &.actor.pc.character{
     @import 'import/character-sheet.scss';
-
-    &.character-v2 {
-      @import 'import/character-sheet-v2.scss';
-    }
   }
 
   &.actor.mask {

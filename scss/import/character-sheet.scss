@@ -7,20 +7,75 @@
  */
 
 & {
+  .character-identity-choices {
+    padding-right: 0;
+  }
+
+  /* Identity removal controls occupy their own fixed grid track, so selected
+   * values can truncate before the action rather than overlapping it. */
+  .character-identity-choices .item-block {
+    grid-template-columns: max-content minmax(0, 1fr) 18px;
+  }
+
+.character-identity-choices .identity-choice__value {
+	grid-column: 2;
+	min-width: 0;
+	justify-content: flex-end;
+	text-align: right;
+	white-space: normal;
+	overflow: visible;
+	text-overflow: clip;
+	overflow-wrap: anywhere;
+}
+
+/* Keep selected identity values visually anchored to their fixed × action.
+ * Long values still use the full middle track and wrap without collision. */
+.character-identity-choices .identity-choice__value .item-body,
+.character-identity-choices .identity-choice__value .item-name {
+	width: 100%;
+	justify-content: flex-end;
+	text-align: right;
+}
+
+  .character-identity-choices .identity-choice__action {
+    grid-column: 3;
+    grid-row: 1;
+    display: grid;
+    place-items: center;
+    width: 18px;
+    min-width: 18px;
+    height: 18px;
+    justify-self: end;
+  }
+
+  .character-identity-choices .identity-choice__remove {
+    position: static;
+    width: 18px;
+    min-width: 18px;
+    height: 18px;
+    min-height: 18px;
+    transform: none;
+  }
   min-width: 0;
   color: $almost_black;
 
   .window-content {
     min-height: 0;
+    min-width: 0;
     padding: 0;
+    overflow-x: hidden;
     overflow-y: auto;
-    background: #eeeee8;
+    scrollbar-gutter: stable;
+    background-color: #eeeee8;
     color: $almost_black;
     container-type: inline-size;
   }
 
   form.actor-sheet {
     box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
     min-height: 0;
     padding: 20px;
     container-type: inline-size;
@@ -387,14 +442,12 @@ nav.tabs {
 
   .character-sheet__workspace:has(.tab[data-tab="loadout"].active),
   .character-sheet__workspace:has(.tab[data-tab="character-notes"].active),
-  .character-sheet__workspace:has(.tab[data-tab="downtime"].active),
   .character-sheet__workspace:has(.tab[data-tab="effects"].active) {
     grid-template-columns: minmax(0, 1fr);
   }
 
   .character-sheet__workspace:has(.tab[data-tab="loadout"].active) > .attributes,
   .character-sheet__workspace:has(.tab[data-tab="character-notes"].active) > .attributes,
-  .character-sheet__workspace:has(.tab[data-tab="downtime"].active) > .attributes,
   .character-sheet__workspace:has(.tab[data-tab="effects"].active) > .attributes {
     display: none;
   }
@@ -420,40 +473,40 @@ nav.tabs {
 }
 
 /* Legacy tabs need their final grid before optional polish styles load. */
-&:not(.character-v2) .character-sheet__workspace {
+& .character-sheet__workspace {
   grid-template-columns: minmax(0, 1fr);
   row-gap: 0;
 }
 
-&:not(.character-v2) .character-sheet__workspace > nav.tabs {
+& .character-sheet__workspace > nav.tabs {
   grid-column: 1 / -1;
   width: 100%;
   box-sizing: border-box;
 }
 
-&:not(.character-v2) .character-sheet__workspace > nav.tabs .item {
+& .character-sheet__workspace > nav.tabs .item {
   flex: 1 1 0;
   min-width: 0;
 }
 
 /* Legacy content expands naturally; the outer sheet viewport owns scrolling. */
-&:not(.character-v2) form.actor-sheet {
+& form.actor-sheet {
   overflow: visible;
 }
 
-&:not(.character-v2) form.actor-sheet > .name-alias,
-&:not(.character-v2) form.actor-sheet > .bans-armor,
-&:not(.character-v2) form.actor-sheet > .character-sheet__workspace {
+& form.actor-sheet > .name-alias,
+& form.actor-sheet > .bans-armor,
+& form.actor-sheet > .character-sheet__workspace {
   flex: 0 0 auto;
 }
 
-&:not(.character-v2) form.actor-sheet > .bans-armor {
+& form.actor-sheet > .bans-armor {
   overflow: visible;
 }
 
-&:not(.character-v2) .character-sheet__workspace,
-&:not(.character-v2) .character-sheet__workspace > .tab-content,
-&:not(.character-v2) .character-sheet__workspace > .tab-content > .tab[data-tab] {
+& .character-sheet__workspace,
+& .character-sheet__workspace > .tab-content,
+& .character-sheet__workspace > .tab-content > .tab[data-tab] {
   height: auto;
   max-height: none;
   overflow: visible;
@@ -472,16 +525,17 @@ nav.tabs {
 
   color: var(--bw-ink);
 
-  .window-content,
-  form.actor-sheet {
+  .window-content {
     background-color: var(--bw-paper);
     color: var(--bw-ink);
   }
 
   form.actor-sheet {
+    background-color: transparent;
+    color: var(--bw-ink);
     display: grid;
     gap: 14px;
-    overflow: auto;
+    overflow: visible;
     scrollbar-color: var(--bw-rule) transparent;
   }
 
@@ -647,7 +701,7 @@ nav.tabs {
 // Focused 0.6.7 usability layer for dense character-sheet regions.
 & {
   .bans-armor {
-    padding: 10px;
+    padding: 10px 10px 0;
     border: 1px solid var(--bw-rule);
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.24);
@@ -670,9 +724,14 @@ nav.tabs {
       td {
         min-height: 44px;
         padding: 6px;
-        border-bottom: 1px solid rgba(141, 98, 93, 0.35);
+        border-bottom: 1px solid rgba(141, 98, 93, 0.5);
         font-size: 1rem;
       }
+
+      tbody tr + tr > td {
+        border-top: 1px solid rgba(141, 98, 93, 0.5);
+      }
+
     }
   }
 
@@ -767,10 +826,21 @@ nav.tabs {
 
   .downtime-actions {
     display: grid;
+    width: 100%;
+    min-width: 0;
     gap: 12px;
   }
 
+  .tab.downtime {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
   .downtime-action {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
     overflow: hidden;
     border: 1px solid var(--bw-rule);
     border-left: 5px solid var(--bw-accent);
@@ -787,6 +857,7 @@ nav.tabs {
       font-weight: 700;
       line-height: 1.25;
       text-transform: none;
+      overflow-wrap: anywhere;
     }
 
     p {
@@ -795,6 +866,7 @@ nav.tabs {
       color: var(--bw-ink);
       font-size: 1rem;
       line-height: 1.45;
+      overflow-wrap: anywhere;
     }
   }
 

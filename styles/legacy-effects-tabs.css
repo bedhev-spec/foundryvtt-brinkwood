@@ -1,7 +1,7 @@
 @import url("./legacy-sheet-polish.css");
 
 /* Legacy character sheet only; V2 owns a separate Effects layout. */
-.brinkwood.actor.pc.character:not(.character-v2) .effects-tabs {
+.brinkwood.actor.pc.character .effects-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
@@ -10,7 +10,7 @@
   border: 1px solid var(--bw-rule);
  background: var(--bw-paper-deep);
 }
-.brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace > nav.tabs {
+.brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs {
  grid-column: 1 / -1;
  width: 100%;
  box-sizing: border-box;
@@ -18,33 +18,33 @@
  border-right: 1px solid var(--bw-rule);
  border-radius: 3px;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace > .tab-content {
+.brinkwood.actor.pc.character .character-sheet__workspace > .tab-content {
  grid-column: 1;
  width: 100%;
  min-width: 0;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace > .tab-content > .tab[data-tab] {
+.brinkwood.actor.pc.character .character-sheet__workspace > .tab-content > .tab[data-tab] {
  margin-top: 0;
  padding-top: 10px;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace {
+.brinkwood.actor.pc.character .character-sheet__workspace {
  grid-template-columns: minmax(0, 1fr);
  row-gap: 0;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace .tab[data-tab=traits].active > .attributes {
+.brinkwood.actor.pc.character .character-sheet__workspace .tab[data-tab=traits].active > .attributes {
  display: grid;
  grid-template-columns: repeat(3, minmax(0, 1fr));
  width: 100%;
  min-width: 0;
  gap: 12px;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace .tab[data-tab=traits].active > .attributes .attribute {
+.brinkwood.actor.pc.character .character-sheet__workspace .tab[data-tab=traits].active > .attributes .attribute {
  min-width: 0;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace .tab[data-tab=traits].active > .attributes .attributes-exp {
+.brinkwood.actor.pc.character .character-sheet__workspace .tab[data-tab=traits].active > .attributes .attributes-exp {
  margin-top: 0;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .effects-tab {
+.brinkwood.actor.pc.character .effects-tab {
   flex: 1 1 8rem;
   min-height: 34px;
   margin: 0;
@@ -58,23 +58,23 @@
   font: inherit;
   font-weight: 700;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .effects-tab:hover,
-.brinkwood.actor.pc.character:not(.character-v2) .effects-tab:focus-visible,
-.brinkwood.actor.pc.character:not(.character-v2) .effects-tab.active {
+.brinkwood.actor.pc.character .effects-tab:hover,
+.brinkwood.actor.pc.character .effects-tab:focus-visible,
+.brinkwood.actor.pc.character .effects-tab.active {
   border-color: var(--bw-rule);
   border-bottom-color: var(--bw-accent);
   color: var(--bw-ink);
 }
-.brinkwood.actor.pc.character:not(.character-v2) .effects-tab.active {
+.brinkwood.actor.pc.character .effects-tab.active {
   background: rgba(255, 255, 255, 0.42);
 }
-.brinkwood.actor.pc.character:not(.character-v2) .effects-tab:focus-visible,
-.brinkwood.actor.pc.character:not(.character-v2) .effects-category__add:focus-visible {
+.brinkwood.actor.pc.character .effects-tab:focus-visible,
+.brinkwood.actor.pc.character .effects-category__add:focus-visible {
   outline: 3px solid var(--bw-focus);
   outline-offset: 1px;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .effects-category[data-effect-panel][hidden] { display: none; }
-.brinkwood.actor.pc.character:not(.character-v2) .effects-category[data-effect-panel] {
+.brinkwood.actor.pc.character .effects-category[data-effect-panel][hidden] { display: none; }
+.brinkwood.actor.pc.character .effects-category[data-effect-panel] {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto auto;
@@ -82,19 +82,19 @@
   min-width: 0;
   height: auto;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .effects-category[data-effect-panel] > .effects-category__header,
-.brinkwood.actor.pc.character:not(.character-v2) .effects-category[data-effect-panel] > .effects-category__list {
+.brinkwood.actor.pc.character .effects-category[data-effect-panel] > .effects-category__header,
+.brinkwood.actor.pc.character .effects-category[data-effect-panel] > .effects-category__list {
   grid-column: 1;
   width: 100%;
   min-width: 0;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .effects-category__list {
+.brinkwood.actor.pc.character .effects-category__list {
   grid-template-columns: minmax(0, 1fr); align-content: start;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .name-alias > .grow-two:last-child,
-.brinkwood.actor.pc.character:not(.character-v2) .big-teeth-section,
-.brinkwood.actor.pc.character:not(.character-v2) .big-teeth-section .big-teeth { min-width: 0; }
-.brinkwood.actor.pc.character:not(.character-v2) .big-teeth-section .big-teeth {
+.brinkwood.actor.pc.character .name-alias > .grow-two:last-child,
+.brinkwood.actor.pc.character .big-teeth-section,
+.brinkwood.actor.pc.character .big-teeth-section .big-teeth { min-width: 0; }
+.brinkwood.actor.pc.character .big-teeth-section .big-teeth {
  display: flex;
  flex-wrap: nowrap;
  gap: 0;
@@ -105,24 +105,24 @@
  width: auto;
  overflow: visible;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .big-teeth-section {
+.brinkwood.actor.pc.character .big-teeth-section {
  --legacy-tooth-pitch: 14px;
  width: 100%;
  margin-bottom: 0;
  border-top: 1px solid var(--bw-ink);
  padding-block: 1.5px;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .big-teeth-section:last-child {
+.brinkwood.actor.pc.character .big-teeth-section:last-child {
  border-bottom: 1px solid var(--bw-ink);
 }
-.brinkwood.actor.pc.character:not(.character-v2) .character-xp-section {
+.brinkwood.actor.pc.character .character-xp-section {
  border-color: #315f82;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .character-xp,
-.brinkwood.actor.pc.character:not(.character-v2) .character-stress {
+.brinkwood.actor.pc.character .character-xp,
+.brinkwood.actor.pc.character .character-stress {
   width: 100%;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .big-teeth-section .black-label {
+.brinkwood.actor.pc.character .big-teeth-section .black-label {
  flex: 0 0 auto;
  box-sizing: border-box;
  width: auto;
@@ -131,7 +131,7 @@
  line-height: 26px;
  font-size: 0.8rem;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .legacy-tracker-segments {
+.brinkwood.actor.pc.character .legacy-tracker-segments {
  display: flex;
  flex: 0 0 auto;
  gap: 1px;
@@ -142,7 +142,7 @@
  width: auto;
  overflow: visible;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .big-teeth-section button.dot-value {
+.brinkwood.actor.pc.character .big-teeth-section button.dot-value {
  box-sizing: border-box;
  flex: 0 0 var(--legacy-tooth-pitch);
  width: var(--legacy-tooth-pitch);
@@ -153,7 +153,7 @@
  padding: 0;
  justify-content: center;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .big-teeth-section img.big-teeth {
+.brinkwood.actor.pc.character .big-teeth-section img.big-teeth {
  display: block;
  width: 12px;
  max-width: none;
@@ -161,7 +161,7 @@
  margin-left: 0;
  object-fit: fill;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .name-alias .item-block .item {
+.brinkwood.actor.pc.character .name-alias .item-block .item {
  position: relative;
  box-sizing: border-box;
  height: 26px;
@@ -171,7 +171,7 @@
  align-items: center;
  gap: 4px;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices .item-block {
+.brinkwood.actor.pc.character .character-identity-choices .item-block {
  box-sizing: border-box;
  height: 26px;
  min-height: 26px;
@@ -179,19 +179,19 @@
  flex-wrap: nowrap;
  align-items: center;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices .item-block::after {
+.brinkwood.actor.pc.character .character-identity-choices .item-block::after {
  content: "";
  flex: 0 0 18px;
  width: 18px;
  height: 18px;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices .item-block .item-body {
+.brinkwood.actor.pc.character .character-identity-choices .item-block .item-body {
  display: flex;
  align-items: center;
  min-height: 26px;
  margin: 0;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .identity-choice__remove {
+.brinkwood.actor.pc.character .identity-choice__remove {
  display: inline-grid;
  position: absolute;
  top: 50%;
@@ -210,24 +210,24 @@
  line-height: 1;
  place-items: center;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .identity-choice__remove:hover,
-.brinkwood.actor.pc.character:not(.character-v2) .identity-choice__remove:focus-visible {
+.brinkwood.actor.pc.character .identity-choice__remove:hover,
+.brinkwood.actor.pc.character .identity-choice__remove:focus-visible {
  color: var(--bw-accent);
  text-shadow: 0 0 0.2em rgba(143, 47, 53, 0.4);
 }
-.brinkwood.actor.pc.character:not(.character-v2) .identity-choice__remove:focus-visible {
+.brinkwood.actor.pc.character .identity-choice__remove:focus-visible {
  outline: 3px solid var(--bw-focus);
  outline-offset: 1px;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .bans-armor td:has(.character-scars-clock) {
+.brinkwood.actor.pc.character .bans-armor td:has(.character-scars-clock) {
   width: 96px; min-width: 96px; vertical-align: top;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .bans-armor .character-bans table tbody > tr:last-child > td,
-.brinkwood.actor.pc.character:not(.character-v2) .bans-armor .character-bans table tbody > tr:first-child > td[rowspan] {
+.brinkwood.actor.pc.character .bans-armor .character-bans table tbody > tr:last-child > td,
+.brinkwood.actor.pc.character .bans-armor .character-bans table tbody > tr:first-child > td[rowspan] {
  border-bottom: 0;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .character-scars-clock,
-.brinkwood.actor.pc.character:not(.character-v2) .character-oath-clock {
+.brinkwood.actor.pc.character .character-scars-clock,
+.brinkwood.actor.pc.character .character-oath-clock {
   grid-template-columns: 64px;
   grid-template-rows: auto auto auto;
   gap: 2px;
@@ -239,85 +239,105 @@
   justify-items: center;
   align-items: start;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .character-scars-clock span.clock-label,
-.brinkwood.actor.pc.character:not(.character-v2) .character-oath-clock span.clock-label {
+.brinkwood.actor.pc.character .character-scars-clock span.clock-label,
+.brinkwood.actor.pc.character .character-oath-clock span.clock-label {
   grid-column: 1;
   grid-row: 2;
   margin-left: 0;
   text-align: center;
   white-space: normal;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .character-scars-clock .blades-clock,
-.brinkwood.actor.pc.character:not(.character-v2) .character-oath-clock .blades-clock {
+.brinkwood.actor.pc.character .character-scars-clock .blades-clock,
+.brinkwood.actor.pc.character .character-oath-clock .blades-clock {
   grid-column: 1;
   grid-row: 1;
   justify-content: center;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .character-scars-clock .clock-progress,
-.brinkwood.actor.pc.character:not(.character-v2) .character-oath-clock .clock-progress {
+.brinkwood.actor.pc.character .character-scars-clock .clock-progress,
+.brinkwood.actor.pc.character .character-oath-clock .clock-progress {
   grid-column: 1;
   grid-row: 3;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .character-armor-uses { min-width: 96px; vertical-align: top; }
-.brinkwood.actor.pc.character:not(.character-v2) .attributes-container button.dot-value:focus,
-.brinkwood.actor.pc.character:not(.character-v2) .attributes-container button.dot-value:active {
+.brinkwood.actor.pc.character .character-armor-uses { min-width: 96px; vertical-align: top; }
+.brinkwood.actor.pc.character .attributes-container button.dot-value:focus,
+.brinkwood.actor.pc.character .attributes-container button.dot-value:active {
   outline: 0; box-shadow: none;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .attributes .attributes-container {
+.brinkwood.actor.pc.character .attributes .attributes-container {
   display: flex;
   align-items: center;
   min-height: 28px;
   line-height: 1;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .attributes .attributes-container button.dot-value {
+.brinkwood.actor.pc.character .attributes .attributes-container button.dot-value {
  align-self: center;
  line-height: 1;
  transform: translateY(-2px);
 }
-.brinkwood.actor.pc.character:not(.character-v2) .attributes .attribute-skill-label {
+.brinkwood.actor.pc.character .attributes .attribute-skill-label {
   display: inline-flex;
   align-items: center;
   min-height: 28px;
   margin-top: 0;
   line-height: 1.2;
 }
-.brinkwood.actor.pc.character:not(.character-v2) .attributes-container button.dot-value:focus-visible::before {
+.brinkwood.actor.pc.character .attributes-container button.dot-value:focus-visible::before {
   outline: 3px solid var(--bw-focus); outline-offset: 3px;
 }
-.brinkwood.actor.pc.character:not(.character-v2) button.effects-category__add {
+.brinkwood.actor.pc.character button.effects-category__add {
   display: inline-grid; flex: 0 0 32px; width: 32px; min-width: 32px; height: 32px; min-height: 32px; margin: 0; padding: 0; line-height: 1; place-items: center;
 }
 @container (max-width: 620px) {
-  .brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace .tab[data-tab=traits].active > .attributes {
+  .brinkwood.actor.pc.character .character-sheet__workspace .tab[data-tab=traits].active > .attributes {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @container (max-width: 430px) {
-  .brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace .tab[data-tab=traits].active > .attributes {
+  .brinkwood.actor.pc.character .character-sheet__workspace .tab[data-tab=traits].active > .attributes {
     grid-template-columns: minmax(0, 1fr);
   }
-  .brinkwood.actor.pc.character:not(.character-v2) .effects-tab { flex-basis: 100%; }
+  .brinkwood.actor.pc.character .effects-tab { flex-basis: 100%; }
 }
 
 /* Keep header/state regions at natural height; only the sheet viewport scrolls. */
-.brinkwood.actor.pc.character:not(.character-v2) form.actor-sheet {
+.brinkwood.actor.pc.character form.actor-sheet {
   overflow: visible;
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) form.actor-sheet > .name-alias,
-.brinkwood.actor.pc.character:not(.character-v2) form.actor-sheet > .bans-armor,
-.brinkwood.actor.pc.character:not(.character-v2) form.actor-sheet > .character-sheet__workspace {
+.brinkwood.actor.pc.character form.actor-sheet > .name-alias,
+.brinkwood.actor.pc.character form.actor-sheet > .bans-armor,
+.brinkwood.actor.pc.character form.actor-sheet > .character-sheet__workspace {
   flex: 0 0 auto;
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) form.actor-sheet > .bans-armor {
+.brinkwood.actor.pc.character form.actor-sheet > .bans-armor {
   overflow: visible;
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace,
-.brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace > .tab-content,
-.brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace > .tab-content > .tab[data-tab] {
+.brinkwood.actor.pc.character .character-sheet__workspace,
+.brinkwood.actor.pc.character .character-sheet__workspace > .tab-content,
+.brinkwood.actor.pc.character .character-sheet__workspace > .tab-content > .tab[data-tab] {
   height: auto;
   max-height: none;
   overflow: visible;
+}
+
+/* This file loads after blades.css. Keep the effect disclosure control's
+ * neutral toolbar state intact when it is hosted on the legacy character sheet. */
+.brinkwood.actor.pc.character .effect-card__actions button.effect-control.effect-card__details-toggle,
+.brinkwood.actor.pc.character .effect-card__actions button.effect-control.effect-card__details-toggle:hover,
+.brinkwood.actor.pc.character .effect-card__actions button.effect-control.effect-card__details-toggle:active,
+.brinkwood.actor.pc.character .effect-card__actions button.effect-control.effect-card__details-toggle:focus,
+.brinkwood.actor.pc.character .effect-card__actions button.effect-control.effect-card__details-toggle[aria-expanded="true"] {
+  border-color: transparent !important;
+  border-left-color: var(--bw-rule) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none;
+}
+
+.brinkwood.actor.pc.character .effect-card__actions button.effect-control.effect-card__details-toggle:focus-visible {
+  background: var(--bw-paper-deep) !important;
+  outline: 2px solid var(--bw-ink-soft) !important;
+  outline-offset: -2px;
 }

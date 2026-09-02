@@ -26,12 +26,12 @@
           </div>
           {{#each items as |item id|}}
             {{#if (eq item.type "upbringing")}}
-						<div class="item flex-horizontal tooltip" data-item-id="{{item._id}}" data-tooltip="Actor.Upbringings.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
+            <div class="item flex-horizontal tooltip identity-choice__value" data-item-id="{{item._id}}" data-tooltip="Actor.Upbringings.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
 <div class="item-body flex-horizontal"{{#if editable}} role="button" tabindex="0"{{/if}}>
 								<div class="item-name">{{item.name}}</div>
                 </div>
                 {{#if ../editable}}
-                <button type="button" class="item-delete identity-choice__remove" title="Remove Upbringing" aria-label="Remove Upbringing"><span aria-hidden="true">&times;</span></button>
+            <div class="identity-choice__action"><button type="button" class="item-delete identity-choice__remove" title="Remove Upbringing" aria-label="Remove Upbringing"><span aria-hidden="true">&times;</span></button></div>
                 {{/if}}
               </div>
             {{/if}}
@@ -44,12 +44,12 @@
 					</div>
           {{#each items as |item id|}}
             {{#if (eq item.type "profession")}}
-						<div class="item flex-horizontal tooltip" data-item-id="{{item._id}}" data-tooltip="Actor.Professions.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
+            <div class="item flex-horizontal tooltip identity-choice__value" data-item-id="{{item._id}}" data-tooltip="Actor.Professions.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
 <div class="item-body flex-horizontal"{{#if editable}} role="button" tabindex="0"{{/if}}>
                 <div class="item-name">{{item.name}}</div>
               </div>
               {{#if ../editable}}
-              <button type="button" class="item-delete identity-choice__remove" title="Remove Profession" aria-label="Remove Profession"><span aria-hidden="true">&times;</span></button>
+            <div class="identity-choice__action"><button type="button" class="item-delete identity-choice__remove" title="Remove Profession" aria-label="Remove Profession"><span aria-hidden="true">&times;</span></button></div>
               {{/if}}
             </div>
             {{/if}}
@@ -60,12 +60,12 @@
           <div class="item-class-label"><a class="item-add-popup" data-distinct="true" data-item-type="class">{{localize "BITD.Class"}}</a></div>
             {{#each items as |item id|}}
                 {{#if (eq item.type "class")}}
-                <div class="item flex-horizontal tooltip" data-item-id="{{item._id}}" data-tooltip="Actor.Classes.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
+            <div class="item flex-horizontal tooltip identity-choice__value" data-item-id="{{item._id}}" data-tooltip="Actor.Classes.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
 <div class="item-body flex-horizontal"{{#if editable}} role="button" tabindex="0"{{/if}}>
                     <div class="item-name">{{item.name}}</div>
                   </div>
                   {{#if ../editable}}
-                  <button type="button" class="item-delete identity-choice__remove" title="Remove Class" aria-label="Remove Class"><span aria-hidden="true">&times;</span></button>
+            <div class="identity-choice__action"><button type="button" class="item-delete identity-choice__remove" title="Remove Class" aria-label="Remove Class"><span aria-hidden="true">&times;</span></button></div>
                   {{/if}}
                 </div>
               {{/if}}
@@ -76,12 +76,12 @@
           <div class="item-class-label"><a class="item-add-popup" data-distinct="true" data-item-type="pact">{{localize "BITD.Pact"}}</a></div>
             {{#each items as |item id|}}
                 {{#if (eq item.type "pact")}}
-                <div class="item flex-horizontal tooltip" data-item-id="{{item._id}}" data-tooltip="Actor.Pacts.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
+            <div class="item flex-horizontal tooltip identity-choice__value" data-item-id="{{item._id}}" data-tooltip="Actor.Pacts.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
 <div class="item-body flex-horizontal"{{#if editable}} role="button" tabindex="0"{{/if}}>
                     <div class="item-name">{{item.name}}</div>
                   </div>
                   {{#if ../editable}}
-                  <button type="button" class="item-delete identity-choice__remove" title="Remove Pact" aria-label="Remove Pact"><span aria-hidden="true">&times;</span></button>
+            <div class="identity-choice__action"><button type="button" class="item-delete identity-choice__remove" title="Remove Pact" aria-label="Remove Pact"><span aria-hidden="true">&times;</span></button></div>
                   {{/if}}
                 </div>
               {{/if}}
@@ -153,7 +153,7 @@
           <th class="black-white">{{localize "BITD.Armor"}}</th>
         </thead>
         <tbody>
-          <tr>
+          <tr data-ban-level="3">
             <td>3</td>
             <td colspan="2">
               <input type="text" id="character-{{_id}}-bans-3-1" name="system.bans.heavy.one" value="{{system.bans.heavy.one}}">
@@ -183,7 +183,7 @@
               </div>
             </td>
           </tr>
-          <tr>
+          <tr data-ban-level="2">
             <td>2</td>
             <td>
               <input type="text" id="character-{{_id}}-bans-2-1" name="system.bans.medium.one" value="{{system.bans.medium.one}}">
@@ -193,7 +193,7 @@
             </td>
             <td></td>
           </tr>
-          <tr>
+          <tr data-ban-level="1">
             <td>1</td>
             <td>
               <input type="text" id="character-{{_id}}-bans-1-1" name="system.bans.light.one" value="{{system.bans.light.one}}">

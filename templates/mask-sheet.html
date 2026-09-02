@@ -19,7 +19,7 @@
           <article class="item mask-sheet__item" data-item-id="{{item._id}}">
             <button type="button" class="item-body mask-sheet__item-open" aria-label="{{item.name}}">{{item.name}}</button>
             {{#if ../editable}}
-            <button type="button" class="item-control item-delete" title="{{localize 'BITD.TitleDeleteItem'}}" aria-label="{{localize 'BITD.TitleDeleteItem'}}"><i class="fas fa-trash" aria-hidden="true"></i></button>
+            <button type="button" class="item-control item-delete identity-choice__remove" title="{{localize 'BITD.TitleDeleteItem'}}" aria-label="{{localize 'BITD.TitleDeleteItem'}}"><span aria-hidden="true">&times;</span></button>
             {{/if}}
           </article>
           {{/if}}
@@ -71,8 +71,11 @@
 
       <section id="mask-{{_id}}-panel-traits" class="tab mask-sheet__panel {{#if (eq tabs.primary "traits")}}active{{/if}}" data-group="primary" data-tab="traits" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-traits">
         <div class="mask-sheet__traits-workspace">
-          <div class="mask-sheet__trait-library">
-            <h2>{{localize "BITD.Traits"}}</h2>
+      <div class="mask-sheet__trait-library">
+        <div class="mask-sheet__section-heading">
+          <h2>{{localize "BITD.Traits"}}</h2>
+          {{#if editable}}<button type="button" class="item-add-popup" data-item-type="trait">{{localize "Add"}}</button>{{/if}}
+        </div>
             <div class="mask-sheet__traits">
               {{#each traits as |trait|}}
               <article class="item mask-trait-card" data-item-id="{{trait._id}}">
@@ -94,8 +97,7 @@
         </div>
       </section>
 
-      <section id="mask-{{_id}}-panel-notes" class="tab mask-sheet__panel {{#if (eq tabs.primary "mask-notes")}}active{{/if}}" data-group="primary" data-tab="mask-notes" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-notes">
-        <h2>{{localize "BITD.Notes"}}</h2>
+  <section id="mask-{{_id}}-panel-notes" class="tab mask-sheet__panel mask-sheet__notes {{#if (eq tabs.primary "mask-notes")}}active{{/if}}" data-group="primary" data-tab="mask-notes" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-notes">
       {{#if editable}}
       <prose-mirror name="system.description" value="{{system.description}}" data-document-uuid="{{actor.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
       {{else}}

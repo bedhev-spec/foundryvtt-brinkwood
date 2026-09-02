@@ -24,7 +24,7 @@ test("Legacy tabs receive their final equal-width layout from the base styleshee
   ]);
 
   for (const styles of [source, compiled]) {
-    assert.match(styles, /:not\(\.character-v2\)[\s\S]*?character-sheet__workspace[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
+  assert.match(styles, /\.character-sheet__workspace[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
     assert.match(styles, /nav\.tabs \.item\s*\{[\s\S]*?flex:\s*1 1 0[\s\S]*?min-width:\s*0/);
   }
 });
@@ -48,5 +48,11 @@ test("Legacy tall tabs leave scrolling to the sheet viewport", async () => {
 test("Legacy sheets reset to Traits only when genuinely closed", async () => {
   const controller = await read("module/blades-actor-sheet.js");
 
-  assert.match(controller, /async close\(options = \{\}\)[\s\S]*?this\._legacyViewState = undefined[\s\S]*?this\.tabGroups\.primary = "traits"[\s\S]*?super\.close\(options\)/);
+  assert.match(controller, /async close\(options = \{\}\)[\s\S]*?this\._sheetViewState = undefined[\s\S]*?this\.tabGroups\.primary = "traits"[\s\S]*?super\.close\(options\)/);
+});
+
+test("Bans and Armor content meets the lower frame without excess parchment space", async () => {
+  const styles = await read("scss/import/character-sheet.scss");
+
+  assert.match(styles, /\.bans-armor\s*\{[\s\S]*?padding:\s*10px 10px 0/);
 });

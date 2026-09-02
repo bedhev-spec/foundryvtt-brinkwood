@@ -79,17 +79,11 @@ export class BladesActorSheet extends BladesSheet {
     const context = await super._prepareContext(options);
     await preloadClockImages(4);
 
+    this._ensureValidPrimaryTab(context);
+
     // Prepare active effects
-    context.effects = BladesActiveEffect.prepareActiveEffectCategories(this.actor.effects);
-    this._isLegacyCharacterSheet = !this.constructor.DEFAULT_OPTIONS.classes.includes("character-v2");
-    context.isCharacterSheet = this._isLegacyCharacterSheet;
-    const visibleEffectTabs = Object.values(context.effects)
-      .filter(section => section.visible)
-      .map(section => section.type);
-    if (!visibleEffectTabs.includes(this._activeEffectTab)) {
-      this._activeEffectTab = visibleEffectTabs[0] ?? "temporary";
-    }
-    context.activeEffectTab = this._activeEffectTab;
+    context.effects = await BladesActiveEffect.prepareActiveEffectCategories(this.actor.effects, { owner: this.actor });
+    this._prepareEffectTabs(context);
 
     this.setAttrLabels(context.system.attributes);
 
@@ -132,96 +126,43 @@ export class BladesActorSheet extends BladesSheet {
     return context;
   }
 
-  /* -------------------------------------------- */
+  /** Keep a valid user-selected tab through rerenders; only fall back on no valid state. */
+  _ensureValidPrimaryTab(context) {
+    const validTabs = ["traits", "loadout", "character-notes", "downtime"];
+    if (context.isGM) validTabs.push("effects");
+    if (validTabs.includes(this.tabGroups.primary)) return;
 
-  /** Reset transient Legacy navigation when the sheet is genuinely closed. */
-  async close(options = {}) {
-    const isLegacy = !this.constructor.DEFAULT_OPTIONS.classes.includes("character-v2");
-    if (isLegacy) {
-      this._legacyViewState = undefined;
-      this.tabGroups.primary = "traits";
-    }
-    return super.close(options);
+    this.tabGroups.primary = "traits";
+    context.tabs.primary = "traits";
   }
 
   /* -------------------------------------------- */
 
-  /**
-  * The legacy actor sheet owns its viewport on the form, not on Foundry's
-  * .window-content wrapper.  The wrapper can also scroll in older Foundry
-  * themes, so retain both independently instead of guessing one owner.
-  */
- _getLegacyScrollContainers() {
- const root = this.element;
- const form = root?.matches?.("form.actor-sheet") ? root : root?.querySelector?.("form.actor-sheet");
- const windowContent = root?.closest?.(".window-content") ?? root?.querySelector?.(".window-content");
- return [
- ["form", form],
- ["window", windowContent],
- ].filter(([, element]) => element);
- }
+  /** Reset transient navigation when the sheet is genuinely closed. */
+  async close(options = {}) {
+    this._sheetViewState = undefined;
+    this.tabGroups.primary = "traits";
+    return super.close(options);
+  }
 
- _captureLegacyScrollPosition({ primaryTab } = {}) {
- if (!this._isLegacyCharacterSheet) return;
- const activePanel = this.element?.querySelector?.('.tab[data-group="primary"].active');
- const selectedPrimaryTab = primaryTab ?? activePanel?.dataset.tab ?? this.tabGroups.primary;
- this._legacyViewState = {
- primaryTab: selectedPrimaryTab,
- effectTab: this._activeEffectTab,
- scrollPositions: Object.fromEntries(this._getLegacyScrollContainers().map(([name, element]) => [name, {
- scrollTop: element.scrollTop,
- scrollLeft: element.scrollLeft,
- }])),
- };
- }
+  /* -------------------------------------------- */
+  /** @override */
+  async _onRender(context, options) {
+     await super._onRender(context, options);
+     const html = this.element;
 
- _restoreLegacyScrollPosition() {
- if (!this._isLegacyCharacterSheet || !this._legacyViewState) return;
- const state = this._legacyViewState;
- if (state.primaryTab) this.tabGroups.primary = state.primaryTab;
- for (const [name, element] of this._getLegacyScrollContainers()) {
- const position = state.scrollPositions?.[name];
- if (!position) continue;
- element.scrollTop = position.scrollTop;
- element.scrollLeft = position.scrollLeft;
- }
- if (state.effectTab) this._activateEffectTab(state.effectTab);
- }
+     this._characterSheetListenerController?.abort();
+     this._characterSheetListenerController = new AbortController();
+     const listenerOptions = { signal: this._characterSheetListenerController.signal };
+     this._bindSheetViewState(html, listenerOptions);
+     if (!this.isEditable) return;
 
- /** @override */
- async _onRender(context, options) {
-    await super._onRender(context, options);
-    const html = this.element;
-
- this._characterSheetListenerController?.abort();
- this._restoreLegacyScrollPosition();
- if (!this.isEditable) return;
-    this._characterSheetListenerController = new AbortController();
-    const listenerOptions = { signal: this._characterSheetListenerController.signal };
-
- if (this._isLegacyCharacterSheet) {
- this._getLegacyScrollContainers().forEach(([, container]) => {
- container.addEventListener("scroll", () => this._captureLegacyScrollPosition(), listenerOptions);
- });
- html.addEventListener("click", event => {
- const action = event.target.closest?.(
- '[data-group="primary"][data-action="tab"], [data-effect-tab], .effect-control, .item-select, .item-add-popup, .item-delete'
- );
- if (!action) return;
- const primaryTab = action.matches('[data-group="primary"][data-action="tab"]') ? action.dataset.tab : undefined;
- this._captureLegacyScrollPosition({ primaryTab });
- }, { ...listenerOptions, capture: true });
- html.querySelectorAll("[data-effect-tab]").forEach(tab => {
-        tab.addEventListener("click", event => this._onEffectTabClick(event), listenerOptions);
-        tab.addEventListener("keydown", event => this._onEffectTabKeydown(event), listenerOptions);
-      });
-      html.querySelectorAll('input[name], select[name], textarea[name], prose-mirror[name]').forEach(control => {
+       html.querySelectorAll('input[name], select[name], textarea[name], prose-mirror[name]').forEach(control => {
         control.addEventListener("change", event => this._persistFormControl(event), listenerOptions);
         if (!control.matches("prose-mirror[name]")) {
           control.addEventListener("focusout", event => this._persistFormControl(event), listenerOptions);
         }
       });
-    }
 
     // Open Inventory Item sheet
     html.querySelectorAll(".item-body").forEach(el =>
@@ -258,55 +199,13 @@ export class BladesActorSheet extends BladesSheet {
     );
 
     // Active effect controls - use data-effect-action to avoid AppV2 action dispatch
- html.querySelectorAll(".effect-control").forEach(el =>
+ html.querySelectorAll(".effect-control[data-effect-action]").forEach(el =>
  el.addEventListener("click", ev => {
- if (!this._isLegacyCharacterSheet) {
- return BladesActiveEffect.onManageActiveEffect(ev, this.actor, { gmOnly: true });
- }
- this._captureLegacyScrollPosition();
- const action = BladesActiveEffect.onManageActiveEffect(ev, this.actor, { gmOnly: true });
- Promise.resolve(action).finally(() => this._restoreLegacyScrollPosition());
+  this._captureSheetViewState();
+  const action = BladesActiveEffect.onManageActiveEffect(ev, this.actor, { gmOnly: true });
+  Promise.resolve(action).finally(() => this._restoreSheetViewState());
  }, listenerOptions)
  );
-  }
-
-  /* -------------------------------------------- */
-
-  _onEffectTabClick(event) {
-    event.preventDefault();
-    this._activateEffectTab(event.currentTarget.dataset.effectTab);
-  }
-
-  _onEffectTabKeydown(event) {
-    const tabs = Array.from(
-      event.currentTarget.closest('[role="tablist"]')?.querySelectorAll("[data-effect-tab]") ?? []
-    );
-    const current = tabs.indexOf(event.currentTarget);
-    const target = event.key === "Home" ? tabs[0]
-      : event.key === "End" ? tabs.at(-1)
-      : event.key === "ArrowRight" || event.key === "ArrowDown" ? tabs[(current + 1) % tabs.length]
-      : event.key === "ArrowLeft" || event.key === "ArrowUp" ? tabs[(current - 1 + tabs.length) % tabs.length]
-      : null;
-    if (!target) return;
-    event.preventDefault();
-    target.focus();
-    this._activateEffectTab(target.dataset.effectTab);
-  }
-
-  _activateEffectTab(type) {
-    const html = this.element;
-    const nextTab = html.querySelector(`[data-effect-tab="${type}"]`);
-    if (!nextTab) return;
-    this._activeEffectTab = type;
-    html.querySelectorAll("[data-effect-tab]").forEach(tab => {
-      const active = tab === nextTab;
-      tab.classList.toggle("active", active);
-      tab.setAttribute("aria-selected", String(active));
-      tab.tabIndex = active ? 0 : -1;
-    });
-    html.querySelectorAll("[data-effect-panel]").forEach(panel => {
-      panel.hidden = panel.dataset.effectPanel !== type;
-    });
   }
 
   async _persistFormControl(event) {

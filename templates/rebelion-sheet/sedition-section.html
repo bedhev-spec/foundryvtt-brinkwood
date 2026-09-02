@@ -1,16 +1,16 @@
-<section class="flexcol sedition">
-	<div class="flexrow">
-		<h2 class="flex075">{{label}}</h2>
- 		<h2 class="flex125">Sedition</h2>
+<section class="sedition rebelion-settlements" aria-label="{{label}}">
+	<div class="rebelion-settlements__header">
+		<h2>{{label}}</h2>
+		<h2>Sedition</h2>
 	 	<h2>Level</h2>
 	</div>
   {{#each collection }}
-	  <div class="flexrow sedition-row">
-		  <div class="flex075 name">{{this.name}}</div>
-			<div class="flex125">
+	  <div class="sedition-row rebelion-settlements__row">
+		  <div class="name rebelion-settlements__name">{{this.name}}</div>
+			<div class="rebelion-settlements__tracker">
 				{{> "systems/brinkwood/templates/parts/teeth-section.html" path=(concat 'system.' ../type '.' @index '.sedition.clock.value') value=this.sedition.clock.value max_value=this.sedition.clock.max color='blue'}}
 			</div>
-			<div>
+			<div class="rebelion-settlements__level">
         {{> "systems/brinkwood/templates/parts/teeth-section.html" path=(concat 'system.' ../type '.' @index '.sedition.level') value=this.sedition.level max_value=3 color='blue'}}
 			</div>
 		</div>

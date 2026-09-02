@@ -86,8 +86,9 @@
   font-style: italic;
 }
 .brinkwood {
-  --bw-paper: #eeeae0;
-  --bw-paper-deep: #e0d7c5;
+  --bw-paper: #f7f4ed;
+  --bw-paper-deep: #ece5d9;
+  --bw-paper-overlay: rgba(247, 244, 237, 0.72);
   --bw-ink: #211b1d;
   --bw-ink-soft: #51464a;
   --bw-inverse: #f7f4ed;
@@ -98,7 +99,12 @@
 }
 .brinkwood .window-content {
   background-color: var(--bw-paper);
-  background-blend-mode: luminosity, normal;
+  /* Keep the grain tactile but behind an ivory wash: texture must read as
+   * depth, never as a yellow patterned backdrop. */
+  background-image: radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0) 42%), linear-gradient(180deg, rgba(247, 244, 237, 0.28), rgba(239, 234, 225, 0.28)), url("assets/textures/parchment-grain-sage-v4.png");
+  background-repeat: no-repeat, no-repeat, repeat;
+  background-size: cover, cover, 768px 768px;
+  background-blend-mode: normal, normal, normal;
   color: var(--bw-ink);
 }
 .brinkwood .window-header {
@@ -404,8 +410,12 @@
   flex-wrap: wrap;
   gap: 4px 16px;
   margin: 0;
-  color: var(--bw-ink-soft);
-  font-size: 0.85rem;
+  color: var(--bw-ink);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.25;
+  opacity: 1;
+  text-shadow: none;
 }
 .brinkwood .effect-card__metadata div {
   display: flex;
@@ -416,23 +426,264 @@
 }
 .brinkwood .effect-card__metadata dd {
   margin: 0;
+  color: var(--bw-ink-soft);
+}
+.brinkwood {
+  /* A native disclosure keeps effect summaries compact while preserving
+   * keyboard and screen-reader expand/collapse behavior without sheet JS. */
+}
+.brinkwood .effect-card {
+  display: block;
+}
+.brinkwood .effect-card:focus-within {
+  border-color: var(--bw-accent);
+}
+.brinkwood .effect-card__summary {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 9px 10px;
+  cursor: pointer;
+  list-style: none;
+}
+.brinkwood .effect-card__header {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+}
+.brinkwood .effect-card__summary::-webkit-details-marker {
+  display: none;
+}
+.brinkwood .effect-card__summary:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: -3px;
+}
+.brinkwood .effect-card[open] .effect-card__summary {
+  border-bottom: 0;
+}
+.brinkwood .effect-card[open] .effect-card__header {
+  border-bottom: 1px solid var(--bw-rule);
+}
+.brinkwood .effect-card__disclosure {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--bw-ink-soft);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.brinkwood .effect-card__disclosure i {
+  transition: transform 120ms ease;
+}
+.brinkwood .effect-card[open] .effect-card__disclosure i {
+  transform: rotate(180deg);
+}
+.brinkwood .effect-card__details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px 16px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.18);
+}
+.brinkwood .effect-card__detail-group,
+.brinkwood .effect-card__empty-details {
+  flex: 1 1 220px;
+  min-width: 0;
+  margin: 0;
+}
+.brinkwood .effect-card__detail-group h5 {
+  margin: 0 0 5px;
+  color: var(--bw-ink-soft);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.brinkwood .effect-card__statuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.brinkwood .effect-card__statuses li {
+  padding: 2px 6px;
+  border: 1px solid var(--bw-rule);
+  border-radius: 999px;
+  color: var(--bw-ink-soft);
+  font-size: 0.82rem;
+}
+.brinkwood .effect-card__description > :last-child {
+  margin-bottom: 0;
+}
+.brinkwood .effect-card__empty-details {
+  color: var(--bw-ink-soft);
+  font-style: italic;
 }
 .brinkwood .effect-card__actions {
   display: flex;
-  gap: 4px;
+  align-items: center;
+  align-self: center;
+  gap: 0;
+  margin-right: 10px;
+  padding: 2px;
+  border: 1px solid var(--bw-rule);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.3);
 }
 .brinkwood .effect-card__actions button.effect-control {
   display: inline-grid;
   place-items: center;
-  width: 36px;
-  min-width: 36px;
-  height: 36px;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
   margin: 0;
   padding: 0;
-  border: 1px solid var(--bw-rule);
-  border-radius: 4px;
+  border: 0;
+  border-radius: 2px;
   background: transparent;
   color: var(--bw-ink);
+}
+.brinkwood .effect-card__actions button.effect-control + button.effect-control {
+  border-left: 1px solid var(--bw-rule);
+}
+.brinkwood .effect-card__actions button.effect-control[data-effect-action=toggle] {
+  order: 1;
+}
+.brinkwood .effect-card__actions button.effect-control[data-effect-action=edit] {
+  order: 2;
+}
+.brinkwood .effect-card__actions button.effect-control.effect-control--danger {
+  order: 4;
+  margin-left: 4px;
+  border-left: 1px solid var(--bw-rule);
+}
+.brinkwood .effect-card__actions .effect-card__disclosure {
+  order: 3;
+  display: grid;
+  flex: 0 0 32px;
+  place-items: center;
+  justify-content: center;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+  gap: 0;
+  border-left: 1px solid var(--bw-rule);
+  background: transparent;
+  color: var(--bw-ink-soft);
+  line-height: 1;
+}
+.brinkwood .effect-card__actions .effect-card__disclosure span {
+  display: none;
+}
+.brinkwood .effect-card__actions .effect-card__disclosure i {
+  display: block;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
+  transform-origin: center;
+}
+.brinkwood .effect-card__actions .effect-card__disclosure:hover, .brinkwood .effect-card__actions .effect-card__disclosure:active, .brinkwood .effect-card__actions .effect-card__disclosure[aria-expanded=true] {
+  background: transparent;
+  color: var(--bw-ink-soft);
+}
+.brinkwood .effect-card__actions .effect-card__disclosure:focus-visible {
+  background: var(--bw-paper-deep);
+  color: var(--bw-ink);
+  outline: 2px solid var(--bw-ink-soft);
+  outline-offset: -2px;
+}
+.brinkwood .effect-card__actions .effect-card__disclosure[aria-expanded=true] i {
+  transform: rotate(180deg);
+}
+.brinkwood .effect-card:has(.effect-card__details-toggle:focus) {
+  border-color: var(--bw-rule);
+}
+.brinkwood .effect-card__actions button.effect-control.effect-card__details-toggle,
+.brinkwood .effect-card__actions button.effect-control.effect-card__details-toggle:hover,
+.brinkwood .effect-card__actions button.effect-control.effect-card__details-toggle:active,
+.brinkwood .effect-card__actions button.effect-control.effect-card__details-toggle:focus,
+.brinkwood .effect-card__actions button.effect-control.effect-card__details-toggle[aria-expanded=true] {
+  position: relative;
+  display: block;
+  flex: 0 0 32px;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border-color: transparent !important;
+  border-left-color: var(--bw-rule) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--bw-ink-soft);
+  outline: none;
+}
+.brinkwood .effect-card__actions button.effect-control.effect-card__details-toggle i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  transform-origin: center;
+}
+.brinkwood .effect-card__actions button.effect-control.effect-card__details-toggle[aria-expanded=true] i {
+  transform: translate(-50%, -50%) rotate(180deg);
+}
+.brinkwood .effect-card__actions button.effect-control.effect-card__details-toggle:focus-visible {
+  background: var(--bw-paper-deep) !important;
+  color: var(--bw-ink);
+  outline: 2px solid var(--bw-ink-soft) !important;
+  outline-offset: -2px;
+}
+.brinkwood .effect-card__metadata,
+.brinkwood .effect-card__metadata dt,
+.brinkwood .effect-card__metadata dd {
+  font-family: Georgia, "Bitstream Charter", "Times New Roman", serif;
+  text-shadow: none;
+}
+.brinkwood .effect-card__metadata {
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+.brinkwood .effect-card__metadata dt {
+  color: var(--bw-ink);
+  font-weight: 700;
+}
+.brinkwood .effect-card__metadata dd {
+  color: var(--bw-ink-soft);
+  font-weight: 500;
+}
+.brinkwood .effect-card__statuses li {
+  padding: 4px 9px;
+  border-color: var(--bw-ink-soft);
+  background: rgba(255, 255, 255, 0.48);
+  color: var(--bw-ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.brinkwood .effect-card__status-group {
+  flex: 0 1 100%;
+}
+.brinkwood .effect-card__description {
+  flex: 1 1 100%;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.brinkwood .effect-card__description > * {
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 .brinkwood .effect-card__actions button.effect-control:hover, .brinkwood .effect-card__actions button.effect-control:focus-visible {
   background: var(--bw-paper-deep);
@@ -461,6 +712,99 @@
     grid-column: 1/-1;
     justify-content: flex-end;
   }
+  .brinkwood .effect-card__summary {
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+  }
+  .brinkwood .effect-card__details {
+    flex-direction: column;
+  }
+  .brinkwood .effect-card__actions {
+    align-self: flex-end;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brinkwood .effect-card__disclosure i {
+    transition-duration: 0.01ms;
+  }
+}
+.brinkwood {
+  /* Shared tab and panel visual language. Geometry stays with each sheet. */
+}
+.brinkwood .sheet-tabs, .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs, .brinkwood.actor.mask .mask-sheet__tabs {
+  --bw-tab-surface: rgba(255, 255, 255, 0.28);
+  --bw-tab-active: rgba(255, 255, 255, 0.56);
+  --bw-tab-transition: 120ms ease;
+}
+.brinkwood .sheet-tabs .item, .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item, .brinkwood.actor.mask .mask-sheet__tabs .item {
+  color: var(--bw-ink-soft);
+  background-color: var(--bw-tab-surface);
+  border-bottom: 3px solid transparent;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  transition: background-color var(--bw-tab-transition), border-color var(--bw-tab-transition), box-shadow var(--bw-tab-transition), color var(--bw-tab-transition);
+}
+.brinkwood .sheet-tabs .item:hover:not(.active), .brinkwood .sheet-tabs .item:focus-visible:not(.active), .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item:hover:not(.active), .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item:focus-visible:not(.active), .brinkwood.actor.mask .mask-sheet__tabs .item:hover:not(.active), .brinkwood.actor.mask .mask-sheet__tabs .item:focus-visible:not(.active) {
+  color: var(--bw-ink);
+  background-color: rgba(255, 255, 255, 0.44);
+}
+.brinkwood .sheet-tabs .item.active, .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item.active, .brinkwood.actor.mask .mask-sheet__tabs .item.active {
+  color: var(--bw-ink);
+  background-color: var(--bw-tab-active);
+  border-bottom-color: var(--bw-accent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.58), 0 1px 3px rgba(33, 27, 29, 0.12);
+}
+.brinkwood .sheet-tabs .item:focus-visible, .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item:focus-visible, .brinkwood.actor.mask .mask-sheet__tabs .item:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: -3px;
+}
+.brinkwood .sheet-panel, .brinkwood.actor.mask .mask-sheet__panel {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(141, 98, 93, 0.46);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.brinkwood.actor.mask .mask-sheet__panel > h2, .brinkwood.actor.mask .mask-sheet__panel.effects > h2 {
+  margin: 0;
+  padding: 7px 10px;
+  color: var(--bw-inverse);
+  background: var(--bw-ink);
+  border-bottom: 1px solid rgba(141, 98, 93, 0.7);
+  font-size: 1rem;
+  line-height: 1.2;
+}
+.brinkwood.actor.mask .mask-sheet__panel .editor-content, .brinkwood.actor.mask .mask-sheet__panel prose-mirror {
+  min-height: 160px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.16);
+}
+.brinkwood.actor.mask .mask-sheet__panel .effects-tabs {
+  padding: 4px;
+  background: var(--bw-paper-deep);
+  border-bottom: 1px solid var(--bw-rule);
+}
+.brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab {
+  color: var(--bw-ink-soft);
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  transition: color var(--bw-tab-transition), border-color var(--bw-tab-transition);
+}
+.brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab:hover, .brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab:focus-visible, .brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab.active {
+  color: var(--bw-ink);
+  border-bottom-color: var(--bw-accent);
+}
+.brinkwood.actor.mask .mask-sheet__panel .effects-category[data-effect-panel] {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.brinkwood.actor.mask .mask-sheet__panel .effects-category[data-effect-panel] .effects-category__header {
+  min-height: 38px;
+  padding: 6px 10px;
+  color: var(--bw-inverse);
+  background: var(--bw-ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .brinkwood .sheet-tabs .item, .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item, .brinkwood.actor.mask .mask-sheet__tabs .item, .brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab {
+    transition-duration: 0.01ms;
+  }
 }
 .brinkwood.actor.pc.character {
   /*
@@ -477,14 +821,20 @@
 }
 .brinkwood.actor.pc.character .window-content {
   min-height: 0;
+  min-width: 0;
   padding: 0;
+  overflow-x: hidden;
   overflow-y: auto;
-  background: #eeeee8;
+  scrollbar-gutter: stable;
+  background-color: #eeeee8;
   color: #191813;
   container-type: inline-size;
 }
 .brinkwood.actor.pc.character form.actor-sheet {
   box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: 0;
   padding: 20px;
   container-type: inline-size;
@@ -566,6 +916,46 @@
 .brinkwood.actor.pc.character .name-alias input.alias {
   width: 100%;
   margin-bottom: 10px;
+}
+.brinkwood.actor.pc.character .character-identity-choices {
+  padding-right: 0;
+}
+.brinkwood.actor.pc.character .character-identity-choices .item-block {
+  grid-template-columns: max-content minmax(0, 1fr) 18px;
+}
+.brinkwood.actor.pc.character .character-identity-choices .identity-choice__value {
+  grid-column: 2;
+  min-width: 0;
+  justify-content: flex-end;
+  text-align: right;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+}
+.brinkwood.actor.pc.character .character-identity-choices .identity-choice__value .item-body,
+.brinkwood.actor.pc.character .character-identity-choices .identity-choice__value .item-name {
+  width: 100%;
+  justify-content: flex-end;
+  text-align: right;
+}
+.brinkwood.actor.pc.character .character-identity-choices .identity-choice__action {
+  grid-column: 3;
+  grid-row: 1;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+  justify-self: end;
+}
+.brinkwood.actor.pc.character .character-identity-choices .identity-choice__remove {
+  position: static;
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+  min-height: 18px;
+  transform: none;
 }
 .brinkwood.actor.pc.character .item-block {
   align-items: baseline;
@@ -862,13 +1252,11 @@
 }
 .brinkwood.actor.pc.character .character-sheet__workspace:has(.tab[data-tab=loadout].active),
 .brinkwood.actor.pc.character .character-sheet__workspace:has(.tab[data-tab=character-notes].active),
-.brinkwood.actor.pc.character .character-sheet__workspace:has(.tab[data-tab=downtime].active),
 .brinkwood.actor.pc.character .character-sheet__workspace:has(.tab[data-tab=effects].active) {
   grid-template-columns: minmax(0, 1fr);
 }
 .brinkwood.actor.pc.character .character-sheet__workspace:has(.tab[data-tab=loadout].active) > .attributes,
 .brinkwood.actor.pc.character .character-sheet__workspace:has(.tab[data-tab=character-notes].active) > .attributes,
-.brinkwood.actor.pc.character .character-sheet__workspace:has(.tab[data-tab=downtime].active) > .attributes,
 .brinkwood.actor.pc.character .character-sheet__workspace:has(.tab[data-tab=effects].active) > .attributes {
   display: none;
 }
@@ -888,6 +1276,39 @@
   margin-left: 10px;
 }
 .brinkwood.actor.pc.character {
+  /* Legacy tabs need their final grid before optional polish styles load. */
+}
+.brinkwood.actor.pc.character .character-sheet__workspace {
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 0;
+}
+.brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs {
+  grid-column: 1/-1;
+  width: 100%;
+  box-sizing: border-box;
+}
+.brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.brinkwood.actor.pc.character {
+  /* Legacy content expands naturally; the outer sheet viewport owns scrolling. */
+}
+.brinkwood.actor.pc.character form.actor-sheet {
+  overflow: visible;
+}
+.brinkwood.actor.pc.character form.actor-sheet > .name-alias, .brinkwood.actor.pc.character form.actor-sheet > .bans-armor, .brinkwood.actor.pc.character form.actor-sheet > .character-sheet__workspace {
+  flex: 0 0 auto;
+}
+.brinkwood.actor.pc.character form.actor-sheet > .bans-armor {
+  overflow: visible;
+}
+.brinkwood.actor.pc.character .character-sheet__workspace, .brinkwood.actor.pc.character .character-sheet__workspace > .tab-content, .brinkwood.actor.pc.character .character-sheet__workspace > .tab-content > .tab[data-tab] {
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}
+.brinkwood.actor.pc.character {
   --bw-paper: #eeeae0;
   --bw-paper-deep: #e0d7c5;
   --bw-ink: #211b1d;
@@ -897,15 +1318,16 @@
   --bw-focus: #9b5d14;
   color: var(--bw-ink);
 }
-.brinkwood.actor.pc.character .window-content,
-.brinkwood.actor.pc.character form.actor-sheet {
+.brinkwood.actor.pc.character .window-content {
   background-color: var(--bw-paper);
   color: var(--bw-ink);
 }
 .brinkwood.actor.pc.character form.actor-sheet {
+  background-color: transparent;
+  color: var(--bw-ink);
   display: grid;
   gap: 14px;
-  overflow: auto;
+  overflow: visible;
   scrollbar-color: var(--bw-rule) transparent;
 }
 .brinkwood.actor.pc.character input[type=text],
@@ -1040,7 +1462,7 @@
   }
 }
 .brinkwood.actor.pc.character .bans-armor {
-  padding: 10px;
+  padding: 10px 10px 0;
   border: 1px solid var(--bw-rule);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.24);
@@ -1062,8 +1484,11 @@
 .brinkwood.actor.pc.character .bans-armor .character-bans table td {
   min-height: 44px;
   padding: 6px;
-  border-bottom: 1px solid rgba(141, 98, 93, 0.35);
+  border-bottom: 1px solid rgba(141, 98, 93, 0.5);
   font-size: 1rem;
+}
+.brinkwood.actor.pc.character .bans-armor .character-bans table tbody tr + tr > td {
+  border-top: 1px solid rgba(141, 98, 93, 0.5);
 }
 .brinkwood.actor.pc.character .character-scars-clock,
 .brinkwood.actor.pc.character .character-oath-clock {
@@ -1215,9 +1640,19 @@
 }
 .brinkwood.actor.pc.character .downtime-actions {
   display: grid;
+  width: 100%;
+  min-width: 0;
   gap: 12px;
 }
+.brinkwood.actor.pc.character .tab.downtime {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
 .brinkwood.actor.pc.character .downtime-action {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   overflow: hidden;
   border: 1px solid var(--bw-rule);
   border-left: 5px solid var(--bw-accent);
@@ -1234,6 +1669,7 @@
   font-weight: 700;
   line-height: 1.25;
   text-transform: none;
+  overflow-wrap: anywhere;
 }
 .brinkwood.actor.pc.character .downtime-action p {
   margin: 0;
@@ -1241,6 +1677,7 @@
   color: var(--bw-ink);
   font-size: 1rem;
   line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 @container (max-width: 760px) {
   .brinkwood.actor.pc.character .bans-armor {
@@ -1320,886 +1757,6 @@
     transform: rotate(270deg) skewY(180deg);
   }
 }
-.brinkwood.actor.pc.character.character-v2 {
-  --bw-sheet-version: 2;
-  --bw-paper: #f7f1e4;
-  --bw-paper-deep: #e8dcc8;
-  --bw-ink: #211b1d;
-  --bw-ink-soft: #51464a;
-  --bw-rule: #8d625d;
-  --bw-accent: #8f2f35;
-  --bw-xp: #315f82;
-  --bw-focus: #9b5d14;
-  --bw-inverse: #fffaf1;
-  min-width: 0;
-  color: var(--bw-ink);
-}
-.brinkwood.actor.pc.character.character-v2 .window-content {
-  min-height: 0;
-  padding: 0;
-  overflow: hidden;
-  background: var(--bw-paper);
-}
-.brinkwood.actor.pc.character.character-v2 form.character-sheet {
-  display: grid;
-  box-sizing: border-box;
-  gap: 16px;
-  width: 100%;
-  min-width: 0;
-  min-height: 0;
-  padding: 16px;
-  overflow: auto;
-  container-type: inline-size;
-  color: var(--bw-ink);
-  background: var(--bw-paper);
-  scrollbar-color: var(--bw-rule) transparent;
-}
-.brinkwood.actor.pc.character.character-v2 input[type=text],
-.brinkwood.actor.pc.character.character-v2 select,
-.brinkwood.actor.pc.character.character-v2 textarea {
-  box-sizing: border-box;
-  width: 100%;
-  min-width: 0;
-  border: 1px solid var(--bw-rule);
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.58);
-  color: var(--bw-ink);
-  font: inherit;
-  box-shadow: inset 0 -2px 0 rgba(33, 27, 29, 0.08);
-}
-.brinkwood.actor.pc.character.character-v2 input[type=text]:focus-visible,
-.brinkwood.actor.pc.character.character-v2 select:focus-visible,
-.brinkwood.actor.pc.character.character-v2 textarea:focus-visible {
-  outline: 3px solid var(--bw-focus);
-  outline-offset: 1px;
-}
-.brinkwood.actor.pc.character.character-v2 input[type=checkbox] {
-  accent-color: var(--bw-accent);
-}
-.brinkwood.actor.pc.character.character-v2 button {
-  font: inherit;
-}
-.brinkwood.actor.pc.character.character-v2 button:focus-visible,
-.brinkwood.actor.pc.character.character-v2 [role=button]:focus-visible,
-.brinkwood.actor.pc.character.character-v2 img[data-action=editImage]:focus-visible {
-  outline: 3px solid var(--bw-focus);
-  outline-offset: 2px;
-}
-.brinkwood.actor.pc.character.character-v2 .visually-hidden {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__header {
-  display: grid;
-  grid-template-columns: 164px minmax(280px, 1fr) minmax(220px, 270px);
-  gap: 18px;
-  align-items: start;
-  min-width: 0;
-  padding-bottom: 16px;
-  border-bottom: 2px solid var(--bw-rule);
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__portrait-frame {
-  display: grid;
-  gap: 9px;
-  min-width: 0;
-}
-.brinkwood.actor.pc.character.character-v2 img.portrait {
-  display: block;
-  box-sizing: border-box;
-  width: 100%;
-  aspect-ratio: 1;
-  border: 2px solid var(--bw-ink);
-  border-radius: 4px;
-  object-fit: cover;
-  box-shadow: 6px 6px 0 var(--bw-paper-deep);
-}
-.brinkwood.actor.pc.character.character-v2 img.portrait[data-action=editImage] {
-  cursor: pointer;
-}
-.brinkwood.actor.pc.character.character-v2 .roll-statistics-control {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  min-height: 34px;
-  padding: 6px 9px;
-  border: 1px solid var(--bw-rule);
-  border-radius: 4px;
-  color: var(--bw-ink);
-  background: var(--bw-paper-deep);
-  cursor: pointer;
-  font-size: 0.82rem;
-  font-weight: 700;
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__identity {
-  display: grid;
-  gap: 12px;
-  min-width: 0;
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__identity-fields {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__field {
-  display: grid;
-  gap: 4px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__field label {
-  color: var(--bw-ink-soft);
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__field input {
-  min-height: 38px;
-  padding: 6px 8px;
-  font-size: 1.15rem;
-  font-weight: 700;
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__origins {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-origin {
-  display: grid;
-  align-content: start;
-  gap: 4px;
-  min-width: 0;
-  padding: 7px 8px;
-  border: 1px solid rgba(141, 98, 93, 0.55);
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.28);
-}
-.brinkwood.actor.pc.character.character-v2 .character-origin__heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  color: var(--bw-ink-soft);
-  font-size: 0.73rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.brinkwood.actor.pc.character.character-v2 .character-origin__heading .item-add-popup {
-  display: inline-grid;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border: 0;
-  color: var(--bw-accent);
-  background: transparent;
-  cursor: pointer;
-  place-items: center;
-}
-.brinkwood.actor.pc.character.character-v2 .character-origin__item {
-  min-width: 0;
-}
-.brinkwood.actor.pc.character.character-v2 .character-origin__item .item-body {
-  min-width: 0;
-  padding: 2px 0;
-  overflow: hidden;
-  color: var(--bw-ink);
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.brinkwood.actor.pc.character.character-v2 .character-origin__item .item-body[role=button] {
-  cursor: pointer;
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__trackers {
-  display: grid;
-  gap: 10px;
-  min-width: 0;
-}
-.brinkwood.actor.pc.character.character-v2 .character-tracker {
-  display: grid;
-  gap: 6px;
-  min-width: 0;
-  padding: 10px;
-  border: 1px solid var(--bw-rule);
-  border-radius: 5px;
-  background: var(--bw-paper-deep);
-}
-.brinkwood.actor.pc.character.character-v2 .character-tracker__heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.brinkwood.actor.pc.character.character-v2 .character-tracker__heading output {
-  color: var(--bw-ink-soft);
-  font-variant-numeric: tabular-nums;
-}
-.brinkwood.actor.pc.character.character-v2 .character-tracker__pips {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(32px, 1fr));
-  gap: 2px;
-  min-width: 0;
-}
-.brinkwood.actor.pc.character.character-v2 .character-tracker button.dot-value {
-  position: relative;
-  display: inline-grid;
-  width: 100%;
-  min-width: 32px;
-  height: 32px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  box-shadow: none;
-  cursor: pointer;
-  place-items: center;
-}
-.brinkwood.actor.pc.character.character-v2 .character-tracker button.dot-value::before {
-  width: 16px;
-  height: 16px;
-  border: 2px solid var(--bw-ink-soft);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.48);
-  content: "";
-}
-.brinkwood.actor.pc.character.character-v2 .character-tracker button.dot-value.dot-value--filled::before {
-  border-color: var(--bw-accent);
-  background: var(--bw-accent);
-}
-.brinkwood.actor.pc.character.character-v2 .character-tracker button.dot-value:disabled {
-  cursor: default;
-  opacity: 0.72;
-}
-.brinkwood.actor.pc.character.character-v2 .character-xp button.dot-value.dot-value--filled::before {
-  border-color: var(--bw-xp);
-  background: var(--bw-xp);
-}
-.brinkwood.actor.pc.character.character-v2 .character-state {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(230px, 0.85fr) minmax(140px, 0.45fr);
-  gap: 12px;
-  align-items: stretch;
-  min-width: 0;
-}
-.brinkwood.actor.pc.character.character-v2 .character-bans,
-.brinkwood.actor.pc.character.character-v2 .character-consequences,
-.brinkwood.actor.pc.character.character-v2 .character-armor-uses {
-  box-sizing: border-box;
-  min-width: 0;
-  margin: 0;
-  padding: 10px;
-  border: 1px solid var(--bw-rule);
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.28);
-}
-.brinkwood.actor.pc.character.character-v2 .character-bans {
-  display: block;
-}
-.brinkwood.actor.pc.character.character-v2 .character-bans h2,
-.brinkwood.actor.pc.character.character-v2 .character-armor-uses legend,
-.brinkwood.actor.pc.character.character-v2 .character-sheet__panel > h2,
-.brinkwood.actor.pc.character.character-v2 .character-traits__library > h2,
-.brinkwood.actor.pc.character.character-v2 .character-panel__header h2 {
-  margin: 0;
-  color: var(--bw-ink);
-  font-family: "Crimson Text", serif;
-  font-size: 1.12rem;
-  font-weight: 700;
-  line-height: 1.2;
-}
-.brinkwood.actor.pc.character.character-v2 .character-bans h2 {
-  margin-bottom: 8px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-bans__rows {
-  display: grid;
-  gap: 5px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-bans__row {
-  display: grid;
-  grid-template-columns: 30px repeat(2, minmax(0, 1fr));
-  gap: 6px;
-  align-items: center;
-  min-width: 0;
-}
-.brinkwood.actor.pc.character.character-v2 .character-bans__row input {
-  min-height: 34px;
-  padding: 5px 7px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-bans__level {
-  display: inline-grid;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  color: var(--bw-inverse);
-  background: var(--bw-ink);
-  font-weight: 700;
-  place-items: center;
-}
-.brinkwood.actor.pc.character.character-v2 .character-bans__wide {
-  grid-column: 2/-1;
-}
-.brinkwood.actor.pc.character.character-v2 .character-consequences {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  align-items: stretch;
-}
-.brinkwood.actor.pc.character.character-v2 .character-scars-clock,
-.brinkwood.actor.pc.character.character-v2 .character-oath-clock {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 64px;
-  align-items: center;
-  min-width: 0;
-  padding: 7px;
-  border: 1px solid rgba(141, 98, 93, 0.55);
-  border-radius: 4px;
-  background: var(--bw-paper);
-  position: relative;
-}
-.brinkwood.actor.pc.character.character-v2 .character-scars-clock .blades-clock,
-.brinkwood.actor.pc.character.character-v2 .character-oath-clock .blades-clock {
-  position: relative;
-  padding: 0;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  list-style: none;
-  overflow: hidden;
-  background-color: var(--bw-paper);
-  background-size: cover;
-}
-.brinkwood.actor.pc.character.character-v2 .character-scars-clock .blades-clock:has(input[value="0"]:focus-visible),
-.brinkwood.actor.pc.character.character-v2 .character-oath-clock .blades-clock:has(input[value="0"]:focus-visible) {
-  outline: 3px solid var(--bw-focus);
-  outline-offset: 3px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-scars-clock .blades-clock label,
-.brinkwood.actor.pc.character.character-v2 .character-oath-clock .blades-clock label {
-  overflow: hidden;
-  position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 100%;
-  height: 100%;
-  transform-origin: 0% 100%;
-  transition: filter 0.1s;
-  cursor: pointer;
-}
-.brinkwood.actor.pc.character.character-v2 .character-scars-clock .blades-clock label:hover,
-.brinkwood.actor.pc.character.character-v2 .character-oath-clock .blades-clock label:hover {
-  filter: brightness(0.8);
-  opacity: 0.9;
-}
-.brinkwood.actor.pc.character.character-v2 .character-scars-clock .blades-clock input,
-.brinkwood.actor.pc.character.character-v2 .character-oath-clock .blades-clock input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-}
-.brinkwood.actor.pc.character.character-v2 .character-scars-clock .blades-clock input:focus-visible + label,
-.brinkwood.actor.pc.character.character-v2 .character-oath-clock .blades-clock input:focus-visible + label {
-  outline: 3px solid var(--bw-focus);
-  outline-offset: -3px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-scars-clock .blades-clock input[value="0"],
-.brinkwood.actor.pc.character.character-v2 .character-oath-clock .blades-clock input[value="0"] {
-  width: 1px;
-  height: 1px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-scars-clock .blades-clock *:nth-child(3),
-.brinkwood.actor.pc.character.character-v2 .character-oath-clock .blades-clock *:nth-child(3) {
-  transform: rotate(0deg) skewY(180deg);
-}
-.brinkwood.actor.pc.character.character-v2 .character-scars-clock .blades-clock *:nth-child(5),
-.brinkwood.actor.pc.character.character-v2 .character-oath-clock .blades-clock *:nth-child(5) {
-  transform: rotate(90deg) skewY(180deg);
-}
-.brinkwood.actor.pc.character.character-v2 .character-scars-clock .blades-clock *:nth-child(7),
-.brinkwood.actor.pc.character.character-v2 .character-oath-clock .blades-clock *:nth-child(7) {
-  transform: rotate(180deg) skewY(180deg);
-}
-.brinkwood.actor.pc.character.character-v2 .character-scars-clock .blades-clock *:nth-child(9),
-.brinkwood.actor.pc.character.character-v2 .character-oath-clock .blades-clock *:nth-child(9) {
-  transform: rotate(270deg) skewY(180deg);
-}
-.brinkwood.actor.pc.character.character-v2 .character-scars-clock span.clock-label,
-.brinkwood.actor.pc.character.character-v2 .character-oath-clock span.clock-label {
-  margin: 0;
-  color: var(--bw-ink);
-  font-family: "Crimson Text", serif;
-  font-size: 0.95rem;
-  font-weight: 700;
-  line-height: 1.1;
-  text-transform: capitalize;
-}
-.brinkwood.actor.pc.character.character-v2 .character-scars-clock .blades-clock,
-.brinkwood.actor.pc.character.character-v2 .character-oath-clock .blades-clock {
-  grid-column: 2;
-  grid-row: 1/3;
-}
-.brinkwood.actor.pc.character.character-v2 .character-scars-clock .clock-progress,
-.brinkwood.actor.pc.character.character-v2 .character-oath-clock .clock-progress {
-  grid-column: 1;
-  color: var(--bw-ink-soft);
-  font-size: 0.78rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-.brinkwood.actor.pc.character.character-v2 .character-scars-clock:has(input:focus-visible),
-.brinkwood.actor.pc.character.character-v2 .character-oath-clock:has(input:focus-visible) {
-  outline: 3px solid var(--bw-focus);
-  outline-offset: 1px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-armor-uses {
-  display: grid;
-  align-content: start;
-  gap: 7px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-armor-uses legend {
-  padding: 0 4px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-armor-uses label {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  min-height: 34px;
-  padding: 5px 7px;
-  border-bottom: 1px solid rgba(141, 98, 93, 0.35);
-  font-weight: 700;
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__workspace {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  min-width: 0;
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__tabs {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  display: flex;
-  gap: 4px;
-  min-width: 0;
-  margin: 0;
-  padding: 4px;
-  border-top: 1px solid var(--bw-rule);
-  border-bottom: 1px solid var(--bw-rule);
-  background: var(--bw-paper-deep);
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__tabs .item {
-  flex: 1 1 0;
-  min-height: 40px;
-  padding: 8px 10px;
-  border: 0;
-  border-bottom: 3px solid transparent;
-  color: var(--bw-ink-soft);
-  background: transparent;
-  cursor: pointer;
-  font-weight: 700;
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__tabs .item:hover, .brinkwood.actor.pc.character.character-v2 .character-sheet__tabs .item:focus-visible, .brinkwood.actor.pc.character.character-v2 .character-sheet__tabs .item.active {
-  color: var(--bw-ink);
-  border-bottom-color: var(--bw-accent);
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__tabs .item.active {
-  background: rgba(255, 255, 255, 0.42);
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__panel {
-  display: none;
-  box-sizing: border-box;
-  width: 100%;
-  min-width: 0;
-  padding-top: 14px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__panel.active {
-  display: block;
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__panel > h2 {
-  margin-bottom: 10px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-traits__layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);
-  gap: 18px;
-  align-items: start;
-  min-width: 0;
-}
-.brinkwood.actor.pc.character.character-v2 .character-traits__library,
-.brinkwood.actor.pc.character.character-v2 .attributes {
-  min-width: 0;
-}
-.brinkwood.actor.pc.character.character-v2 .character-traits__library {
-  display: block;
-}
-.brinkwood.actor.pc.character.character-v2 .character-traits__library > h2 {
-  margin-bottom: 9px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-traits__list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 9px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-trait {
-  min-width: 0;
-  padding: 9px 10px;
-  border: 1px solid rgba(141, 98, 93, 0.55);
-  border-left: 4px solid var(--bw-accent);
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.3);
-}
-.brinkwood.actor.pc.character.character-v2 .character-trait__select {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-}
-.brinkwood.actor.pc.character.character-v2 .character-trait__description {
-  margin-top: 6px;
-  color: var(--bw-ink-soft);
-  line-height: 1.35;
-}
-.brinkwood.actor.pc.character.character-v2 .attributes {
-  box-sizing: border-box;
-  width: 100%;
-  padding: 10px;
-  border: 1px solid var(--bw-rule);
-  border-radius: 5px;
-  background: var(--bw-paper-deep);
-  flex: none;
-}
-.brinkwood.actor.pc.character.character-v2 .attribute {
-  margin-bottom: 10px;
-}
-.brinkwood.actor.pc.character.character-v2 .attribute:last-child {
-  margin-bottom: 0;
-}
-.brinkwood.actor.pc.character.character-v2 .attributes-exp {
-  margin-bottom: 6px;
-}
-.brinkwood.actor.pc.character.character-v2 .stripe {
-  padding: 5px 7px;
-  background: var(--bw-ink);
-  color: var(--bw-inverse);
-}
-.brinkwood.actor.pc.character.character-v2 .attribute-label,
-.brinkwood.actor.pc.character.character-v2 .attribute-skill-label {
-  border: 0;
-  color: inherit;
-  background: transparent;
-  cursor: pointer;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-.brinkwood.actor.pc.character.character-v2 .attributes-container {
-  display: grid;
-  grid-template-columns: repeat(4, 28px) minmax(0, 1fr);
-  gap: 2px;
-  align-items: center;
-  min-width: 0;
-  margin-top: 4px;
-}
-.brinkwood.actor.pc.character.character-v2 .attributes-container button.dot-value {
-  position: relative;
-  display: inline-grid;
-  width: 28px;
-  height: 28px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  color: transparent;
-  background: transparent;
-  cursor: pointer;
-  font-size: 0;
-  place-items: center;
-}
-.brinkwood.actor.pc.character.character-v2 .attributes-container button.dot-value::before {
-  width: 13px;
-  height: 13px;
-  border: 2px solid var(--bw-ink-soft);
-  border-radius: 50%;
-  background: transparent;
-  content: "";
-}
-.brinkwood.actor.pc.character.character-v2 .attributes-container button.dot-value.dot-value--filled::before {
-  border-color: var(--bw-ink);
-  background: var(--bw-ink);
-}
-.brinkwood.actor.pc.character.character-v2 .attributes-container button.dot-value:disabled {
-  cursor: default;
-  opacity: 0.7;
-}
-.brinkwood.actor.pc.character.character-v2 .attributes-container .attribute-skill-label {
-  min-width: 0;
-  overflow: hidden;
-  color: var(--bw-ink);
-  font-size: 0.82rem;
-  text-align: right;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.brinkwood.actor.pc.character.character-v2 .character-panel__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-  padding: 10px 12px;
-  border-left: 5px solid var(--bw-accent);
-  background: var(--bw-paper-deep);
-}
-.brinkwood.actor.pc.character.character-v2 .character-panel__header p {
-  margin: 3px 0 0;
-  color: var(--bw-ink-soft);
-}
-.brinkwood.actor.pc.character.character-v2 .character-loadout__actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-loadout__actions select {
-  width: auto;
-  min-width: 120px;
-  min-height: 34px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-loadout__actions .item-add-popup {
-  min-height: 34px;
-  padding: 6px 10px;
-  border: 1px solid var(--bw-rule);
-  border-radius: 4px;
-  color: var(--bw-inverse);
-  background: var(--bw-accent);
-  cursor: pointer;
-  font-weight: 700;
-}
-.brinkwood.actor.pc.character.character-v2 .character-loadout__list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-.brinkwood.actor.pc.character.character-v2 .character-loadout__item {
-  display: grid;
-  grid-template-columns: 30px minmax(0, 1fr) auto;
-  gap: 8px;
-  align-items: center;
-  min-width: 0;
-  padding: 8px 10px;
-  border: 1px solid rgba(141, 98, 93, 0.55);
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.28);
-}
-.brinkwood.actor.pc.character.character-v2 .character-loadout__item .item-body {
-  min-width: 0;
-  overflow: hidden;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.brinkwood.actor.pc.character.character-v2 .character-loadout__item .item-body[role=button] {
-  cursor: pointer;
-}
-.brinkwood.actor.pc.character.character-v2 .character-loadout__toggle {
-  display: inline-grid;
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-  place-items: center;
-}
-.brinkwood.actor.pc.character.character-v2 .character-loadout__load {
-  min-width: 24px;
-  color: var(--bw-ink-soft);
-  font-weight: 700;
-  text-align: right;
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__panel[data-tab=character-notes] prose-mirror,
-.brinkwood.actor.pc.character.character-v2 .character-sheet__panel[data-tab=character-notes] .editor-content {
-  min-height: 280px;
-  padding: 12px;
-  border: 1px solid var(--bw-rule);
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.35);
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__panel[data-tab=character-notes] .editor-edit {
-  display: inline-grid;
-  width: 36px;
-  height: 36px;
-  color: var(--bw-ink);
-  place-items: center;
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__panel.effects .effects-groups {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  width: 100%;
-  min-width: 0;
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__panel.effects .effects-category {
-  min-width: 0;
-}
-.brinkwood.actor.pc.character.character-v2 .downtime-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-.brinkwood.actor.pc.character.character-v2 .downtime-action {
-  overflow: hidden;
-  border: 1px solid var(--bw-rule);
-  border-left: 5px solid var(--bw-accent);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.3);
-}
-.brinkwood.actor.pc.character.character-v2 .downtime-action h3 {
-  margin: 0;
-  padding: 9px 12px;
-  background: var(--bw-paper-deep);
-  color: var(--bw-ink);
-  font-family: "Crimson Text", serif;
-  font-size: 1.1rem;
-}
-.brinkwood.actor.pc.character.character-v2 .downtime-action p {
-  margin: 0;
-  padding: 10px 12px 12px;
-  line-height: 1.4;
-}
-.brinkwood.actor.pc.character.character-v2 .character-sheet__empty {
-  margin: 0;
-  color: var(--bw-ink-soft);
-  font-style: italic;
-}
-@container (max-width: 860px) {
-  .brinkwood.actor.pc.character.character-v2 .character-sheet__header {
-    grid-template-columns: 136px minmax(0, 1fr);
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-sheet__trackers {
-    grid-column: 1/-1;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-state {
-    grid-template-columns: minmax(0, 1fr) minmax(150px, 0.38fr);
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-bans {
-    grid-column: 1/-1;
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-consequences {
-    grid-column: 1;
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-armor-uses {
-    grid-column: 2;
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-traits__layout {
-    grid-template-columns: minmax(0, 1fr) minmax(210px, 240px);
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-traits__list,
-  .brinkwood.actor.pc.character.character-v2 .character-loadout__list {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-@container (max-width: 620px) {
-  .brinkwood.actor.pc.character.character-v2 form.character-sheet {
-    padding: 12px;
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-sheet__header,
-  .brinkwood.actor.pc.character.character-v2 .character-state,
-  .brinkwood.actor.pc.character.character-v2 .character-traits__layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-sheet__header {
-    grid-template-areas: "portrait identity" "trackers trackers";
-    grid-template-columns: 112px minmax(0, 1fr);
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-sheet__portrait-frame {
-    grid-area: portrait;
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-sheet__identity {
-    grid-area: identity;
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-sheet__trackers {
-    grid-area: trackers;
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-sheet__identity-fields,
-  .brinkwood.actor.pc.character.character-v2 .character-sheet__origins {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-bans,
-  .brinkwood.actor.pc.character.character-v2 .character-consequences,
-  .brinkwood.actor.pc.character.character-v2 .character-armor-uses {
-    grid-column: 1;
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-consequences {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-traits__layout {
-    gap: 12px;
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-sheet__tabs {
-    overflow-x: auto;
-    justify-content: flex-start;
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-sheet__tabs .item {
-    flex: 0 0 auto;
-    white-space: nowrap;
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-panel__header {
-    align-items: stretch;
-    flex-direction: column;
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-loadout__actions {
-    align-items: stretch;
-    flex-direction: column;
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-loadout__actions select {
-    width: 100%;
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-sheet__panel.effects .effects-groups,
-  .brinkwood.actor.pc.character.character-v2 .downtime-actions {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-@container (max-width: 430px) {
-  .brinkwood.actor.pc.character.character-v2 form.character-sheet {
-    padding: 10px;
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-sheet__header {
-    grid-template-areas: "portrait" "identity" "trackers";
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-sheet__portrait-frame {
-    width: 112px;
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-sheet__trackers,
-  .brinkwood.actor.pc.character.character-v2 .character-consequences {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-bans__row {
-    grid-template-columns: 30px minmax(0, 1fr);
-  }
-  .brinkwood.actor.pc.character.character-v2 .character-bans__row input {
-    grid-column: 2;
-  }
-  .brinkwood.actor.pc.character.character-v2 .attributes-container {
-    grid-template-columns: repeat(4, 28px) minmax(0, 1fr);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .brinkwood.actor.pc.character.character-v2 *,
-  .brinkwood.actor.pc.character.character-v2 *::before,
-  .brinkwood.actor.pc.character.character-v2 *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-  }
-}
 .brinkwood.actor.mask {
   min-width: 0;
   color: var(--bw-ink);
@@ -2211,7 +1768,7 @@
   padding: 16px;
   container-type: inline-size;
   color: var(--bw-ink);
-  background: var(--bw-paper);
+  background: rgba(247, 244, 237, 0.28);
 }
 .brinkwood.actor.mask form.mask-sheet input[type=text],
 .brinkwood.actor.mask form.mask-sheet textarea {
@@ -2435,6 +1992,88 @@
 .brinkwood.actor.mask .mask-sheet__panel prose-mirror {
   min-height: 180px;
 }
+.brinkwood.actor.mask {
+  /* Mask-only Living Parchment polish.  The shared effects partial renders
+   * <section> elements, so reset the legacy generic section flex rule here. */
+}
+.brinkwood.actor.mask .mask-sheet__header {
+  padding: 10px;
+  border: 1px solid rgba(141, 98, 93, 0.62);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(224, 215, 197, 0.16));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.52), 0 2px 6px rgba(33, 27, 29, 0.08);
+}
+.brinkwood.actor.mask .mask-sheet__portrait {
+  border-color: rgba(33, 27, 29, 0.72);
+  box-shadow: 4px 4px 0 rgba(141, 98, 93, 0.18);
+}
+.brinkwood.actor.mask .mask-sheet__item {
+  border-width: 0 0 1px;
+  border-radius: 0;
+  background: transparent;
+}
+.brinkwood.actor.mask .mask-sheet__item:hover,
+.brinkwood.actor.mask .mask-sheet__item:focus-within {
+  background: rgba(143, 47, 53, 0.055);
+}
+.brinkwood.actor.mask .mask-sheet__item .identity-choice__remove {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border-radius: 50%;
+  color: var(--bw-ink-soft) !important;
+  font-size: 1rem !important;
+  line-height: 1;
+}
+.brinkwood.actor.mask .mask-sheet__item .identity-choice__remove:hover,
+.brinkwood.actor.mask .mask-sheet__item .identity-choice__remove:focus-visible {
+  color: var(--bw-accent) !important;
+  background: rgba(143, 47, 53, 0.1);
+}
+.brinkwood.actor.mask .mask-tracker,
+.brinkwood.actor.mask .mask-attributes {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 1px 3px rgba(33, 27, 29, 0.07);
+}
+.brinkwood.actor.mask .mask-sheet__tabs .item {
+  transition: background-color 120ms ease, color 120ms ease, transform 120ms ease;
+}
+.brinkwood.actor.mask .mask-sheet__tabs .item:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.32);
+}
+.brinkwood.actor.mask .mask-sheet__tabs .item.active {
+  box-shadow: inset 0 -3px 0 var(--bw-accent), 0 1px 3px rgba(33, 27, 29, 0.12);
+  transform: translateY(-1px);
+}
+.brinkwood.actor.mask .mask-sheet__panel[data-tab=effects] .effects-groups {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  gap: 10px;
+}
+.brinkwood.actor.mask .mask-sheet__panel[data-tab=effects] .effects-category {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+.brinkwood.actor.mask .mask-sheet__panel[data-tab=effects] .effects-category__header {
+  min-height: 42px;
+  padding: 7px 10px 7px 12px;
+}
+.brinkwood.actor.mask .mask-sheet__panel[data-tab=effects] .effects-category__list {
+  width: 100%;
+  min-width: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .brinkwood.actor.mask .mask-sheet__tabs .item {
+    transition-duration: 0.01ms;
+  }
+  .brinkwood.actor.mask .mask-sheet__tabs .item.active {
+    transform: none;
+  }
+}
 .brinkwood.actor.mask .mask-sheet__traits-workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(190px, 0.42fr);
@@ -2443,8 +2082,26 @@
   width: 100%;
   min-width: 0;
 }
+.brinkwood.actor.mask .mask-sheet__notes .editor,
+.brinkwood.actor.mask .mask-sheet__notes .editor-content,
+.brinkwood.actor.mask .mask-sheet__notes prose-mirror {
+  min-height: 160px;
+  padding: 10px 12px;
+  border: 1px solid var(--bw-rule);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.3);
+}
 .brinkwood.actor.mask .mask-sheet__trait-library {
   min-width: 0;
+}
+.brinkwood.actor.mask .mask-sheet__section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.brinkwood.actor.mask .mask-sheet__section-heading .item-add-popup {
+  padding: 2px 0;
 }
 .brinkwood.actor.mask .mask-attributes > h2 {
   margin: 0 0 10px;
@@ -2566,65 +2223,160 @@
   }
 }
 .brinkwood.actor.rebelion {
-  /*
-  *  Elements that can be changed will hint this by dimming and fading a little on hover
-  */
-  /*
-   * Toothradio. Some (eg trauma) are not changeable, hence the option.
-   */
-  /*
-   * Custom Radio
-   */
-  /*
-   * Custom Radio Squared
-   */
-  /*
-   * Checkboxes underscored.
-   */
-  /*
-   * Create Clock
-   */
-  /*
-   * Turf Block
-   */
-  /*
-   * Toothradio single elements
-   */
-  /*
-   * Custom Radio Round
-   */
-  /*
-   * General Styles
-   * Cleaned out things that don't appear to apply to the character sheet, and exist in other, separated SCSS files.
-   * Some things *might* be missing, but at a glance, everything looks to be in order.
-   */
+  /* Rebellion-only Living Parchment ledger. Generic tracker and flex names are
+   * deliberately contained here because other actor sheets reuse the partials. */
 }
-.brinkwood.actor.rebelion * section.rebelion-sheet {
-  justify-content: center;
+.brinkwood.actor.rebelion {
+  --rebellion-paper: var(--bw-paper, #eeeae0);
+  --rebellion-panel: rgba(255, 255, 255, 0.24);
+  --rebellion-ink: var(--bw-ink, #191813);
+  --rebellion-rule: var(--bw-rule, rgba(33, 27, 29, 0.35));
+  --rebellion-accent: var(--bw-accent, #8f2f35);
 }
-.brinkwood.actor.rebelion * nav {
-  margin-bottom: 1em;
+.brinkwood.actor.rebelion .rebelion-sheet__form {
+  min-width: 0;
+  background: transparent;
+}
+.brinkwood.actor.rebelion .rebelion-sheet__tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 10px;
+  padding: 0 2px 6px;
+  border-bottom: 1px solid var(--rebellion-rule);
   font-family: Kirsty, serif;
-  font-size: 1.5em;
+  font-size: 1.25em;
   font-variant: small-caps;
 }
-.brinkwood.actor.rebelion * section.sedition, .brinkwood.actor.rebelion * section.aspect {
-  min-width: 450px;
+.brinkwood.actor.rebelion .rebelion-sheet__tabs .item {
+  min-width: 0;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: var(--rebellion-ink);
 }
-.brinkwood.actor.rebelion * section.sedition h2, .brinkwood.actor.rebelion * section.aspect h2 {
-  border: none;
-  padding-top: 0.5em;
-  margin-left: 3px;
+.brinkwood.actor.rebelion .rebelion-sheet__tabs .item.active {
+  border-color: var(--rebellion-rule);
+  background: var(--rebellion-panel);
+  box-shadow: inset 0 -2px 0 var(--rebellion-accent);
 }
-.brinkwood.actor.rebelion * .sedition-row {
-  border-top: 2px solid #191813;
+.brinkwood.actor.rebelion .rebelion-sheet {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 2px;
 }
-.brinkwood.actor.rebelion * .sedition-row .name {
-  font-size: 1.2em;
-  margin-top: 4px;
+.brinkwood.actor.rebelion .rebelion-sheet__status {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 9px 10px;
+  border: 1px solid var(--rebellion-rule);
+  border-radius: 3px;
+  background: var(--rebellion-panel);
 }
-.brinkwood.actor.rebelion * .sedition-row .big-teeth-section {
-  border: none;
+.brinkwood.actor.rebelion .rebelion-sheet__status-tracker, .brinkwood.actor.rebelion .rebelion-settlements__tracker,
+.brinkwood.actor.rebelion .rebelion-settlements__level, .brinkwood.actor.rebelion .rebelion-aspect__row > :nth-child(2) {
+  min-width: 0;
+}
+.brinkwood.actor.rebelion {
+  /* The shared teeth partial has no dimensions outside character sheets. */
+}
+.brinkwood.actor.rebelion .rebelion-sheet .big-teeth-section {
+  min-width: 0;
+  border: 0;
+}
+.brinkwood.actor.rebelion .rebelion-sheet .big-teeth {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+.brinkwood.actor.rebelion .rebelion-sheet .big-teeth .dot-value, .brinkwood.actor.rebelion .rebelion-sheet .big-teeth img.big-teeth {
+  display: block;
+  flex: 0 0 16px;
+  inline-size: 16px;
+  block-size: 22px;
+  max-inline-size: 16px;
+  object-fit: contain;
+}
+.brinkwood.actor.rebelion .rebelion-settlements, .brinkwood.actor.rebelion .rebelion-aspect {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--rebellion-rule);
+  border-radius: 3px;
+  background: var(--rebellion-panel);
+}
+.brinkwood.actor.rebelion .rebelion-settlements__header, .brinkwood.actor.rebelion .rebelion-settlements__row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 1fr) minmax(8rem, auto) minmax(4rem, auto);
+  column-gap: 12px;
+  align-items: center;
+  min-width: 0;
+  padding: 7px 10px;
+}
+.brinkwood.actor.rebelion .rebelion-settlements__header, .brinkwood.actor.rebelion .rebelion-aspect__header {
+  background: rgba(33, 27, 29, 0.06);
+}
+.brinkwood.actor.rebelion .rebelion-settlements h2, .brinkwood.actor.rebelion .rebelion-aspect h2 {
+  margin: 0;
+  border: 0;
+  color: var(--rebellion-ink);
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+.brinkwood.actor.rebelion .rebelion-settlements__row, .brinkwood.actor.rebelion .rebelion-aspect__row {
+  border-top: 1px solid var(--rebellion-rule);
+}
+.brinkwood.actor.rebelion .rebelion-settlements__name {
+  min-width: 0;
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+.brinkwood.actor.rebelion .rebelion-aspect__header, .brinkwood.actor.rebelion .rebelion-aspect__row {
+  display: grid;
+  grid-template-columns: minmax(5rem, 0.7fr) minmax(8rem, auto) minmax(10rem, 1.4fr);
+  column-gap: 12px;
+  align-items: center;
+  min-width: 0;
+  padding: 7px 10px;
+}
+.brinkwood.actor.rebelion .rebelion-aspect__row > :nth-child(3) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 480px) {
+  .brinkwood.actor.rebelion .rebelion-sheet__status {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .brinkwood.actor.rebelion .rebelion-sheet .big-teeth .dot-value, .brinkwood.actor.rebelion .rebelion-sheet .big-teeth img.big-teeth {
+    flex-basis: 14px;
+    inline-size: 14px;
+    block-size: 19px;
+    max-inline-size: 14px;
+  }
+  .brinkwood.actor.rebelion .rebelion-settlements__header, .brinkwood.actor.rebelion .rebelion-settlements__row {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    column-gap: 8px;
+    padding-inline: 8px;
+  }
+  .brinkwood.actor.rebelion .rebelion-aspect__header {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .brinkwood.actor.rebelion .rebelion-aspect__header h2:last-child {
+    display: none;
+  }
+  .brinkwood.actor.rebelion .rebelion-aspect__row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 5px;
+    padding-inline: 8px;
+  }
+  .brinkwood.actor.rebelion .rebelion-aspect__row > :nth-child(3) {
+    grid-column: 1/-1;
+    padding-top: 5px;
+    border-top: 1px dashed var(--rebellion-rule);
+  }
 }
 .brinkwood.actor.clock {
   /* Standalone clock sheet. Imported under .brinkwood.actor.clock. */
@@ -2636,7 +2388,7 @@
 }
 .brinkwood.actor.clock .window-content {
   padding: 0;
-  background: var(--bw-paper);
+  background-color: var(--bw-paper);
 }
 .brinkwood.actor.clock .clock-sheet {
   display: grid;
@@ -2644,7 +2396,7 @@
   box-sizing: border-box;
   min-height: 0;
   padding: 14px;
-  background: var(--bw-paper);
+  background: transparent;
   container-type: inline-size;
 }
 .brinkwood.actor.clock .clock-sheet__header {
@@ -2699,13 +2451,6 @@
   min-height: 36px;
   font: inherit;
 }
-.brinkwood.actor.clock .clock-sheet__progress {
-  margin: 0;
-  color: var(--bw-ink-soft);
-  font-size: 1rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
 .brinkwood.actor.clock .clock-sheet__clock {
   display: grid;
   place-items: center;
@@ -2714,6 +2459,17 @@
   border: 1px solid var(--bw-rule);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.28);
+}
+.brinkwood.actor.clock .clock-sheet__clock .clocks {
+  width: 100%;
+  justify-items: center;
+  gap: 0;
+}
+.brinkwood.actor.clock .clock-sheet__clock .clock-zero-label {
+  display: none;
+}
+.brinkwood.actor.clock .clock-sheet__clock .blades-clock {
+  margin-inline: auto;
 }
 .brinkwood.actor.clock .clocks {
   display: grid;
@@ -2999,7 +2755,6 @@
   line-height: 1.45;
 }
 .brinkwood.actor.clock .clock-sheet.locked .clock-sheet__name,
-.brinkwood.actor.clock .clock-sheet.locked .clock-sheet__progress,
 .brinkwood.actor.clock .clock-sheet.locked .clock-sheet__public-description {
   color: var(--bw-ink);
 }
@@ -3024,7 +2779,7 @@
 }
 .brinkwood.actor.npc .window-content {
   padding: 0;
-  background: var(--bw-paper);
+  background-color: var(--bw-paper);
 }
 .brinkwood.actor.npc .npc-dossier {
   display: grid;
@@ -3032,7 +2787,7 @@
   box-sizing: border-box;
   min-height: 0;
   padding: 16px;
-  background: var(--bw-paper);
+  background: transparent;
   container-type: inline-size;
 }
 .brinkwood.actor.npc .npc-dossier__header {
@@ -3177,6 +2932,51 @@
     height: 96px;
   }
 }
+.brinkwood.actor.npc .npc-dossier {
+  max-width: 640px;
+}
+.brinkwood.actor.npc .npc-dossier .npc-dossier__header {
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid var(--bw-rule);
+  border-radius: 7px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.12)), var(--bw-paper-deep);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.48), 0 1px 3px rgba(33, 27, 29, 0.08);
+}
+.brinkwood.actor.npc .npc-dossier .npc-dossier__portrait {
+  width: 72px;
+  height: 72px;
+  border-radius: 4px;
+}
+.brinkwood.actor.npc .npc-dossier .npc-dossier__identity {
+  gap: 6px;
+}
+.brinkwood.actor.npc .npc-dossier .npc-dossier__profile {
+  padding: 8px 10px;
+}
+.brinkwood.actor.npc .npc-dossier .npc-dossier__profile-fields {
+  gap: 8px;
+}
+.brinkwood.actor.npc .npc-dossier .npc-dossier__editors {
+  gap: 10px;
+}
+.brinkwood.actor.npc .npc-dossier .npc-dossier__editor-panel > h2 {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--bw-rule);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+.brinkwood.actor.npc .npc-dossier .npc-dossier__editor-panel .editor,
+.brinkwood.actor.npc .npc-dossier .npc-dossier__editor-panel prose-mirror {
+  min-height: 160px;
+  padding: 9px 10px;
+}
+@container (max-width: 560px) {
+  .brinkwood.actor.npc .npc-dossier .npc-dossier__profile-fields,
+  .brinkwood.actor.npc .npc-dossier .npc-dossier__editors {
+    grid-template-columns: 1fr;
+  }
+}
 .brinkwood.item.sheet .window-content {
   container-type: inline-size;
   height: 100%;
@@ -3293,7 +3093,7 @@
   padding: 16px;
   overflow: auto;
   color: var(--bw-ink);
-  background: var(--bw-paper);
+  background: transparent;
 }
 .brinkwood.item.sheet .loadout-item-sheet__header {
   display: grid;
@@ -3767,32 +3567,3 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   padding-top: 7px;
   border-top: 1px solid rgba(247, 244, 237, 0.2);
 }
-
-/* Legacy tabs need their final grid before optional polish styles load. */
-.brinkwood.actor.clock .clock-sheet__clock .clocks {
-  width: 100%;
-  justify-items: center;
-  gap: 0;
-}
-.brinkwood.actor.clock .clock-sheet__clock .clock-zero-label {
-  display: none;
-}
-.brinkwood.actor.clock .clock-sheet__clock .blades-clock {
-  margin-inline: auto;
-}
-
-.brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace {
-  grid-template-columns: minmax(0, 1fr);
-  row-gap: 0;
-}
-.brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace > nav.tabs {
-  grid-column: 1 / -1;
-  width: 100%;
-  box-sizing: border-box;
-}
-.brinkwood.actor.pc.character:not(.character-v2) .character-sheet__workspace > nav.tabs .item {
-  flex: 1 1 0;
-  min-width: 0;
-}
-
-/*# sourceMappingURL=blades.css.map */

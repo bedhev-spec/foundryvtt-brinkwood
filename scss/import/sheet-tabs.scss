@@ -1,0 +1,103 @@
+/* Shared tab and panel visual language. Geometry stays with each sheet. */
+.sheet-tabs,
+&.actor.pc.character .character-sheet__workspace > nav.tabs,
+&.actor.mask .mask-sheet__tabs {
+  --bw-tab-surface: rgba(255, 255, 255, 0.28);
+  --bw-tab-active: rgba(255, 255, 255, 0.56);
+  --bw-tab-transition: 120ms ease;
+}
+
+.sheet-tabs .item,
+&.actor.pc.character .character-sheet__workspace > nav.tabs .item,
+&.actor.mask .mask-sheet__tabs .item {
+  color: var(--bw-ink-soft);
+  background-color: var(--bw-tab-surface);
+  border-bottom: 3px solid transparent;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  transition: background-color var(--bw-tab-transition), border-color var(--bw-tab-transition), box-shadow var(--bw-tab-transition), color var(--bw-tab-transition);
+
+  &:hover:not(.active),
+  &:focus-visible:not(.active) {
+    color: var(--bw-ink);
+    background-color: rgba(255, 255, 255, 0.44);
+  }
+
+  &.active {
+    color: var(--bw-ink);
+    background-color: var(--bw-tab-active);
+    border-bottom-color: var(--bw-accent);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.58), 0 1px 3px rgba(33, 27, 29, 0.12);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--bw-focus);
+    outline-offset: -3px;
+  }
+}
+
+.sheet-panel,
+&.actor.mask .mask-sheet__panel {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(141, 98, 93, 0.46);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+&.actor.mask .mask-sheet__panel > h2,
+&.actor.mask .mask-sheet__panel.effects > h2 {
+  margin: 0;
+  padding: 7px 10px;
+  color: var(--bw-inverse);
+  background: var(--bw-ink);
+  border-bottom: 1px solid rgba(141, 98, 93, 0.7);
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+&.actor.mask .mask-sheet__panel .editor-content,
+&.actor.mask .mask-sheet__panel prose-mirror {
+  min-height: 160px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+&.actor.mask .mask-sheet__panel .effects-tabs {
+  padding: 4px;
+  background: var(--bw-paper-deep);
+  border-bottom: 1px solid var(--bw-rule);
+
+  .effects-tab {
+    color: var(--bw-ink-soft);
+    background: transparent;
+    border-bottom: 2px solid transparent;
+    transition: color var(--bw-tab-transition), border-color var(--bw-tab-transition);
+
+    &:hover,
+    &:focus-visible,
+    &.active {
+      color: var(--bw-ink);
+      border-bottom-color: var(--bw-accent);
+    }
+  }
+}
+
+&.actor.mask .mask-sheet__panel .effects-category[data-effect-panel] {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+
+  .effects-category__header {
+    min-height: 38px;
+    padding: 6px 10px;
+    color: var(--bw-inverse);
+    background: var(--bw-ink);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet-tabs .item,
+  &.actor.pc.character .character-sheet__workspace > nav.tabs .item,
+  &.actor.mask .mask-sheet__tabs .item,
+  &.actor.mask .mask-sheet__panel .effects-tabs .effects-tab {
+    transition-duration: 0.01ms;
+  }
+}

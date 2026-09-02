@@ -8,7 +8,7 @@ export class BladesNPCSheet extends BladesSheet {
 
   static DEFAULT_OPTIONS = {
     classes: ["brinkwood", "sheet", "actor", "npc"],
-    position: { width: 900 },
+    position: { width: 640 },
     form: { submitOnChange: true },
     window: { resizable: true },
   };

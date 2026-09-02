@@ -9,7 +9,7 @@
     padding: 16px;
     container-type: inline-size;
     color: var(--bw-ink);
-    background: var(--bw-paper);
+  background: rgba(247, 244, 237, 0.28);
 
     input[type="text"],
     textarea {
@@ -269,6 +269,105 @@
     }
   }
 
+  /* Mask-only Living Parchment polish.  The shared effects partial renders
+   * <section> elements, so reset the legacy generic section flex rule here. */
+  .mask-sheet__header {
+    padding: 10px;
+    border: 1px solid rgba(141, 98, 93, 0.62);
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(224, 215, 197, 0.16));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.52), 0 2px 6px rgba(33, 27, 29, 0.08);
+  }
+
+  .mask-sheet__portrait {
+    border-color: rgba(33, 27, 29, 0.72);
+    box-shadow: 4px 4px 0 rgba(141, 98, 93, 0.18);
+  }
+
+  .mask-sheet__item {
+    border-width: 0 0 1px;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .mask-sheet__item:hover,
+  .mask-sheet__item:focus-within {
+    background: rgba(143, 47, 53, 0.055);
+  }
+
+  .mask-sheet__item .identity-choice__remove {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border-radius: 50%;
+    color: var(--bw-ink-soft) !important;
+    font-size: 1rem !important;
+    line-height: 1;
+  }
+
+  .mask-sheet__item .identity-choice__remove:hover,
+  .mask-sheet__item .identity-choice__remove:focus-visible {
+    color: var(--bw-accent) !important;
+    background: rgba(143, 47, 53, 0.1);
+  }
+
+  .mask-tracker,
+  .mask-attributes {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 1px 3px rgba(33, 27, 29, 0.07);
+  }
+
+  .mask-sheet__tabs .item {
+    transition: background-color 120ms ease, color 120ms ease, transform 120ms ease;
+
+    &:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.32);
+    }
+
+    &.active {
+      box-shadow: inset 0 -3px 0 var(--bw-accent), 0 1px 3px rgba(33, 27, 29, 0.12);
+      transform: translateY(-1px);
+    }
+  }
+
+  .mask-sheet__panel[data-tab="effects"] {
+    .effects-groups {
+      display: grid;
+      width: 100%;
+      min-width: 0;
+      gap: 10px;
+    }
+
+    .effects-category {
+      display: block;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .effects-category__header {
+      min-height: 42px;
+      padding: 7px 10px 7px 12px;
+    }
+
+    .effects-category__list {
+      width: 100%;
+      min-width: 0;
+    }
+
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mask-sheet__tabs .item {
+      transition-duration: 0.01ms;
+
+      &.active {
+        transform: none;
+      }
+    }
+  }
+
   .mask-sheet__traits-workspace {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(190px, 0.42fr);
@@ -278,8 +377,31 @@
     min-width: 0;
   }
 
+  .mask-sheet__notes {
+    .editor,
+    .editor-content,
+    prose-mirror {
+      min-height: 160px;
+      padding: 10px 12px;
+      border: 1px solid var(--bw-rule);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+
   .mask-sheet__trait-library {
     min-width: 0;
+  }
+
+  .mask-sheet__section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    .item-add-popup {
+      padding: 2px 0;
+    }
   }
 
   .mask-attributes > h2 {

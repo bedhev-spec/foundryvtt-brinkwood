@@ -6,9 +6,8 @@ const root = new URL("../", import.meta.url);
 const read = file => readFile(new URL(file, root), "utf8");
 
 test("sheet tabs and action surfaces expose keyboard semantics", async () => {
-  const [character, characterV2, mask, npc, attributes, baseSheet, actorSheet] = await Promise.all([
+  const [character, mask, npc, attributes, baseSheet, actorSheet] = await Promise.all([
     read("templates/actor-sheet.html"),
-    read("templates/actor-sheet-v2.html"),
     read("templates/mask-sheet.html"),
     read("templates/npc-sheet.html"),
     read("templates/parts/attributes.html"),
@@ -16,15 +15,14 @@ test("sheet tabs and action surfaces expose keyboard semantics", async () => {
     read("module/blades-actor-sheet.js"),
   ]);
 
-  for (const template of [character, characterV2, mask]) {
+  for (const template of [character, mask]) {
     assert.match(template, /<button type="button"[^>]*role="tab"[^>]*tabindex="\{\{#if/);
     assert.doesNotMatch(template, /<a[^>]*role="tab"/);
   }
-  for (const template of [character, characterV2, mask, npc]) {
+  for (const template of [character, mask, npc]) {
     assert.match(template, /data-action="editImage" data-edit="img" role="button" tabindex="0"/);
   }
   assert.match(character, /class="item-body flex-horizontal"\{\{#if editable\}\} role="button" tabindex="0"/);
-  assert.match(characterV2, /class="item-body"\{\{#if \.\.\/editable\}\} role="button" tabindex="0"/);
   assert.match(attributes, /<button type="button" class="attribute-label roll-die-attribute/);
   assert.match(attributes, /<button type="button" class="attribute-skill-label roll-die-attribute/);
   assert.match(baseSheet, /key === "Home"[\s\S]*key === "End"[\s\S]*key === "ArrowRight"[\s\S]*key === "ArrowLeft"/);

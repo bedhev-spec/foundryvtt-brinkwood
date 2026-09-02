@@ -85,7 +85,7 @@ export class BladesActiveEffect extends foundry.documents.ActiveEffect {
    * @param {ActiveEffect[]} effects    The array of Active Effect instances to prepare sheet data for
    * @return {object}                   Data for rendering
    */
-  static prepareActiveEffectCategories(effects) {
+  static async prepareActiveEffectCategories(effects, { owner } = {}) {
 
     // Define effect header categories
     const categories = {
@@ -122,14 +122,47 @@ export class BladesActiveEffect extends foundry.documents.ActiveEffect {
 
     // Iterate over active effects, classifying them into categories
     // Use the synchronous sourceName getter (v13 replaced async _getSourceName())
-    for ( let e of effects ) {
-      if ( e.isSuppressed ) categories.suppressed.effects.push(e);
-      else if ( e.disabled ) categories.inactive.effects.push(e);
-      else if ( e.isTemporary ) categories.temporary.effects.push(e);
-      else categories.passive.effects.push(e);
+    for ( const effect of effects ) {
+      const displayEffect = await this.prepareActiveEffectDisplay(effect, owner);
+      if ( effect.isSuppressed ) categories.suppressed.effects.push(displayEffect);
+      else if ( effect.disabled ) categories.inactive.effects.push(displayEffect);
+      else if ( effect.isTemporary ) categories.temporary.effects.push(displayEffect);
+      else categories.passive.effects.push(displayEffect);
     categories.suppressed.visible = categories.suppressed.effects.length > 0;
     }
     return categories;
+  }
+
+  static async prepareActiveEffectDisplay(effect, owner) {
+    const statusDefinitions = globalThis.CONFIG?.statusEffects ?? [];
+    const statuses = Array.from(effect.statuses ?? [], statusId => {
+      const definition = statusDefinitions.find(status => status.id === statusId);
+      return definition?.name ? game.i18n.localize(definition.name) : statusId;
+    });
+    const rawDescription = typeof effect.description === "string" ? effect.description.trim() : "";
+    const enrichHTML = foundry.applications?.ux?.TextEditor?.implementation?.enrichHTML;
+    const enrichedDescription = rawDescription && typeof enrichHTML === "function"
+      ? await enrichHTML(rawDescription, {
+        async: true,
+        relativeTo: effect,
+        secrets: owner?.isOwner ?? effect.isOwner
+      })
+      : "";
+
+    return {
+      id: effect.id,
+      img: effect.img,
+      name: effect.name,
+      disabled: effect.disabled,
+      sourceName: effect.sourceName,
+      duration: effect.duration,
+      statuses,
+      hasStatuses: statuses.length > 0,
+      enrichedDescription,
+      hasDescription: enrichedDescription.length > 0,
+      hasDetails: statuses.length > 0 || enrichedDescription.length > 0,
+      detailsId: `effect-${effect.id}-details`
+    };
   }
 
 }

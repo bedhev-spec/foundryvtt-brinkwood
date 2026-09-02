@@ -216,7 +216,9 @@ test("read-only sheets disable every input type while retaining read-only text a
         if (selector === "textarea") return [textarea];
         return [];
       }
-    }
+    },
+    _restoreEffectDisclosureState: BladesSheet.prototype._restoreEffectDisclosureState,
+    _bindEffectDisclosureState: BladesSheet.prototype._bindEffectDisclosureState,
   };
 
   await BladesSheet.prototype._onRender.call(sheet, {}, {});
@@ -265,26 +267,62 @@ test("legacy actor sheets retain the form viewport, wrapper viewport, and select
   const originalForm = { scrollTop: 248, scrollLeft: 17 };
   const originalWindow = { scrollTop: 31, scrollLeft: 5 };
   const sheet = {
-    _isLegacyCharacterSheet: true,
     _activeEffectTab: "passive",
     tabGroups: { primary: "traits" },
     element: makeRoot(originalForm, originalWindow, { dataset: { tab: "traits" } }),
-    _getLegacyScrollContainers: BladesActorSheet.prototype._getLegacyScrollContainers,
-    _captureLegacyScrollPosition: BladesActorSheet.prototype._captureLegacyScrollPosition,
-    _restoreLegacyScrollPosition: BladesActorSheet.prototype._restoreLegacyScrollPosition,
+    _captureSheetViewState: BladesSheet.prototype._captureSheetViewState,
+    _restoreSheetViewState: BladesSheet.prototype._restoreSheetViewState,
     _activateEffectTab(type) { this.restoredEffectTab = type; }
   };
 
-  sheet._captureLegacyScrollPosition({ primaryTab: "effects" });
+  sheet._captureSheetViewState({ primaryTab: "effects" });
   const rerenderedForm = { scrollTop: 0, scrollLeft: 0 };
   const rerenderedWindow = { scrollTop: 0, scrollLeft: 0 };
   sheet.element = makeRoot(rerenderedForm, rerenderedWindow);
-  sheet._restoreLegacyScrollPosition();
+  sheet._restoreSheetViewState();
 
   assert.deepEqual(rerenderedForm, { scrollTop: 248, scrollLeft: 17 });
   assert.deepEqual(rerenderedWindow, { scrollTop: 31, scrollLeft: 5 });
   assert.equal(sheet.tabGroups.primary, "effects");
   assert.equal(sheet.restoredEffectTab, "passive");
+});
+
+test("effect disclosure state defaults collapsed and survives a replacement DOM without document state", () => {
+  const listeners = new Map();
+  const card = (id, open) => {
+    const details = { hidden: !open };
+    const entry = { dataset: { effectId: id }, querySelector(selector) {
+      if (selector === "[data-effect-details]") return details;
+      if (selector === "[data-effect-details-toggle]") return entry.toggle;
+      return null;
+    } };
+    entry.toggle = {
+      setAttribute(name, value) { this[name] = value; },
+      closest: () => entry,
+      addEventListener(type, listener) { listeners.set(id, listener); },
+    };
+    return entry;
+  };
+  const root = cards => ({
+    querySelectorAll(selector) {
+      return selector.includes("data-effect-details-toggle") ? cards.map(entry => entry.toggle) : cards;
+    },
+  });
+  const firstCards = [card("keep-open", true), card("collapsed", false)];
+  const sheet = {
+    _captureEffectDisclosureState: BladesSheet.prototype._captureEffectDisclosureState,
+    _restoreEffectDisclosureState: BladesSheet.prototype._restoreEffectDisclosureState,
+    _bindEffectDisclosureState: BladesSheet.prototype._bindEffectDisclosureState,
+  };
+
+  sheet._bindEffectDisclosureState(root(firstCards), {});
+  assert.equal(firstCards[0].querySelector("[data-effect-details]").hidden, true);
+  assert.equal(firstCards[1].querySelector("[data-effect-details]").hidden, true);
+  listeners.get("collapsed")({ preventDefault() {}, currentTarget: firstCards[1].toggle });
+
+  const rerenderedCards = [card("keep-open", false), card("collapsed", true), card("new-effect", false)];
+  sheet._restoreEffectDisclosureState(root(rerenderedCards));
+  assert.deepEqual(rerenderedCards.map(entry => entry.querySelector("[data-effect-details]").hidden), [true, false, true]);
 });
 
 test("legacy scroll capture forwards main-tab clicks for immediate native activation", async () => {
@@ -304,14 +342,16 @@ test("legacy scroll capture forwards main-tab clicks for immediate native activa
     addEventListener(type, listener, options) { listeners.set(type, { listener, options }); }
   };
   const sheet = {
-    _isLegacyCharacterSheet: true,
     _activeEffectTab: "passive",
     isEditable: true,
     tabGroups: { primary: "traits" },
     element: html,
-    _getLegacyScrollContainers: BladesActorSheet.prototype._getLegacyScrollContainers,
-    _captureLegacyScrollPosition: BladesActorSheet.prototype._captureLegacyScrollPosition,
-    _restoreLegacyScrollPosition: BladesActorSheet.prototype._restoreLegacyScrollPosition
+    _captureSheetViewState: BladesSheet.prototype._captureSheetViewState,
+    _restoreSheetViewState: BladesSheet.prototype._restoreSheetViewState,
+    _restoreEffectDisclosureState: BladesSheet.prototype._restoreEffectDisclosureState,
+    _bindEffectDisclosureState: BladesSheet.prototype._bindEffectDisclosureState,
+    _bindEffectTabs: BladesSheet.prototype._bindEffectTabs,
+    _bindSheetViewState: BladesSheet.prototype._bindSheetViewState
   };
   await BladesActorSheet.prototype._onRender.call(sheet, {}, {});
 
@@ -328,7 +368,7 @@ test("legacy scroll capture forwards main-tab clicks for immediate native activa
 
   assert.equal(event.defaultPrevented, false);
   assert.equal(sheet.tabGroups.primary, "traits");
-  assert.equal(sheet._legacyViewState.primaryTab, "effects");
+  assert.equal(sheet._sheetViewState.primaryTab, "effects");
 
   // This models Foundry's delegated action handler, which now receives the
   // untouched click and can activate the panel in the same event turn.

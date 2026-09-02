@@ -5,16 +5,6 @@ import test from "node:test";
 const root = new URL("../", import.meta.url);
 const read = file => readFile(new URL(file, root), "utf8");
 
-test("Character fallbacks respond to the sheet container", async () => {
-  const source = await read("scss/import/character-sheet-v2.scss");
-
-  assert.match(source, /&\s*\{[\s\S]*?min-width:\s*0/);
-  assert.match(source, /form\.character-sheet\s*\{[\s\S]*?container-type:\s*inline-size/);
-  assert.match(source, /@container \(max-width: 620px\)/);
-  assert.match(source, /@container \(max-width: 430px\)/);
-  assert.doesNotMatch(source, /@media \(max-width: (?:900|640)px\)/);
-});
-
 test("Mask Essence uses assigned Character Oath and read-only items remain viewable", async () => {
   const [template, controller] = await Promise.all([
     read("templates/mask-sheet.html"),

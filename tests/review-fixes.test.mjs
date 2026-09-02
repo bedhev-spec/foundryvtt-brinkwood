@@ -266,7 +266,7 @@ test("legacy migration preserves effects and updates embedded items in place", a
   for (const [, update] of updates) assert.equal(update._id, undefined);
 });
 
-test("test manifest targets the 0.6.11 integration branch", async () => {
+test("test manifest targets the 0.6.12 integration branch", async () => {
   const manifest = JSON.parse(await read("system-test.json"));
   for (const field of ["url", "manifest", "download"]) {
     assert.match(manifest[field], /integration\/v13-follow-up/);

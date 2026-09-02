@@ -6,7 +6,7 @@
 
   .window-content {
     padding: 0;
-    background: var(--bw-paper);
+    background-color: var(--bw-paper);
   }
 
   .clock-sheet {
@@ -15,7 +15,7 @@
     box-sizing: border-box;
     min-height: 0;
     padding: 14px;
-    background: var(--bw-paper);
+    background: transparent;
     container-type: inline-size;
   }
 
@@ -75,14 +75,6 @@
     min-width: 66px;
     min-height: 36px;
     font: inherit;
-  }
-
-  .clock-sheet__progress {
-    margin: 0;
-    color: var(--bw-ink-soft);
-    font-size: 1rem;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
   }
 
   .clock-sheet__clock {
@@ -229,7 +221,6 @@
 
   .clock-sheet.locked {
     .clock-sheet__name,
-    .clock-sheet__progress,
     .clock-sheet__public-description {
       color: var(--bw-ink);
     }

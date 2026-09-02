@@ -64,7 +64,8 @@ export class BladesMaskSheet extends BladesSheet {
     context.maskAttributesLabel = "BITD.Mask";
 
     // Prepare active effects
-    context.effects = BladesActiveEffect.prepareActiveEffectCategories(this.actor.effects);
+    context.effects = await BladesActiveEffect.prepareActiveEffectCategories(this.actor.effects, { owner: this.actor });
+    this._prepareEffectTabs(context);
 
     this.setAttrLabels(context.system.attributes, "Mask");
 
@@ -134,6 +135,7 @@ export class BladesMaskSheet extends BladesSheet {
     const html = this.element;
     this._maskSheetListenerController = new AbortController();
     const listenerOptions = { signal: this._maskSheetListenerController.signal };
+    this._bindSheetViewState(html, listenerOptions);
 
     // Open inventory item sheet
     html.querySelectorAll(".item-body").forEach(el =>
@@ -160,8 +162,12 @@ export class BladesMaskSheet extends BladesSheet {
     );
 
     // Active effect controls
-    html.querySelectorAll(".effect-control").forEach(el =>
-      el.addEventListener("click", ev => BladesActiveEffect.onManageActiveEffect(ev, this.actor, { gmOnly: true }), listenerOptions)
+    html.querySelectorAll(".effect-control[data-effect-action]").forEach(el =>
+      el.addEventListener("click", ev => {
+        this._captureSheetViewState();
+        const action = BladesActiveEffect.onManageActiveEffect(ev, this.actor, { gmOnly: true });
+        Promise.resolve(action).finally(() => this._restoreSheetViewState());
+      }, listenerOptions)
     );
   }
 

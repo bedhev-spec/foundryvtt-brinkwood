@@ -1,15 +1,15 @@
-<form class="actor-sheet" autocomplete="off">
-	<nav class="tabs" data-group="primary">
+<form class="actor-sheet rebelion-sheet__form" autocomplete="off">
+  <nav class="tabs rebelion-sheet__tabs" data-group="primary" aria-label="Rebellion sections">
 		<a class="item {{#if (eq tabs.primary "overview")}}active{{/if}}" data-action="tab" data-tab="overview" data-group="primary">Overview</a>
 		<a class="item {{#if (eq tabs.primary "aspects")}}active{{/if}}" data-action="tab" data-tab="aspects" data-group="primary">Aspects</a>
 	</nav>
   <section class="rebelion-sheet content">
-		<div class="tab {{#if (eq tabs.primary "overview")}}active{{/if}}" data-tab="overview" data-group="primary">
-			<section class="flexrow tab">
-				<div class="">
+    <div class="tab rebelion-sheet__overview {{#if (eq tabs.primary "overview")}}active{{/if}}" data-tab="overview" data-group="primary">
+      <section class="rebelion-sheet__status" aria-label="Rebellion Status">
+        <div class="rebelion-sheet__status-tracker">
 					{{> "systems/brinkwood/templates/parts/teeth-section.html" path='system.tyranny.value' value=system.tyranny.value max_value=system.tyranny.max label='Tyranny' color='red'}}
 				</div>
-				<div class="">
+        <div class="rebelion-sheet__status-tracker">
 					{{> "systems/brinkwood/templates/parts/teeth-section.html" path='system.heat.value' value=system.heat.value max_value=system.heat.max label='Heat' color='red'}}
 				</div>
 			</section>
@@ -17,7 +17,7 @@
 			{{> "systems/brinkwood/templates/rebelion-sheet/sedition-section.html" label='Villages' collection=system.villages type='villages'}}
 			{{> "systems/brinkwood/templates/rebelion-sheet/sedition-section.html" label='Lands' collection=system.lands type='lands'}}
 		</div>
-		<div class="tab {{#if (eq tabs.primary "aspects")}}active{{/if}}" data-tab="aspects" data-group="primary">
+    <div class="tab rebelion-sheet__aspects {{#if (eq tabs.primary "aspects")}}active{{/if}}" data-tab="aspects" data-group="primary">
 			{{> "systems/brinkwood/templates/rebelion-sheet/aspect-section.html" label='Organization' aspect=system.aspects.[0] type='aspects.0'}}
 			{{> "systems/brinkwood/templates/rebelion-sheet/aspect-section.html" label='Force' aspect=system.aspects.[1] type='aspects.1'}}
 			{{> "systems/brinkwood/templates/rebelion-sheet/aspect-section.html" label='Influence' aspect=system.aspects.[2] type='aspects.2'}}

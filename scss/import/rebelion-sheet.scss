@@ -1,44 +1,74 @@
-// Colors
-@import 'mixin.scss';
+/* Rebellion-only Living Parchment ledger. Generic tracker and flex names are
+ * deliberately contained here because other actor sheets reuse the partials. */
+& {
+  --rebellion-paper: var(--bw-paper, #eeeae0);
+  --rebellion-panel: rgba(255, 255, 255, 0.24);
+  --rebellion-ink: var(--bw-ink, #191813);
+  --rebellion-rule: var(--bw-rule, rgba(33, 27, 29, 0.35));
+  --rebellion-accent: var(--bw-accent, #8f2f35);
 
-/*
- * General Styles
- * Cleaned out things that don't appear to apply to the character sheet, and exist in other, separated SCSS files.
- * Some things *might* be missing, but at a glance, everything looks to be in order.
- */
+  .rebelion-sheet__form { min-width: 0; background: transparent; }
 
-& * {
-	section.rebelion-sheet {
-    justify-content: center;
-	}
+  .rebelion-sheet__tabs {
+    display: flex; gap: 4px; margin: 0 0 10px; padding: 0 2px 6px;
+    border-bottom: 1px solid var(--rebellion-rule); font-family: Kirsty, serif;
+    font-size: 1.25em; font-variant: small-caps;
+    .item { min-width: 0; padding: 4px 10px; border: 1px solid transparent; border-radius: 3px; color: var(--rebellion-ink); }
+    .item.active { border-color: var(--rebellion-rule); background: var(--rebellion-panel); box-shadow: inset 0 -2px 0 var(--rebellion-accent); }
+  }
 
-	nav {
-		margin-bottom: 1em;
-    font-family: Kirsty, serif;
-		font-size: 1.5em;
-		font-variant: small-caps;
-	}
+  .rebelion-sheet { display: grid; gap: 12px; min-width: 0; padding: 2px; }
 
-	section.sedition, section.aspect {
-		min-width: 450px;
-  	h2 {
-    	border: none;
-	    padding-top: 0.5em;
-  		margin-left: 3px;
-	  }
-	}
+  .rebelion-sheet__status {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;
+    padding: 9px 10px; border: 1px solid var(--rebellion-rule); border-radius: 3px;
+    background: var(--rebellion-panel);
+  }
 
-  .sedition-row {
-		border-top: 2px solid #191813;
+  .rebelion-sheet__status-tracker, .rebelion-settlements__tracker,
+  .rebelion-settlements__level, .rebelion-aspect__row > :nth-child(2) { min-width: 0; }
 
-		.name {
-      font-size: 1.2em;
-			margin-top: 4px;
-		}
-    .big-teeth-section {
-			border: none;
-			.big-teeth {
-			}
-		}
-	} 
+  /* The shared teeth partial has no dimensions outside character sheets. */
+  .rebelion-sheet .big-teeth-section { min-width: 0; border: 0; }
+  .rebelion-sheet .big-teeth { display: flex; flex: 0 1 auto; flex-wrap: nowrap; align-items: center; gap: 2px; min-width: 0; }
+  .rebelion-sheet .big-teeth .dot-value, .rebelion-sheet .big-teeth img.big-teeth {
+    display: block; flex: 0 0 16px; inline-size: 16px; block-size: 22px;
+    max-inline-size: 16px; object-fit: contain;
+  }
+
+  .rebelion-settlements, .rebelion-aspect {
+    min-width: 0; margin: 0; border: 1px solid var(--rebellion-rule); border-radius: 3px;
+    background: var(--rebellion-panel);
+  }
+
+  .rebelion-settlements__header, .rebelion-settlements__row {
+    display: grid; grid-template-columns: minmax(7rem, 1fr) minmax(8rem, auto) minmax(4rem, auto);
+    column-gap: 12px; align-items: center; min-width: 0; padding: 7px 10px;
+  }
+  .rebelion-settlements__header, .rebelion-aspect__header { background: rgba(33, 27, 29, 0.06); }
+  .rebelion-settlements h2, .rebelion-aspect h2 { margin: 0; border: 0; color: var(--rebellion-ink); font-size: 0.9rem; line-height: 1.2; }
+  .rebelion-settlements__row, .rebelion-aspect__row { border-top: 1px solid var(--rebellion-rule); }
+  .rebelion-settlements__name { min-width: 0; font-size: 1rem; overflow-wrap: anywhere; }
+
+  .rebelion-aspect__header, .rebelion-aspect__row {
+    display: grid; grid-template-columns: minmax(5rem, .7fr) minmax(8rem, auto) minmax(10rem, 1.4fr);
+    column-gap: 12px; align-items: center; min-width: 0; padding: 7px 10px;
+  }
+  .rebelion-aspect__row > :nth-child(3) { min-width: 0; overflow-wrap: anywhere; }
+
+  @media (max-width: 480px) {
+    .rebelion-sheet__status { grid-template-columns: minmax(0, 1fr); }
+    .rebelion-sheet .big-teeth .dot-value, .rebelion-sheet .big-teeth img.big-teeth {
+      flex-basis: 14px; inline-size: 14px; block-size: 19px; max-inline-size: 14px;
+    }
+    .rebelion-settlements__header, .rebelion-settlements__row {
+      grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 8px; padding-inline: 8px;
+    }
+    .rebelion-aspect__header { grid-template-columns: minmax(0, 1fr) auto; }
+    .rebelion-aspect__header h2:last-child { display: none; }
+    .rebelion-aspect__row { grid-template-columns: minmax(0, 1fr) auto; row-gap: 5px; padding-inline: 8px; }
+    .rebelion-aspect__row > :nth-child(3) {
+      grid-column: 1 / -1; padding-top: 5px; border-top: 1px dashed var(--rebellion-rule);
+    }
+  }
 }

@@ -8,6 +8,14 @@ import { BladesHelpers } from "./blades-helpers.js";
 import { escapeHTML } from "./html-utils.js";
 import { renderItemTooltip } from "./item-tooltip.js";
 import { showRollStatistics } from "./roll-statistics.js";
+import {
+  activateEffectTab,
+  bindEffectTabs,
+  captureSheetViewState,
+  getSheetScrollContainers,
+  normalizeEffectTab,
+  restoreSheetViewState,
+} from "./sheet-view-state.js";
 
 export function lockSheetFormControls(html) {
   html.querySelectorAll("input, select").forEach(control => {
@@ -75,6 +83,7 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
     this._brinkwoodListenerController?.abort();
     this._brinkwoodListenerController = new AbortController();
     const listenerOptions = { signal: this._brinkwoodListenerController.signal };
+    this._bindEffectDisclosureState(html, listenerOptions);
 
     html.querySelectorAll('[role="tab"][data-action="tab"]').forEach(tab =>
       tab.addEventListener("keydown", event => {
@@ -120,6 +129,123 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
     html.querySelectorAll(".roll-statistics-control").forEach(el =>
       el.addEventListener("click", () => showRollStatistics(), listenerOptions)
     );
+  }
+
+  /** Preserve native Active Effect disclosure state without mutating documents. */
+  _captureEffectDisclosureState(root = this.element) {
+    this._effectDisclosureState = new Map(
+      Array.from(root?.querySelectorAll?.('.effect-card[data-effect-id]') ?? [], card => [
+        card.dataset.effectId,
+        !card.querySelector('[data-effect-details]')?.hidden,
+      ])
+    );
+  }
+
+  _restoreEffectDisclosureState(root = this.element) {
+    root?.querySelectorAll?.('.effect-card[data-effect-id]').forEach(card => {
+      const expanded = this._effectDisclosureState?.get(card.dataset.effectId) ?? false;
+      const details = card.querySelector('[data-effect-details]');
+      const toggle = card.querySelector('[data-effect-details-toggle]');
+      if (details) details.hidden = !expanded;
+      toggle?.setAttribute("aria-expanded", String(expanded));
+    });
+  }
+
+  _bindEffectDisclosureState(html, listenerOptions) {
+    this._restoreEffectDisclosureState(html);
+    html.querySelectorAll('.effect-card[data-effect-id] [data-effect-details-toggle]').forEach(toggle => {
+      toggle.addEventListener("click", event => {
+        event.preventDefault();
+        const card = event.currentTarget.closest('.effect-card[data-effect-id]');
+        const details = card?.querySelector('[data-effect-details]');
+        if (!details) return;
+        details.hidden = !details.hidden;
+        event.currentTarget.setAttribute("aria-expanded", String(!details.hidden));
+        this._captureEffectDisclosureState(html);
+      }, listenerOptions);
+    });
+  }
+
+  /** Capture only transient UI state; Foundry remains responsible for tabs. */
+  _captureSheetViewState({ primaryTab } = {}) {
+    this._sheetViewState = captureSheetViewState(this.element, {
+      primaryTab: primaryTab ?? this.tabGroups.primary,
+      effectTab: this._activeEffectTab,
+    });
+  }
+
+  _restoreSheetViewState() {
+    restoreSheetViewState(this.element, this._sheetViewState, {
+      setPrimaryTab: tab => { this.tabGroups.primary = tab; },
+      activateEffectTab: tab => this._activateEffectTab(tab),
+    });
+  }
+
+  /**
+   * Wire the transient state shared by Character and Mask sheets.  Native
+   * ApplicationV2 tabs remain authoritative; this only remembers the view
+   * before document operations replace the form.
+   */
+  _bindSheetViewState(html, listenerOptions) {
+    this._restoreSheetViewState();
+    this._bindEffectTabs(html, listenerOptions);
+
+    getSheetScrollContainers(html).forEach(([, container]) => {
+      container.addEventListener("scroll", () => this._captureSheetViewState(), listenerOptions);
+    });
+    html.addEventListener("click", event => {
+      const action = event.target.closest?.(
+        '[data-group="primary"][data-action="tab"], [data-effect-tab], .effect-control, .item-select, .item-add-popup, .item-delete'
+      );
+      if (!action) return;
+      const primaryTab = action.matches('[data-group="primary"][data-action="tab"]')
+        ? action.dataset.tab
+        : undefined;
+      this._captureSheetViewState({ primaryTab });
+    }, { ...listenerOptions, capture: true });
+    html.addEventListener("change", () => this._captureSheetViewState(), {
+      ...listenerOptions,
+      capture: true,
+    });
+  }
+
+  _bindEffectTabs(html, listenerOptions) {
+    bindEffectTabs(html, {
+      signal: listenerOptions?.signal,
+      onActivate: type => this._activateEffectTab(type),
+    });
+  }
+
+  _prepareEffectTabs(context, fallback = "temporary") {
+    this._activeEffectTab = normalizeEffectTab(context.effects, this._activeEffectTab, fallback);
+    context.isEffectTabbed = true;
+    context.activeEffectTab = this._activeEffectTab;
+  }
+
+  _onEffectTabClick(event) {
+    event.preventDefault();
+    this._activateEffectTab(event.currentTarget.dataset.effectTab);
+  }
+
+  _onEffectTabKeydown(event) {
+    // Kept as a public subclass hook; bindings are provided by _bindEffectTabs.
+    const tabs = Array.from(event.currentTarget.closest('[role="tablist"]')?.querySelectorAll("[data-effect-tab]") ?? []);
+    const current = tabs.indexOf(event.currentTarget);
+    const target = event.key === "Home" ? tabs[0]
+      : event.key === "End" ? tabs.at(-1)
+      : event.key === "ArrowRight" || event.key === "ArrowDown" ? tabs[(current + 1) % tabs.length]
+      : event.key === "ArrowLeft" || event.key === "ArrowUp" ? tabs[(current - 1 + tabs.length) % tabs.length]
+      : null;
+    if (!target) return;
+    event.preventDefault();
+    target.focus();
+    this._activateEffectTab(target.dataset.effectTab);
+  }
+
+  _activateEffectTab(type) {
+    if (!activateEffectTab(this.element, type)) return false;
+    this._activeEffectTab = type;
+    return true;
   }
 
   /* -------------------------------------------- */

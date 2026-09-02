@@ -1,53 +1,54 @@
 /* Final Legacy-only layout corrections. Loaded after legacy-effects-tabs.css. */
 
 /* Keep identity rows stable whether their optional item is empty or selected. */
-.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices {
+.brinkwood.actor.pc.character .character-identity-choices {
   display: grid;
-  grid-template-rows: repeat(4, 26px);
+  grid-template-rows: repeat(4, minmax(26px, auto));
   row-gap: 0;
+  padding-right: 0;
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices .item-block {
+.brinkwood.actor.pc.character .character-identity-choices .item-block {
   position: relative;
   display: grid;
   grid-template-columns: 33% minmax(0, 1fr) 18px;
   align-items: center;
   box-sizing: border-box;
   width: 100%;
-  height: 26px;
+  height: auto;
   min-height: 26px;
-  max-height: 26px;
+  max-height: none;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices .item-class-label {
+.brinkwood.actor.pc.character .character-identity-choices .item-class-label {
   grid-column: 1;
   min-width: 0;
   margin: 0;
   line-height: 26px;
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices .item-block > .item {
+.brinkwood.actor.pc.character .character-identity-choices .item-block > .item {
   position: static;
   display: flex;
   grid-column: 2;
   align-items: center;
   box-sizing: border-box;
   min-width: 0;
-  height: 26px;
-  min-height: 0;
-  max-height: 26px;
+  height: auto;
+  min-height: 26px;
+  max-height: none;
   margin: 0;
   padding: 0;
   gap: 4px;
   line-height: 1;
   align-self: stretch;
-  overflow: hidden;
+  overflow: visible;
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices .item-block::after {
+.brinkwood.actor.pc.character .character-identity-choices .item-block::after {
   content: "";
   grid-column: 3;
   grid-row: 1;
@@ -55,79 +56,105 @@
   height: 18px;
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices .item-body {
+.brinkwood.actor.pc.character .character-identity-choices .item-body {
   display: flex;
   align-items: center;
   box-sizing: border-box;
   min-width: 0;
-  height: 26px;
-  min-height: 0;
-  max-height: 26px;
+  height: auto;
+  min-height: 26px;
+  max-height: none;
   margin: 0;
   padding: 0;
   line-height: 1;
-  overflow: hidden;
+  overflow: visible;
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices .item-name {
+.brinkwood.actor.pc.character .character-identity-choices .item-name {
   min-width: 0;
   margin: 0;
   padding: 0;
   line-height: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+	overflow-wrap: anywhere;
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) .character-identity-choices .identity-choice__remove {
-  position: absolute;
-  top: 50%;
-  right: 0;
+/* The value ends beside the fixed × column; width remains available for
+ * multi-line identities rather than being shortened by the action. */
+.brinkwood.actor.pc.character .character-identity-choices .identity-choice__value {
+	justify-content: flex-end;
+	text-align: right;
+}
+
+.brinkwood.actor.pc.character .character-identity-choices .identity-choice__value .item-body,
+.brinkwood.actor.pc.character .character-identity-choices .identity-choice__value .item-name {
+	width: 100%;
+	justify-content: flex-end;
+	text-align: right;
+}
+
+.brinkwood.actor.pc.character .character-identity-choices .identity-choice__action {
+  grid-column: 3;
+  grid-row: 1;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+  justify-self: end;
+}
+
+.brinkwood.actor.pc.character .character-identity-choices .identity-choice__remove {
+  position: static;
+  grid-column: auto;
+  grid-row: auto;
   width: 18px;
   min-width: 18px;
   height: 18px;
   min-height: 18px;
   margin: 0;
   padding: 0;
-  transform: translateY(-50%);
+  transform: none;
 }
 
 /* Stable action rows: labels stay fixed while only the circle artwork is optically aligned. */
-.brinkwood.actor.pc.character:not(.character-v2) .attributes .attributes-container {
+.brinkwood.actor.pc.character .attributes .attributes-container {
   display: grid;
   grid-template-columns: repeat(4, 28px) minmax(0, 1fr);
   align-items: center;
   min-height: 28px;
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) .attributes .attributes-container button.dot-value {
+.brinkwood.actor.pc.character .attributes .attributes-container button.dot-value {
   align-self: center;
   transform: none;
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) .attributes .attributes-container button.dot-value::before {
+.brinkwood.actor.pc.character .attributes .attributes-container button.dot-value::before {
   transform: translateY(7px);
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) .attributes .attribute-skill-label {
+.brinkwood.actor.pc.character .attributes .attribute-skill-label {
   align-self: center;
   min-height: 28px;
   margin-top: 0;
 }
 
 /* Hide the zero/nullifier glyph while retaining the clock and progress text. */
-.brinkwood.actor.pc.character:not(.character-v2) .character-scars-clock .clock-zero-label,
-.brinkwood.actor.pc.character:not(.character-v2) .character-oath-clock .clock-zero-label {
+.brinkwood.actor.pc.character .character-scars-clock .clock-zero-label,
+.brinkwood.actor.pc.character .character-oath-clock .clock-zero-label {
   display: contents;
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) .character-scars-clock .clock-zero-label > .nullifier,
-.brinkwood.actor.pc.character:not(.character-v2) .character-oath-clock .clock-zero-label > .nullifier {
+.brinkwood.actor.pc.character .character-scars-clock .clock-zero-label > .nullifier,
+.brinkwood.actor.pc.character .character-oath-clock .clock-zero-label > .nullifier {
   display: none;
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) .character-scars-clock span.clock-label,
-.brinkwood.actor.pc.character:not(.character-v2) .character-oath-clock span.clock-label {
+.brinkwood.actor.pc.character .character-scars-clock span.clock-label,
+.brinkwood.actor.pc.character .character-oath-clock span.clock-label {
   grid-column: 1;
   grid-row: 2;
   justify-self: center;
@@ -136,7 +163,7 @@
 }
 
 /* Deterministic Armor checkbox: same footprint, white empty, existing orange/tick when checked. */
-.brinkwood.actor.pc.character:not(.character-v2) .character-armor-uses input[type="checkbox"] {
+.brinkwood.actor.pc.character .character-armor-uses input[type="checkbox"] {
   appearance: none;
   display: inline-grid;
   place-content: center;
@@ -153,12 +180,12 @@
   background: #fff;
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) .character-armor-uses input[type="checkbox"]:checked {
+.brinkwood.actor.pc.character .character-armor-uses input[type="checkbox"]:checked {
   border-color: #f39b55;
   background: #f39b55;
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) .character-armor-uses input[type="checkbox"]:checked::after {
+.brinkwood.actor.pc.character .character-armor-uses input[type="checkbox"]:checked::after {
   width: 4px;
   height: 8px;
   border: solid #fff;
@@ -167,12 +194,98 @@
   transform: translateY(-1px) rotate(45deg);
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) .character-armor-uses input[type="checkbox"]:focus-visible {
+.brinkwood.actor.pc.character .character-armor-uses input[type="checkbox"]:focus-visible {
   outline: 3px solid var(--bw-focus);
   outline-offset: 2px;
 }
 
-.brinkwood.actor.pc.character:not(.character-v2) .character-armor-uses input[type="checkbox"]:disabled {
+.brinkwood.actor.pc.character .character-armor-uses input[type="checkbox"]:disabled {
   cursor: default;
   opacity: 0.65;
+}
+
+/* Restrained legacy character-sheet depth and hierarchy. */
+.brinkwood.actor.pc.character form.actor-sheet {
+  background:
+    radial-gradient(circle at 16% 0%, rgba(255, 255, 255, 0.48), transparent 38%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(224, 215, 197, 0.14));
+}
+
+.brinkwood.actor.pc.character form.actor-sheet > .name-alias {
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid rgba(141, 98, 93, 0.62);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.58),
+    0 2px 6px rgba(33, 27, 29, 0.08);
+}
+
+.brinkwood.actor.pc.character form.actor-sheet > .name-alias .portrait {
+  border-color: rgba(33, 27, 29, 0.72);
+  background: rgba(224, 215, 197, 0.42);
+  box-shadow: 5px 5px 0 rgba(141, 98, 93, 0.2);
+}
+
+.brinkwood.actor.pc.character form.actor-sheet > .name-alias input[type="text"],
+.brinkwood.actor.pc.character form.actor-sheet > .bans-armor input[type="text"] {
+  box-sizing: border-box;
+  border: 1px solid rgba(33, 27, 29, 0.42);
+  border-radius: 2px;
+  background: #fffdf7;
+  color: var(--bw-ink);
+  box-shadow: inset 0 1px 2px rgba(33, 27, 29, 0.13);
+}
+
+.brinkwood.actor.pc.character form.actor-sheet .character-identity-choices .item-block {
+  /* Keep labels in their existing track, while giving selected values a
+   * quieter gutter before the fixed × affordance. */
+  grid-template-columns: max-content minmax(0, 1fr) 18px;
+  column-gap: 4px;
+  margin: 0;
+  box-shadow: inset 0 -1px 0 rgba(141, 98, 93, 0.3);
+}
+
+.brinkwood.actor.pc.character form.actor-sheet .character-identity-choices .item-block > .item {
+  margin: 0;
+  padding: 0;
+}
+
+.brinkwood.actor.pc.character form.actor-sheet .character-identity-choices .item-class-label a {
+  color: var(--bw-ink-soft);
+  font-weight: 700;
+}
+
+.brinkwood.actor.pc.character form.actor-sheet > .bans-armor {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 2px 6px rgba(33, 27, 29, 0.06);
+}
+
+.brinkwood.actor.pc.character form.actor-sheet .character-bans tbody > tr > td:not([rowspan]) {
+  transition: background-color 120ms ease;
+}
+
+.brinkwood.actor.pc.character form.actor-sheet .character-armor-uses {
+  background: rgba(224, 215, 197, 0.24);
+  box-shadow: inset 1px 0 0 rgba(141, 98, 93, 0.28);
+}
+
+.brinkwood.actor.pc.character form.actor-sheet .character-scars-clock,
+.brinkwood.actor.pc.character form.actor-sheet .character-oath-clock {
+  border-color: rgba(141, 98, 93, 0.58);
+  border-radius: 6px;
+  background: rgba(224, 215, 197, 0.46);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.48),
+    0 1px 2px rgba(33, 27, 29, 0.08);
+}
+
+.brinkwood.actor.pc.character form.actor-sheet .character-sheet__workspace > nav.tabs .item.active {
+  color: var(--bw-ink);
+  background: rgba(255, 255, 255, 0.52);
+  box-shadow:
+    inset 0 -3px 0 var(--bw-accent),
+    0 1px 3px rgba(33, 27, 29, 0.12);
 }
