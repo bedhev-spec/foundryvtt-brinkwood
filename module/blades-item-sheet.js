@@ -3,7 +3,7 @@
  * @extends {ItemSheetV2}
  */
 import { BladesActiveEffect } from "./blades-active-effect.js";
-import { lockSheetFormControls } from "./sheet-dom.js";
+import { formControlUpdate, lockSheetFormControls } from "./sheet-dom.js";
 
 /** Brinkwood item fields, including Load, remain GM-authored. */
 export function prepareItemSheetPermissions(doc, { isGM = game.user.isGM, sheetEditable = true } = {}) {
@@ -29,7 +29,7 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
     classes: ["brinkwood", "sheet", "item"],
     position: { width: 720, height: 700 },
     window: { resizable: false },
-    form: { closeOnSubmit: false, submitOnChange: true },
+    form: { closeOnSubmit: false, submitOnChange: false },
   };
 
   /**
@@ -89,6 +89,10 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
       return;
     }
 
+    html.querySelectorAll('input[name], select[name], textarea[name], prose-mirror[name]').forEach(control => {
+      control.addEventListener("change", event => this._persistFormControl(event), listenerOptions);
+    });
+
     html.querySelectorAll('[data-action="editImage"][role="button"]').forEach(el =>
       el.addEventListener("keydown", event => {
         if (!["Enter", " "].includes(event.key)) return;
@@ -103,6 +107,13 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
     html.querySelectorAll(".effect-control[data-effect-action]").forEach(el =>
       el.addEventListener("click", ev => this._onItemEffectControl(ev), listenerOptions)
     );
+  }
+
+  async _persistFormControl(event) {
+    const permissions = prepareItemSheetPermissions(this.document, { sheetEditable: this.isEditable });
+    if (!permissions.canEditFields) return;
+    const update = formControlUpdate(event.currentTarget);
+    if (update) await this.document.update(update);
   }
 
   async _onItemEffectControl(ev) {

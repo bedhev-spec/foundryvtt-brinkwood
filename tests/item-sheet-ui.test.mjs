@@ -98,7 +98,7 @@ test("loadout items use v13 form editing and accessible active-effect controls",
     read("scss/import/item-sheet.scss"),
   ]);
 
-  assert.match(controller, /form:\s*\{ closeOnSubmit: false, submitOnChange: true \}/);
+  assert.match(controller, /form:\s*\{ closeOnSubmit: false, submitOnChange: false \}/);
   assert.doesNotMatch(controller, /activateListeners\s*\(/);
   assert.doesNotMatch(controller, /_onChangeInput\s*\(/);
   assert.match(template, /<textarea id="item-description" name="system\.description" aria-labelledby="item-\{\{_id\}\}-description-heading">\{\{system\.description\}\}<\/textarea>/);

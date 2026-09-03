@@ -9,3 +9,15 @@ export function lockSheetFormControls(html) {
     control.setAttribute("aria-readonly", "true");
   });
 }
+
+/** Convert one named form control into a Foundry document update. */
+export function formControlUpdate(control) {
+  const { name, type } = control ?? {};
+  if (!name || control.disabled || (type === "radio" && !control.checked)) return null;
+  const value = type === "checkbox"
+    ? control.checked
+    : control.multiple
+      ? Array.from(control.selectedOptions, option => option.value)
+      : control.value ?? control.getAttribute?.("value") ?? "";
+  return { [name]: value };
+}

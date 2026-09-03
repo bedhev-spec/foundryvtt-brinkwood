@@ -50,8 +50,6 @@ test("Legacy Effects use persistent accessible sub-tabs and hide empty suppressi
   assert.match(actorTemplate, /name="system\.alias" value="\{\{system\.alias\}\}"/);
   assert.match(controller, /_persistFormControl/);
   assert.match(controller, /prose-mirror\[name\]/);
-  assert.match(controller, /type === "checkbox"/);
-  assert.match(controller, /type === "radio" && !control\.checked/);
   assert.match(controller, /input\[name="system\.scars"\], input\[name="system\.oath"\], \[data-path\]/);
   assert.match(categories, /suppressed:[\s\S]*?visible: false/);
   assert.match(categories, /categories\.suppressed\.visible = categories\.suppressed\.effects\.length > 0/);

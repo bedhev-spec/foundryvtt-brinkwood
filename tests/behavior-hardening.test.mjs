@@ -42,6 +42,7 @@ const { BladesSheet } = await import("../module/blades-sheet.js");
 const { BladesActorSheet, prepareLoadoutCapacity } = await import("../module/blades-actor-sheet.js");
 const { BladesItemSheet, prepareItemSheetPermissions } = await import("../module/blades-item-sheet.js");
 const { BladesMaskSheet, getMaskTypePresentation } = await import("../module/blades-mask-sheet.js");
+const { formControlUpdate } = await import("../module/sheet-dom.js");
 const { syncOpenActorTrackers } = await import("../module/sheet-tracker-sync.js");
 const { BladesRebelionSheet } = await import("../module/blades-rebelion-sheet.js");
 
@@ -342,6 +343,46 @@ test("read-only item sheets disable form controls while retaining readable text"
   assert.equal(select["aria-disabled"], "true");
   assert.equal(textarea.readOnly, true);
   assert.equal(textarea["aria-readonly"], "true");
+});
+
+test("item sheet persists textarea changes through one explicit document update", async () => {
+  game.user.isGM = true;
+  const listeners = new Map();
+  const description = {
+    name: "system.description",
+    type: "textarea",
+    value: "Updated description",
+    addEventListener(type, listener) { listeners.set(type, listener); },
+  };
+  const updates = [];
+  const sheet = Object.assign(Object.create(BladesItemSheet.prototype), {
+    isEditable: true,
+    document: {
+      update: async data => updates.push(data),
+    },
+    element: {
+      querySelectorAll(selector) {
+        if (selector === 'input[name], select[name], textarea[name], prose-mirror[name]') return [description];
+        return [];
+      },
+    },
+  });
+
+  await BladesItemSheet.prototype._onRender.call(sheet, { editable: true }, {});
+  await listeners.get("change")({ currentTarget: description });
+
+  assert.deepEqual(updates, [{ "system.description": "Updated description" }]);
+});
+
+test("shared form updates preserve checkbox state and ignore unchecked radios", () => {
+  assert.deepEqual(
+    formControlUpdate({ name: "system.equipped", type: "checkbox", checked: false }),
+    { "system.equipped": false },
+  );
+  assert.equal(
+    formControlUpdate({ name: "system.choice", type: "radio", checked: false }),
+    null,
+  );
 });
 
 test("item effect listener catches rejected mutations and ignores a rapid second click", async () => {

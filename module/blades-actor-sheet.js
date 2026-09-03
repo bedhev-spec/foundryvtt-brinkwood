@@ -9,19 +9,9 @@ import {
 import { BladesHelpers } from "./blades-helpers.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
 import { preloadClockImages } from "./clock-utils.js";
+import { formControlUpdate } from "./sheet-dom.js";
 
 export { prepareLoadoutCapacity } from "./character/loadout.js";
-
-export function formControlUpdate(control) {
-  const { name, type } = control ?? {};
-  if (!name || control.disabled || (type === "radio" && !control.checked)) return null;
-  const value = type === "checkbox"
-    ? control.checked
-    : control.multiple
-      ? Array.from(control.selectedOptions, option => option.value)
-      : control.value ?? control.getAttribute?.("value") ?? "";
-  return { [name]: value };
-}
 
 export function updateCharacterTrackerDisplay(element, value) {
   const group = element.parentElement;
