@@ -208,28 +208,6 @@
   font-weight: 700;
 }
 
-/* This compact menu keeps its value and native option list centered without
- * inheriting the generic character-control focus frame. */
-.brinkwood.actor.pc.character form.actor-sheet .loadout .dropdown > select[name="system.selected_load_level"] {
-  padding-inline: 20px;
-  text-align: center;
-  text-align-last: center;
-  border-color: transparent;
-  box-shadow: none;
-  outline: none;
-}
-
-.brinkwood.actor.pc.character form.actor-sheet .loadout .dropdown > select[name="system.selected_load_level"]:focus,
-.brinkwood.actor.pc.character form.actor-sheet .loadout .dropdown > select[name="system.selected_load_level"]:focus-visible {
-  border-color: transparent;
-  box-shadow: none;
-  outline: none;
-}
-
-.brinkwood.actor.pc.character form.actor-sheet .loadout .dropdown > select[name="system.selected_load_level"] option {
-  text-align: center;
-}
-
 .brinkwood.actor.pc.character form.actor-sheet > .bans-armor {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.5),

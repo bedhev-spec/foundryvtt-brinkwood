@@ -68,6 +68,7 @@ test("Legacy Effects use persistent accessible sub-tabs and hide empty suppressi
   assert.match(stylesheet, /import\/legacy-character-effects\.scss/);
   assert.doesNotMatch(manifest, /legacy-effects-tabs\.css/);
   assert.match(actorTemplate, /character-sheet__workspace[\s\S]*?<nav class="tabs[\s\S]*?<\/nav>[\s\S]*?<div class="tab-content/);
+  // Load level is one native select, not a duplicated effect surface.
   assert.equal((actorTemplate.match(/name="system\.selected_load_level"/g) ?? []).length, 1);
   assert.doesNotMatch(actorTemplate, /id="character-\{\{_id\}\}-traits-tab"[\s\S]*?class="label-stripe"[\s\S]*?id="character-\{\{_id\}\}-traits-list"/);
   assert.match(styles, /character-sheet__workspace > nav\.tabs \{[\s\S]*?grid-column: 1 \/ -1[\s\S]*?width: 100%[\s\S]*?box-sizing: border-box/);

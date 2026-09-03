@@ -234,6 +234,20 @@ section {
   font-weight: bold;
 }
 
+// Shared framed section shell. Sheets retain ownership of their inner layout.
+.bw-section-frame {
+  min-width: 0;
+  border: 1px solid var(--bw-rule);
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.bw-section-frame__header {
+  background: var(--bw-ink);
+  color: var(--bw-inverse);
+}
+
 .editor,
 .editor-content,
 prose-mirror {

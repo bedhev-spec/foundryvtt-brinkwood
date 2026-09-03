@@ -55,7 +55,7 @@ test("native rich-text controls submit source fields while viewers receive enric
     ["templates/npc-sheet.html", "system.description", "actor.uuid", "enrichedDescription"],
     ["templates/npc-sheet.html", "system.notes", "actor.uuid", "enrichedNotes"],
     ["templates/actors/clock-sheet.html", "system.description", "actor.uuid", "enrichedDescription"],
-    ...["item", "simple", "trait", "class", "moot_decision"].map(type => [
+    ...["simple", "trait", "class", "moot_decision"].map(type => [
       `templates/items/${type}.html`, "system.description", "item.uuid", "enrichedDescription"
     ])
   ];
@@ -82,6 +82,10 @@ test("native rich-text controls submit source fields while viewers receive enric
     const readOnlyBranch = template.slice(control.index, template.indexOf("{{/if}}", control.index));
     assert.match(readOnlyBranch, new RegExp(`\\{\\{else\\}\\}\\s*<div class="editor editor-content">\\{\\{\\{${enriched}\\}\\}\\}<\\/div>`));
   }
+
+  const loadoutItem = await read("templates/items/item.html");
+  assert.match(loadoutItem, /<textarea id="item-description" name="system\.description"[^>]*>\{\{system\.description\}\}<\/textarea>/);
+  assert.doesNotMatch(loadoutItem, /<prose-mirror name="system\.description"/);
 });
 
 test("native editor activation resolves the Foundry v13 dataset UUID", async () => {

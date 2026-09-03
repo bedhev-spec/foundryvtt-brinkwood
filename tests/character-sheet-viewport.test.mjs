@@ -22,7 +22,9 @@ test("character sheet has one bounded frame and an internally scrolling tab view
   assert.match(styles, /form\.actor-sheet\s*\{[\s\S]*?row-gap:\s*10px/);
   assert.match(styles, /form\.actor-sheet > \.bans-armor\s*\{[\s\S]*?margin:\s*0/);
   assert.match(styles, /character-sheet__workspace\s*\{[\s\S]*?min-height:\s*0[\s\S]*?height:\s*100%[\s\S]*?grid-template-rows:\s*auto minmax\(0, 1fr\)[\s\S]*?overflow:\s*hidden/);
-  assert.match(styles, /character-sheet__workspace > \.tab-content\s*\{[\s\S]*?min-height:\s*0[\s\S]*?overflow-y:\s*auto[\s\S]*?overscroll-behavior:\s*contain/);
+  assert.match(styles, /character-sheet__workspace > \.tab-content\s*\{[\s\S]*?display:\s*grid[\s\S]*?grid-template-rows:\s*minmax\(0, 1fr\)[\s\S]*?min-height:\s*0[\s\S]*?height:\s*100%[\s\S]*?overflow-y:\s*auto[\s\S]*?overscroll-behavior:\s*contain/);
+  assert.match(styles, /character-sheet__workspace > \.tab-content > \.tab\[data-tab\]\.active\s*\{[\s\S]*?display:\s*flex[\s\S]*?min-height:\s*0[\s\S]*?height:\s*100%[\s\S]*?pointer-events:\s*auto/);
+  assert.match(styles, /tab\[data-tab="loadout"\]\.active\s*\{[\s\S]*?position:\s*relative[\s\S]*?z-index:\s*0/);
   assert.doesNotMatch(lateStyles, /form\.actor-sheet\s*\{[\s\S]*?grid-template-rows:\s*auto auto minmax\(0, 1fr\)[\s\S]*?overflow:\s*hidden/);
   assert.doesNotMatch(lateStyles, /character-sheet__workspace > \.tab-content\s*\{[\s\S]*?overflow-y:\s*auto/);
   assert.match(compiled, /\.brinkwood\.actor\.pc\.character form\.actor-sheet\s*\{[\s\S]*?grid-template-rows:\s*auto auto auto auto minmax\(0, 1fr\)[\s\S]*?overflow:\s*hidden/);

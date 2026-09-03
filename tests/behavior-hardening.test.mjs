@@ -39,25 +39,73 @@ globalThis.game = { user: { isGM: false }, scenes: { current: null } };
 const { BladesActiveEffect } = await import("../module/blades-active-effect.js");
 const { BladesClockSheet } = await import("../module/blades-clock-sheet.js");
 const { BladesSheet } = await import("../module/blades-sheet.js");
-const { BladesActorSheet } = await import("../module/blades-actor-sheet.js");
-const { BladesItemSheet } = await import("../module/blades-item-sheet.js");
+const { BladesActorSheet, prepareLoadoutCapacity } = await import("../module/blades-actor-sheet.js");
+const { BladesItemSheet, prepareItemSheetPermissions } = await import("../module/blades-item-sheet.js");
 const { BladesMaskSheet, getMaskTypePresentation } = await import("../module/blades-mask-sheet.js");
 const { syncOpenActorTrackers } = await import("../module/sheet-tracker-sync.js");
 const { BladesRebelionSheet } = await import("../module/blades-rebelion-sheet.js");
 
-function effectEvent(action = "create") {
+function effectEvent(action = "create", effectId = null, effectType = "passive") {
   return {
     prevented: false,
     preventDefault() { this.prevented = true; },
     currentTarget: {
       dataset: { effectAction: action },
       closest(selector) {
-        if (selector === "[data-effect-type]") return { dataset: { effectType: "passive" } };
+        if (selector === "[data-effect-type]") return { dataset: { effectType } };
+        if (selector === "[data-effect-id]" && effectId) return { dataset: { effectId } };
         return null;
       }
     }
   };
 }
+
+test("character loadout context exposes normalized declared capacity without document writes", () => {
+  assert.deepEqual(prepareLoadoutCapacity(3, "BITD.Light"), {
+    selectedLoadLevel: "BITD.Light",
+    loadoutCapacity: 3,
+    isLoadoutOverloaded: false,
+  });
+  assert.deepEqual(prepareLoadoutCapacity(6, "BITD.Normal"), {
+    selectedLoadLevel: "BITD.Normal",
+    loadoutCapacity: 5,
+    isLoadoutOverloaded: true,
+  });
+  assert.deepEqual(prepareLoadoutCapacity(6, "BITD.Heavy"), {
+    selectedLoadLevel: "BITD.Heavy",
+    loadoutCapacity: 6,
+    isLoadoutOverloaded: false,
+  });
+  assert.deepEqual(prepareLoadoutCapacity(0, ""), {
+    selectedLoadLevel: "BITD.Light",
+    loadoutCapacity: 3,
+    isLoadoutOverloaded: false,
+  });
+});
+
+test("item Load remains GM-only, including owned actor items", () => {
+  const embedded = {
+    isEmbedded: true,
+    parent: { documentName: "Actor", isOwner: true },
+  };
+
+  assert.deepEqual(prepareItemSheetPermissions(embedded, { isGM: false, sheetEditable: true }), {
+    canEditFields: false,
+    canEditLoad: false,
+  });
+  assert.deepEqual(prepareItemSheetPermissions({ isEmbedded: false }, { isGM: false, sheetEditable: true }), {
+    canEditFields: false,
+    canEditLoad: false,
+  });
+  assert.deepEqual(prepareItemSheetPermissions({ ...embedded, parent: { documentName: "Actor", isOwner: false } }, { isGM: false, sheetEditable: false }), {
+    canEditFields: false,
+    canEditLoad: false,
+  });
+  assert.deepEqual(prepareItemSheetPermissions({ isEmbedded: false }, { isGM: true, sheetEditable: true }), {
+    canEditFields: true,
+    canEditLoad: true,
+  });
+});
 
 test("effect mutations require ownership and respect GM-only sheet policy", async () => {
   const created = [];
@@ -85,6 +133,39 @@ test("effect mutations require ownership and respect GM-only sheet policy", asyn
   const nonOwner = effectEvent();
   await BladesActiveEffect.onManageActiveEffect(nonOwner, { ...owner, isOwner: false }, { gmOnly: true });
   assert.equal(created.length, 2);
+});
+
+test("item-owned effects support create, edit, toggle, and delete without blocking embedded items", async () => {
+  game.user.isGM = true;
+  const calls = [];
+  const effect = {
+    disabled: false,
+    sheet: { render: options => calls.push(["edit", options]) },
+    update: data => calls.push(["toggle", data]),
+    delete: () => calls.push(["delete"]),
+  };
+  const owner = {
+    isOwner: true,
+    isEmbedded: true,
+    uuid: "Actor.owner.Item.item",
+    effects: new Map([["effect-1", effect]]),
+    createEmbeddedDocuments: (type, data) => calls.push(["create", type, data]),
+  };
+
+  await BladesActiveEffect.onManageActiveEffect(effectEvent("create", null, "temporary"), owner, { gmOnly: true });
+  await BladesActiveEffect.onManageActiveEffect(effectEvent("edit", "effect-1"), owner, { gmOnly: true });
+  await BladesActiveEffect.onManageActiveEffect(effectEvent("toggle", "effect-1"), owner, { gmOnly: true });
+  await BladesActiveEffect.onManageActiveEffect(effectEvent("delete", "effect-1"), owner, { gmOnly: true });
+
+  assert.equal(calls[0][0], "create");
+  assert.equal(calls[0][1], "ActiveEffect");
+  assert.equal(calls[0][2][0].origin, owner.uuid);
+  assert.equal(calls[0][2][0]["duration.rounds"], 1);
+  assert.deepEqual(calls.slice(1), [
+    ["edit", { force: true }],
+    ["toggle", { disabled: true }],
+    ["delete"],
+  ]);
 });
 
 test("clock updates preserve actor and token textures when active tokens exist", async () => {
@@ -251,6 +332,73 @@ test("read-only item sheets disable form controls while retaining readable text"
   assert.equal(select["aria-disabled"], "true");
   assert.equal(textarea.readOnly, true);
   assert.equal(textarea["aria-readonly"], "true");
+});
+
+test("item effect listener catches rejected mutations and ignores a rapid second click", async () => {
+  const originalManage = BladesActiveEffect.onManageActiveEffect;
+  const notifications = [];
+  globalThis.ui = { notifications: { error: message => notifications.push(message) } };
+  let rejectMutation;
+  let calls = 0;
+  BladesActiveEffect.onManageActiveEffect = () => {
+    calls += 1;
+    return new Promise((_resolve, reject) => { rejectMutation = reject; });
+  };
+  const listeners = new Map();
+  const control = {
+    disabled: false,
+    addEventListener(type, listener) { listeners.set(type, listener); },
+  };
+  const sheet = Object.assign(Object.create(BladesItemSheet.prototype), {
+    element: { isConnected: true, querySelectorAll: selector =>
+      selector === ".effect-control[data-effect-action]" ? [control] : [] },
+    document: {},
+    _bindEffectDisclosureState() {},
+    render: async () => assert.fail("a rejected mutation must not reconcile"),
+  });
+  try {
+    await BladesItemSheet.prototype._onRender.call(sheet, { editable: true }, {});
+    const first = listeners.get("click")({ currentTarget: control, preventDefault() {} });
+    const second = listeners.get("click")({ currentTarget: control, preventDefault() {} });
+    assert.equal(calls, 1);
+    rejectMutation(new Error("denied"));
+    await Promise.all([first, second]);
+    assert.equal(control.disabled, false);
+    assert.equal(notifications.length, 1);
+  } finally {
+    BladesActiveEffect.onManageActiveEffect = originalManage;
+  }
+});
+
+test("item effect reconciliation restores the Item sheet form scroll after replacement render", async () => {
+  const originalManage = BladesActiveEffect.onManageActiveEffect;
+  BladesActiveEffect.onManageActiveEffect = async () => {};
+  const firstForm = { scrollTop: 214, scrollLeft: 9 };
+  const replacementForm = { scrollTop: 0, scrollLeft: 0 };
+  const itemRoot = form => ({
+    isConnected: true,
+    matches: () => false,
+    closest: () => null,
+    querySelector: selector => selector === "form" ? form : null,
+  });
+  const firstRoot = itemRoot(firstForm);
+  const replacementRoot = itemRoot(replacementForm);
+  const control = { disabled: false };
+  const sheet = Object.assign(Object.create(BladesItemSheet.prototype), {
+    element: firstRoot,
+    document: {},
+    _itemSheetListenerController: new AbortController(),
+    render: async () => { sheet.element = replacementRoot; },
+  });
+  try {
+    await sheet._onItemEffectControl({ currentTarget: control, preventDefault() {} });
+    assert.deepEqual(
+      { scrollTop: replacementForm.scrollTop, scrollLeft: replacementForm.scrollLeft },
+      { scrollTop: 214, scrollLeft: 9 },
+    );
+  } finally {
+    BladesActiveEffect.onManageActiveEffect = originalManage;
+  }
 });
 
 test("legacy actor sheets retain the form viewport, wrapper viewport, and selected tabs across a render", () => {

@@ -298,6 +298,17 @@
   display: flex;
   font-weight: bold;
 }
+.brinkwood .bw-section-frame {
+  min-width: 0;
+  border: 1px solid var(--bw-rule);
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.24);
+}
+.brinkwood .bw-section-frame__header {
+  background: var(--bw-ink);
+  color: var(--bw-inverse);
+}
 .brinkwood .editor,
 .brinkwood .editor-content,
 .brinkwood prose-mirror {
@@ -1444,6 +1455,210 @@
 .brinkwood.actor.pc.character .loadout .item-body {
   width: auto;
 }
+.brinkwood.actor.pc.character .loadout {
+  min-width: 0;
+}
+.brinkwood.actor.pc.character .loadout .loadout__panel {
+  min-width: 0;
+  height: max-content;
+  overflow: visible;
+}
+.brinkwood.actor.pc.character .loadout .loadout__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content minmax(72px, max-content);
+  align-items: center;
+  gap: 5px;
+  min-height: 32px;
+  margin: 0;
+  padding: 4px 8px;
+}
+.brinkwood.actor.pc.character .loadout .loadout__heading, .brinkwood.actor.pc.character .loadout .loadout__weight {
+  margin: 0;
+}
+.brinkwood.actor.pc.character .loadout .loadout__heading {
+  color: var(--bw-inverse);
+  font-size: 0.82rem;
+  line-height: 1;
+  text-align: left;
+}
+.brinkwood.actor.pc.character .loadout .loadout__weight {
+  color: var(--bw-inverse);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.brinkwood.actor.pc.character .loadout .loadout__weight.is-overloaded {
+  color: #d97b76;
+}
+.brinkwood.actor.pc.character .loadout .loadout__level {
+  min-width: 0;
+}
+.brinkwood.actor.pc.character .loadout .loadout__level select {
+  min-width: 72px;
+  min-height: 22px;
+  padding: 1px 18px 1px 5px;
+  border: 1px solid var(--bw-rule);
+  border-radius: 2px;
+  background: var(--bw-paper);
+  color: var(--bw-ink);
+  cursor: pointer;
+  font-family: Georgia, "Bitstream Charter", "Times New Roman", serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  text-align-last: center;
+  text-transform: uppercase;
+}
+.brinkwood.actor.pc.character .loadout .loadout__level select option {
+  text-align: center;
+}
+.brinkwood.actor.pc.character .loadout .loadout__level select:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 2px;
+}
+.brinkwood.actor.pc.character .loadout .loadout__level select:disabled {
+  cursor: default;
+  opacity: 0.65;
+}
+.brinkwood.actor.pc.character .loadout .loadout__catalogue {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 8px;
+  row-gap: 1px;
+  min-width: 0;
+  margin: 0;
+  padding: 7px 8px;
+}
+.brinkwood.actor.pc.character .loadout .loadout__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  min-width: 0;
+  min-height: 32px;
+  margin: 0;
+  border-bottom: 1px solid rgba(141, 98, 93, 0.55);
+  background: rgba(247, 244, 237, 0.32);
+  box-shadow: inset 3px 0 0 var(--bw-accent);
+  transition: background-color 120ms ease, box-shadow 120ms ease;
+}
+.brinkwood.actor.pc.character .loadout .loadout__item:hover {
+  background: rgba(141, 98, 93, 0.12);
+}
+.brinkwood.actor.pc.character .loadout .loadout__item:focus-within {
+  background: rgba(141, 98, 93, 0.16);
+}
+.brinkwood.actor.pc.character .loadout .loadout__item:has(.loadout-item-select:checked) {
+  background: rgba(141, 98, 93, 0.2);
+  box-shadow: inset 3px 0 0 var(--bw-accent);
+}
+.brinkwood.actor.pc.character .loadout .loadout-item-select {
+  display: block;
+  inline-size: 18px;
+  block-size: 18px;
+  margin: 0 8px;
+  opacity: 1;
+}
+.brinkwood.actor.pc.character .loadout .loadout-item-open {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 30px;
+  padding: 4px 6px 4px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--bw-ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.94rem;
+  text-align: left;
+}
+.brinkwood.actor.pc.character .loadout .loadout-item-open:focus, .brinkwood.actor.pc.character .loadout .loadout-item-open:focus-visible {
+  outline: 0;
+  box-shadow: none;
+}
+.brinkwood.actor.pc.character .loadout .loadout__item-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.brinkwood.actor.pc.character .loadout .loadout-item-load {
+  inline-size: 32px;
+  min-inline-size: 32px;
+  min-height: 32px;
+  margin: 0 8px 0 2px;
+  padding: 2px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--bw-ink);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+.brinkwood.actor.pc.character .loadout .loadout-item-load::-webkit-inner-spin-button, .brinkwood.actor.pc.character .loadout .loadout-item-load::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+.brinkwood.actor.pc.character .loadout .loadout-item-load:hover {
+  border-color: rgba(141, 98, 93, 0.58);
+  background: rgba(247, 244, 237, 0.78);
+}
+.brinkwood.actor.pc.character .loadout .loadout-item-load:focus-visible {
+  border-color: var(--bw-rule);
+  background: #fffdf8;
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 1px;
+}
+.brinkwood.actor.pc.character .loadout .loadout-item-load:disabled {
+  background: transparent;
+  color: var(--bw-ink-soft);
+  opacity: 1;
+}
+.brinkwood.actor.pc.character .loadout .loadout__item-delete {
+  width: 24px;
+  min-width: 24px;
+  min-height: 0;
+  margin: 0;
+  border: 0;
+  border-left: 1px solid var(--bw-rule);
+  border-radius: 0;
+  background: transparent;
+  color: var(--bw-ink-soft);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.brinkwood.actor.pc.character .loadout .loadout__item-delete:hover, .brinkwood.actor.pc.character .loadout .loadout__item-delete:focus-visible {
+  background: rgba(141, 98, 93, 0.16);
+  color: var(--bw-ink);
+}
+.brinkwood.actor.pc.character .loadout .loadout__item-delete:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: -3px;
+}
+@container (max-width: 600px) {
+  .brinkwood.actor.pc.character .loadout .loadout__catalogue {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container (max-width: 420px) {
+  .brinkwood.actor.pc.character .loadout .loadout__header {
+    grid-template-columns: minmax(0, 1fr) max-content;
+  }
+  .brinkwood.actor.pc.character .loadout .loadout__level {
+    grid-column: 1/-1;
+    justify-self: end;
+  }
+  .brinkwood.actor.pc.character .loadout .loadout__catalogue {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 .brinkwood.actor.pc.character form.actor-sheet .tab[data-tab=traits] [id$=-traits-list],
 .brinkwood.actor.pc.character form.actor-sheet .tab[data-tab=traits] .traits-list {
   display: grid;
@@ -1593,12 +1808,28 @@
   min-height: 0;
 }
 .brinkwood.actor.pc.character .character-sheet__workspace > .tab-content {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  min-width: 0;
   min-height: 0;
+  height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: auto;
   scrollbar-width: thin;
+}
+.brinkwood.actor.pc.character .character-sheet__workspace > .tab-content > .tab[data-tab].active {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  pointer-events: auto;
+}
+.brinkwood.actor.pc.character .character-sheet__workspace > .tab-content > .tab[data-tab=loadout].active {
+  position: relative;
+  z-index: 0;
 }
 .brinkwood.actor.pc.character input[type=text],
 .brinkwood.actor.pc.character select,
@@ -1732,10 +1963,7 @@
   }
 }
 .brinkwood.actor.pc.character .bans-armor {
-  padding: 10px 10px 0;
-  border: 1px solid var(--bw-rule);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.24);
+  padding: 0;
 }
 .brinkwood.actor.pc.character .bans-armor .character-bans table {
   border-collapse: separate;
@@ -3386,12 +3614,27 @@
   font-size: 0.9rem;
 }
 .brinkwood.item.sheet .loadout-item-sheet__section {
-  padding: 12px;
+  display: block;
+  flex: 0 0 auto;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 12px 12px;
   border: 1px solid rgba(141, 98, 93, 0.55);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.24);
 }
-.brinkwood.item.sheet .loadout-item-sheet__section h2,
+.brinkwood.item.sheet .loadout-item-sheet__section h2 {
+  margin: 0 -12px 12px;
+  padding: 8px 12px;
+  color: var(--bw-paper);
+  background: var(--bw-ink);
+  font-family: var(--bw-heading-font, inherit);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
 .brinkwood.item.sheet .loadout-item-sheet__section .loadout-item-sheet__textarea-label {
   display: block;
   margin: 0 0 9px;
@@ -3401,17 +3644,24 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
-.brinkwood.item.sheet .loadout-item-sheet__editor {
-  min-height: 110px;
-  padding: 8px;
-  border: 1px solid rgba(33, 27, 29, 0.28);
-  border-radius: 6px;
-  background: var(--bw-paper-deep);
+.brinkwood.item.sheet .loadout-item-sheet__effects #effects,
+.brinkwood.item.sheet .loadout-item-sheet__effects .effects-groups,
+.brinkwood.item.sheet .loadout-item-sheet__effects .effects-category {
+  display: block;
+  min-width: 0;
 }
-.brinkwood.item.sheet .loadout-item-sheet__editor .editor,
-.brinkwood.item.sheet .loadout-item-sheet__editor .editor-content,
-.brinkwood.item.sheet .loadout-item-sheet__editor prose-mirror {
-  min-height: 92px;
+.brinkwood.item.sheet .loadout-item-sheet__effects .effects-groups {
+  gap: 0;
+}
+.brinkwood.item.sheet .loadout-item-sheet__effects .effects-category + .effects-category {
+  margin-top: 8px;
+}
+.brinkwood.item.sheet .loadout-item-sheet__effects .effects-category__header {
+  min-height: 42px;
+  padding: 6px 8px 6px 11px;
+}
+.brinkwood.item.sheet .loadout-item-sheet__effects .effects-category__empty {
+  padding: 10px 12px;
 }
 .brinkwood.item.sheet .loadout-item-sheet__grid {
   display: grid;
@@ -4013,28 +4263,6 @@ aside#tooltip.brinkwood-item-tooltip-shell {
 .brinkwood.actor.pc.character form.actor-sheet .character-identity-choices .item-class-label a {
   color: var(--bw-ink-soft);
   font-weight: 700;
-}
-
-/* This compact menu keeps its value and native option list centered without
- * inheriting the generic character-control focus frame. */
-.brinkwood.actor.pc.character form.actor-sheet .loadout .dropdown > select[name="system.selected_load_level"] {
-  padding-inline: 20px;
-  text-align: center;
-  text-align-last: center;
-  border-color: transparent;
-  box-shadow: none;
-  outline: none;
-}
-
-.brinkwood.actor.pc.character form.actor-sheet .loadout .dropdown > select[name="system.selected_load_level"]:focus,
-.brinkwood.actor.pc.character form.actor-sheet .loadout .dropdown > select[name="system.selected_load_level"]:focus-visible {
-  border-color: transparent;
-  box-shadow: none;
-  outline: none;
-}
-
-.brinkwood.actor.pc.character form.actor-sheet .loadout .dropdown > select[name="system.selected_load_level"] option {
-  text-align: center;
 }
 
 .brinkwood.actor.pc.character form.actor-sheet > .bans-armor {

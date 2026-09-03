@@ -125,8 +125,9 @@ test("Character sheet commits generic controls once and completes tab-panel cont
   assert.doesNotMatch(controller, /control\.addEventListener\("focusout", event => this\._persistFormControl\(event\), listenerOptions\)/);
   assert.match(controller, /input\[name="system\.scars"\], input\[name="system\.oath"\], \[data-path\]/);
   assert.match(controller, /control\.matches\("prose-mirror\[name\]"\)/);
+  assert.match(controller, /this\._bindSheetViewState\(html, listenerOptions\);[\s\S]*?bindLoadoutControls\(this, html, listenerOptions\);[\s\S]*?if \(!this\.isEditable\) return;/);
 
-  assert.match(template, /<thead>\s*<tr>[\s\S]*?<\/tr>\s*<\/thead>/);
+  assert.match(template, /<thead(?:\s+[^>]*)?>\s*<tr>[\s\S]*?<\/tr>\s*<\/thead>/);
   for (const [tab, panel] of [
     ["traits", "traits-tab"],
     ["loadout", "loadout"],

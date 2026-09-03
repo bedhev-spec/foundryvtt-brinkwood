@@ -215,6 +215,15 @@ test("item-picker interpolations are escaped before entering HTML", async () => 
   assert.match(tooltip, /BITD\.Load/);
   assert.match(tooltip, /<strong>3<\/strong>/);
   assert.doesNotMatch(tooltip, /<script>/);
+
+  const upbringingTooltip = renderItemTooltip({ type: "upbringing", name: "Foundling" });
+  const professionTooltip = renderItemTooltip({ type: "profession", name: "Bard" });
+  const classTooltip = renderItemTooltip({ type: "class", name: "Commander" });
+  const pactTooltip = renderItemTooltip({ type: "pact", name: "A Pact" });
+  assert.match(upbringingTooltip, /BITD\.UpbringingGrantSummary/);
+  assert.match(professionTooltip, /BITD\.ProfessionGrantSummary/);
+  assert.match(classTooltip, /BITD\.ClassGrantSummary/);
+  assert.doesNotMatch(pactTooltip, /GrantSummary/);
 });
 
 test("loadout item sheet uses compact semantic sections", async () => {

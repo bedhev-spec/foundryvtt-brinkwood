@@ -119,6 +119,11 @@ test("each Item description editor uses the dedicated enriched context", async t
   for (const type of ["item", "simple", "trait", "class", "moot_decision"]) {
     await t.test(type, async () => {
       const template = await read(`templates/items/${type}.html`);
+      if (type === "item") {
+        assert.match(template, /<textarea id="item-description" name="system\.description"[^>]*>\{\{system\.description\}\}<\/textarea>/);
+        assert.doesNotMatch(template, /<prose-mirror name="system\.description"/);
+        return;
+      }
       assert.match(template, /\{\{#if editable\}\}[\s\S]*?<prose-mirror name="system\.description" value="\{\{system\.description\}\}" data-document-uuid="\{\{item\.uuid\}\}" collaborate toggled>/);
       assert.match(template, /\{\{else\}\}[\s\S]*?<div class="editor editor-content">\{\{\{enrichedDescription\}\}\}<\/div>/);
       assert.doesNotMatch(template, /\{\{editor\b/);

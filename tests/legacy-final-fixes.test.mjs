@@ -53,5 +53,5 @@ test("Legacy sheets reset to Traits only when genuinely closed", async () => {
 test("Bans and Armor content meets the lower frame without excess parchment space", async () => {
   const styles = await read("scss/import/character-sheet.scss");
 
-  assert.match(styles, /\.bans-armor\s*\{[\s\S]*?padding:\s*10px 10px 0/);
+  assert.match(styles, /\.bans-armor\s*\{[\s\S]*?padding:\s*0/);
 });

@@ -10,7 +10,9 @@ export function getSheetScrollContainers(root) {
   // preserve the outer scroll positions: restoring either moves the header.
   if (characterViewport) return [["tab", characterViewport]];
 
-  const form = root?.matches?.("form.actor-sheet") ? root : root?.querySelector?.("form.actor-sheet");
+  const form = root?.matches?.("form") || root?.matches?.("form.actor-sheet")
+    ? root
+    : root?.querySelector?.("form") ?? root?.querySelector?.("form.actor-sheet");
   const windowContent = root?.closest?.(".window-content") ?? root?.querySelector?.(".window-content");
   return [["form", form], ["window", windowContent]].filter(([, element]) => element);
 }

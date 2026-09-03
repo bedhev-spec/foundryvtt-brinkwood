@@ -148,10 +148,10 @@
   {{> "systems/brinkwood/templates/parts/attributes.html" actor=actor}}
 </section>
 
-<section id="character-{{_id}}-bans-armor" class="bans-armor" aria-label="{{localize 'BITD.BansArmor'}}">
+<section id="character-{{_id}}-bans-armor" class="bans-armor bw-section-frame" aria-label="{{localize 'BITD.BansArmor'}}">
     <div id="character-{{_id}}-character-bans" class="character-bans">
       <table>
-        <thead>
+      <thead class="bw-section-frame__header">
 				<tr>
 					<th class="black-white" colspan="4"><span class="tooltip" data-tooltip="Actor.Bans.Tooltip" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">{{localize "BITD.Bans"}}</span></th>
 			  <th class="black-white"><label></label></th>
@@ -243,31 +243,41 @@
       </div>
 
       {{!-- Owned Items Tab --}}
-      <div id="character-{{_id}}-loadout" class="tab flex-vertical loadout {{#if (eq tabs.primary "loadout")}}active{{/if}}" role="tabpanel" aria-labelledby="character-{{_id}}-tab-loadout" data-group="primary" data-tab="loadout">
-        <div class="label-stripe flex-horizontal">
-           <p>{{localize "BITD.Loadout"}} <a class="item-add-popup" data-item-type="item"><i class="fas fa-plus-square"></i></a></p>
-           <p>{{system.loadout}}/{{localize system.load_level}} </p>
-           <div class="dropdown">
-             <select name="system.selected_load_level">
-               {{selectOptions system.load_levels selected=system.selected_load_level localize=true}}
-             </select>
-           </div>
+  <div id="character-{{_id}}-loadout" class="tab flex-vertical loadout {{#if (eq tabs.primary "loadout")}}active{{/if}}" role="tabpanel" aria-labelledby="character-{{_id}}-tab-loadout" data-group="primary" data-tab="loadout">
+    <div class="loadout__panel bw-section-frame">
+      <div class="label-stripe loadout__header bw-section-frame__header">
+        <h2 class="loadout__heading">{{localize "BITD.Loadout"}}</h2>
+        <output class="loadout__weight{{#if isLoadoutOverloaded}} is-overloaded{{/if}}" aria-label="{{system.loadout}}/{{loadoutCapacity}}{{#if isLoadoutOverloaded}} — {{localize "BITD.Overloaded"}}{{/if}}"{{#if isLoadoutOverloaded}} title="{{localize "BITD.Overloaded"}}"{{/if}}>{{system.loadout}}/{{loadoutCapacity}}</output>
+        <label class="loadout__level" for="character-{{_id}}-load-level">
+          <select id="character-{{_id}}-load-level" name="system.selected_load_level" aria-label="{{localize "BITD.Loadout"}}"{{#unless editable}} disabled{{/unless}}>
+              <option value="BITD.Light"{{#if (eq selectedLoadLevel "BITD.Light")}} selected{{/if}}>{{localize "BITD.Light"}}</option>
+              <option value="BITD.Normal"{{#if (eq selectedLoadLevel "BITD.Normal")}} selected{{/if}}>{{localize "BITD.Normal"}}</option>
+              <option value="BITD.Heavy"{{#if (eq selectedLoadLevel "BITD.Heavy")}} selected{{/if}}>{{localize "BITD.Heavy"}}</option>
+            </select>
+          </label>
         </div>
-        <div>
-          {{#each items as |item id|}}
-          {{#if (eq item.type "item")}}
-            <div class="item flex-horizontal" data-item-id="{{item._id}}">
-              <div class="item-body flex-horizontal">
-                <div class="item-name">{{item.name}}</div>
-              </div>
-            </div>
-          {{/if}}
+        <div class="loadout__catalogue" role="list" aria-label="{{localize "BITD.Loadout"}}">
+          {{#each loadoutItems as |item|}}
+            <article class="item loadout__item" data-item-id="{{item.actorItemId}}" role="listitem">
+              <input id="character-{{../_id}}-loadout-{{item.sourceId}}" class="loadout-item-select bw-checkbox-x" data-loadout-source-id="{{item.sourceId}}" data-loadout-item-name="{{item.name}}" type="checkbox" aria-label="{{item.name}}"{{#if item.selected}} checked{{/if}}{{#unless ../editable}} disabled{{/unless}}>
+              <button type="button" class="loadout-item-open" data-loadout-source-id="{{item.sourceId}}" data-item-id="{{item.actorItemId}}" aria-label="{{item.name}}">
+                <span class="loadout__item-name">{{item.name}}</span>
+              </button>
+        <input class="loadout-item-load" type="number" min="0" step="1" value="{{item.system.load}}" data-item-id="{{item.actorItemId}}" data-loadout-source-id="{{item.sourceId}}" data-loadout-item-name="{{item.name}}" aria-label="{{localize "BITD.Load"}}: {{item.name}}"{{#unless ../isGM}} disabled{{/unless}}>
+              {{#if ../isGM}}
+                {{#if item.isCustom}}
+                  {{#if item.actorItemId}}
+                    <button type="button" class="item-delete loadout__item-delete" title="{{localize 'BITD.TitleDeleteItem'}}" aria-label="{{localize 'BITD.TitleDeleteItem'}}: {{item.name}}"><span aria-hidden="true">&times;</span></button>
+                  {{/if}}
+                {{/if}}
+              {{/if}}
+            </article>
           {{/each}}
-          <div class="item-class-label"><a class="item-add-popup" data-item-type="item">{{localize "BITD.AddItem"}}</a></div>
-        </div>
       </div>
+    </div>
+  </div>
 
-<div id="character-{{_id}}-notes" class="tab flex-vertical {{#if (eq tabs.primary "character-notes")}}active{{/if}}" role="tabpanel" aria-labelledby="character-{{_id}}-tab-notes" data-group="primary" data-tab="character-notes">
+  <div id="character-{{_id}}-notes" class="tab flex-vertical {{#if (eq tabs.primary "character-notes")}}active{{/if}}" role="tabpanel" aria-labelledby="character-{{_id}}-tab-notes" data-group="primary" data-tab="character-notes">
         {{#if editable}}
         <prose-mirror name="system.description" value="{{system.description}}" data-document-uuid="{{actor.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
         {{else}}

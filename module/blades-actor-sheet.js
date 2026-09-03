@@ -1,7 +1,16 @@
 
 import { BladesSheet } from "./blades-sheet.js";
+import {
+  bindLoadoutControls,
+  calculateLoadoutWeight,
+  prepareLoadoutCapacity,
+  prepareLoadoutCatalogue,
+} from "./character/loadout.js";
+import { BladesHelpers } from "./blades-helpers.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
 import { preloadClockImages } from "./clock-utils.js";
+
+export { prepareLoadoutCapacity } from "./character/loadout.js";
 
 export function formControlUpdate(control) {
   const { name, type } = control ?? {};
@@ -93,17 +102,21 @@ position: { width: 700, height: 1170 },
         return { ...trait, canDelete };
       });
 
+    // This is display-only data. Selecting an entry is the only path that
+    // creates its embedded item on the actor.
+    context.loadoutItems = prepareLoadoutCatalogue(
+      await BladesHelpers.getAllItemsByType("item", game),
+      context.items,
+    );
+
     Object.entries(context.system.attributes).forEach(([name, attr]) => {
       context.system.attributes[name].value = Object.values(attr.skills).filter(s => s.value > 0).length;
     });
 
     // Calculate Load
-    let loadout = 0;
-    context.items.forEach(i => {
-      loadout += (i.type === "item" && i.system.equipped) ? parseInt(i.system.load) : 0;
-    });
-    loadout = Math.max(0, Math.min(10, loadout));
+    const loadout = calculateLoadoutWeight(context.items);
     context.system.loadout = loadout;
+    Object.assign(context, prepareLoadoutCapacity(loadout, context.system.selected_load_level));
 
     // Encumbrance Levels
     const load_level = [
@@ -157,6 +170,7 @@ position: { width: 700, height: 1170 },
      this._characterSheetListenerController = new AbortController();
      const listenerOptions = { signal: this._characterSheetListenerController.signal };
      this._bindSheetViewState(html, listenerOptions);
+     bindLoadoutControls(this, html, listenerOptions);
      if (!this.isEditable) return;
 
        html.querySelectorAll('input[name], select[name], textarea[name], prose-mirror[name]').forEach(control => {

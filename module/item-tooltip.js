@@ -1,7 +1,14 @@
 import { escapeHTML } from "./html-utils.js";
 
+const TYPE_GRANT_SUMMARY_KEYS = Object.freeze({
+  upbringing: "BITD.UpbringingGrantSummary",
+  profession: "BITD.ProfessionGrantSummary",
+  class: "BITD.ClassGrantSummary"
+});
+
 export function renderItemTooltip(item, localize = key => key) {
   const system = item?.system ?? {};
+  const grantSummaryKey = TYPE_GRANT_SUMMARY_KEYS[item?.type];
   const fields = [
     ["BITD.Load", system.load],
     ["BITD.Uses", system.uses],
@@ -20,6 +27,7 @@ export function renderItemTooltip(item, localize = key => key) {
     <section class="brinkwood-item-tooltip">
       <header>${escapeHTML(localize(item?.name ?? ""))}</header>
       <div class="brinkwood-item-tooltip__stats">${rows}</div>
+      ${grantSummaryKey ? `<p>${escapeHTML(localize(grantSummaryKey))}</p>` : ""}
       ${additionalInfo ? `<p>${escapeHTML(additionalInfo)}</p>` : ""}
     </section>`;
 }

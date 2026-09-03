@@ -50,3 +50,29 @@ test("legacy item sheets share bounded headers and scrolling content", async () 
   assert.match(source, /@container \(max-width: 440px\)[\s\S]*?legacy-item-sheet__body/);
   assert.match(compiled, /\.brinkwood\.item\.sheet \.window-content > \.legacy-item-sheet\s*\{[\s\S]*?overflow-y: auto/);
 });
+
+test("loadout items use v13 form editing and accessible active-effect controls", async () => {
+  const [controller, template, source] = await Promise.all([
+    read("module/blades-item-sheet.js"),
+    read("templates/items/item.html"),
+    read("scss/import/item-sheet.scss"),
+  ]);
+
+  assert.match(controller, /form:\s*\{ closeOnSubmit: false, submitOnChange: true \}/);
+  assert.match(controller, /async _onRender\(context, options\)\s*\{\s*await super\._onRender\(context, options\)/);
+  assert.doesNotMatch(controller, /activateListeners\s*\(/);
+  assert.doesNotMatch(controller, /_onChangeInput\s*\(/);
+  assert.match(template, /<textarea id="item-description" name="system\.description" aria-labelledby="item-\{\{_id\}\}-description-heading">\{\{system\.description\}\}<\/textarea>/);
+  assert.doesNotMatch(template, /<prose-mirror name="system\.description"/);
+  assert.match(template, /aria-labelledby="item-\{\{_id\}\}-effects-heading"/);
+  assert.match(template, /\{\{> "systems\/brinkwood\/templates\/parts\/active-effects\.html"\}\}/);
+  assert.match(controller, /_bindEffectDisclosureState\(html\)/);
+  assert.match(controller, /BladesActiveEffect\.onManageActiveEffect\(ev, this\.document, \{ gmOnly: true \}\)/);
+  assert.match(controller, /const canEditFields = Boolean\(isGM && sheetEditable\)/);
+  assert.match(controller, /if \(!context\.editable\)[\s\S]*?lockSheetFormControls\(html\)[\s\S]*?return/);
+  assert.match(template, /name="system\.load"[\s\S]*?\{\{#unless canEditLoad\}\} disabled aria-disabled="true"/);
+  assert.match(source, /\.loadout-item-sheet__section\s*\{[\s\S]*?h2\s*\{[\s\S]*?background: var\(--bw-ink\)/);
+  assert.match(source, /\.loadout-item-sheet__section\s*\{[\s\S]*?display: block/);
+  assert.match(source, /\.loadout-item-sheet__effects\s*\{[\s\S]*?\.effects-category\s*\{[\s\S]*?display: block/);
+  assert.match(source, /\.effects-category \+ \.effects-category\s*\{[\s\S]*?margin-top: 8px/);
+});
