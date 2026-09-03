@@ -2113,6 +2113,7 @@
   padding-inline: 5px;
   color: var(--bw-ink);
 }
+.brinkwood.actor.pc.character .tab[data-tab=character-notes] .editor-content *,
 .brinkwood.actor.pc.character .tab[data-tab=character-notes] prose-mirror .ProseMirror * {
   color: inherit !important;
 }

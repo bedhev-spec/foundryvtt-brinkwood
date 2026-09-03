@@ -13,6 +13,6 @@ test("character notes keep rich text readable and inset from their frame", async
 
   for (const styles of [source, compiled]) {
     assert.match(styles, /\.editor-content,[\s\S]*?prose-mirror \.ProseMirror\s*\{[\s\S]*?padding-inline:\s*5px[\s\S]*?color:\s*var\(--bw-ink\)/);
-    assert.match(styles, /prose-mirror \.ProseMirror \*\s*\{[\s\S]*?color:\s*inherit !important/);
+    assert.match(styles, /\.editor-content \*,[\s\S]*?prose-mirror \.ProseMirror \*\s*\{[\s\S]*?color:\s*inherit !important/);
   }
 });
