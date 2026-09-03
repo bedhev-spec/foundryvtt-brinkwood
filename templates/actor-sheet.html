@@ -247,14 +247,16 @@
     <div class="loadout__panel bw-section-frame">
       <div class="label-stripe loadout__header bw-section-frame__header">
         <h2 class="loadout__heading">{{localize "BITD.Loadout"}}</h2>
-        <output class="loadout__weight{{#if isLoadoutOverloaded}} is-overloaded{{/if}}" aria-label="{{system.loadout}}/{{loadoutCapacity}}{{#if isLoadoutOverloaded}} — {{localize "BITD.Overloaded"}}{{/if}}"{{#if isLoadoutOverloaded}} title="{{localize "BITD.Overloaded"}}"{{/if}}>{{system.loadout}}/{{loadoutCapacity}}</output>
-        <label class="loadout__level" for="character-{{_id}}-load-level">
-          <select id="character-{{_id}}-load-level" name="system.selected_load_level" aria-label="{{localize "BITD.Loadout"}}"{{#unless editable}} disabled{{/unless}}>
-              <option value="BITD.Light"{{#if (eq selectedLoadLevel "BITD.Light")}} selected{{/if}}>{{localize "BITD.Light"}}</option>
-              <option value="BITD.Normal"{{#if (eq selectedLoadLevel "BITD.Normal")}} selected{{/if}}>{{localize "BITD.Normal"}}</option>
-              <option value="BITD.Heavy"{{#if (eq selectedLoadLevel "BITD.Heavy")}} selected{{/if}}>{{localize "BITD.Heavy"}}</option>
-            </select>
-          </label>
+        <div class="loadout__controls">
+          <output class="loadout__weight{{#if isLoadoutOverloaded}} is-overloaded{{/if}}" aria-label="{{system.loadout}}/{{loadoutCapacity}}{{#if isLoadoutOverloaded}} — {{localize "BITD.Overloaded"}}{{/if}}"{{#if isLoadoutOverloaded}} title="{{localize "BITD.Overloaded"}}"{{/if}}>{{system.loadout}}/{{loadoutCapacity}}</output>
+          <label class="loadout__level" for="character-{{_id}}-load-level">
+            <select id="character-{{_id}}-load-level" name="system.selected_load_level" aria-label="{{localize "BITD.Loadout"}}"{{#unless editable}} disabled{{/unless}}>
+                <option value="BITD.Light"{{#if (eq selectedLoadLevel "BITD.Light")}} selected{{/if}}>{{localize "BITD.Light"}}</option>
+                <option value="BITD.Normal"{{#if (eq selectedLoadLevel "BITD.Normal")}} selected{{/if}}>{{localize "BITD.Normal"}}</option>
+                <option value="BITD.Heavy"{{#if (eq selectedLoadLevel "BITD.Heavy")}} selected{{/if}}>{{localize "BITD.Heavy"}}</option>
+              </select>
+            </label>
+        </div>
         </div>
         <div class="loadout__catalogue" role="list" aria-label="{{localize "BITD.Loadout"}}">
           {{#each loadoutItems as |item|}}

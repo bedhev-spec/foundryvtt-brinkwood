@@ -1520,12 +1520,11 @@
 }
 .brinkwood.actor.pc.character .loadout .loadout__header {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) max-content minmax(72px, max-content);
+  grid-template-columns: minmax(0, 1fr) 120px;
   align-items: center;
-  gap: 5px;
-  min-height: 32px;
+  min-height: 38px;
   margin: 0;
-  padding: 4px 8px;
+  padding: 0 8px;
 }
 .brinkwood.actor.pc.character .loadout .loadout__heading, .brinkwood.actor.pc.character .loadout .loadout__weight {
   margin: 0;
@@ -1536,10 +1535,22 @@
   line-height: 1;
   text-align: left;
 }
+.brinkwood.actor.pc.character .loadout .loadout__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 0;
+}
 .brinkwood.actor.pc.character .loadout .loadout__weight {
-  margin-inline-end: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  block-size: 20px;
   color: var(--bw-inverse);
   font-size: calc(1em + 2px);
+  line-height: 1;
+  text-align: center;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
@@ -1547,7 +1558,12 @@
   color: #d97b76;
 }
 .brinkwood.actor.pc.character .loadout .loadout__level {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-width: 0;
+  block-size: 20px;
+  margin: 0;
 }
 .brinkwood.actor.pc.character .loadout .loadout__level select {
   box-sizing: border-box;
@@ -1715,11 +1731,7 @@
 }
 @container (max-width: 420px) {
   .brinkwood.actor.pc.character .loadout .loadout__header {
-    grid-template-columns: minmax(0, 1fr) max-content;
-  }
-  .brinkwood.actor.pc.character .loadout .loadout__level {
-    grid-column: 1/-1;
-    justify-self: end;
+    grid-template-columns: minmax(0, 1fr) 120px;
   }
   .brinkwood.actor.pc.character .loadout .loadout__catalogue {
     grid-template-columns: minmax(0, 1fr);

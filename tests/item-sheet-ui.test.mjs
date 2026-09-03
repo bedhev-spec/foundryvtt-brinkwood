@@ -85,7 +85,8 @@ test("item sheets opt into compact active-effect cards without changing shared s
   assert.match(styles, /\.effect-card--compact\s*\{[\s\S]*?inline-size:\s*fit-content[\s\S]*?justify-self:\s*end/);
   assert.match(styles, /button\.effect-control,[\s\S]*?inline-size:\s*28px !important[\s\S]*?flex:\s*0 0 28px !important/);
   assert.match(styles, /@container \(max-width: 600px\)\s*\{[\s\S]*?\.effect-card--compact[\s\S]*?flex-wrap:\s*wrap/);
-  assert.match(characterStyles, /\.loadout__weight\s*\{[\s\S]*?margin-inline-end:\s*2px[\s\S]*?font-size:\s*calc\(1em \+ 2px\)/);
+  assert.match(characterStyles, /\.loadout__controls\s*\{[\s\S]*?align-items:\s*center[\s\S]*?justify-content:\s*center[\s\S]*?gap:\s*7px/);
+  assert.match(characterStyles, /\.loadout__weight\s*\{[\s\S]*?align-items:\s*center[\s\S]*?block-size:\s*20px[\s\S]*?font-size:\s*calc\(1em \+ 2px\)/);
   assert.match(characterStyles, /\.loadout__level\s*\{[\s\S]*?select\s*\{[\s\S]*?inline-size:\s*82px; min-width:\s*82px; max-width:\s*82px[\s\S]*?height:\s*20px/);
   assert.match(characterStyles, /&:focus\s*\{[\s\S]*?box-shadow:\s*none !important[\s\S]*?&:focus-visible\s*\{[\s\S]*?outline:\s*2px solid var\(--bw-ink-soft\) !important/);
 });

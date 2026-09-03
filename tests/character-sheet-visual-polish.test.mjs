@@ -26,7 +26,9 @@ test("character load-level control is a styled native menu with accessible overl
   assert.match(template, /isLoadoutOverloaded[\s\S]*?aria-label="\{\{system\.loadout\}\}\/\{\{loadoutCapacity\}\}[\s\S]*?BITD\.Overloaded/);
   assert.match(styles, /\.loadout__level \{[\s\S]*?select \{[\s\S]*?border: 1px solid var\(--bw-rule\);[\s\S]*?&:focus-visible \{[\s\S]*?outline: 3px solid var\(--bw-focus\)/);
   assert.match(styles, /\.loadout__weight\.is-overloaded \{ color: #d97b76; \}/);
-  assert.match(styles, /\.loadout__header \{ display: grid; grid-template-columns: minmax\(0, 1fr\) max-content minmax\(72px, max-content\);[\s\S]*?gap: 5px;[\s\S]*?padding: 4px 8px; \}/);
+  assert.match(styles, /\.loadout__header \{ display: grid; grid-template-columns: minmax\(0, 1fr\) 120px;[\s\S]*?min-height: 38px;[\s\S]*?padding: 0 8px; \}/);
+  assert.match(template, /class="loadout__controls">[\s\S]*?class="loadout__weight[\s\S]*?class="loadout__level"/);
+  assert.match(styles, /\.loadout__controls \{ display: flex; align-items: center; justify-content: center; gap: 7px;/);
   assert.match(template, /class="loadout__panel bw-section-frame">[\s\S]*?class="label-stripe loadout__header bw-section-frame__header"[\s\S]*?class="loadout__catalogue"/);
   assert.match(styles, /\.loadout__panel\s*\{[\s\S]*?height:\s*max-content;[\s\S]*?overflow:\s*visible;/);
   assert.match(template, /class="bans-armor bw-section-frame"[\s\S]*?<thead class="bw-section-frame__header">/);
