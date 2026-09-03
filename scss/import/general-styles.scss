@@ -561,9 +561,16 @@ button.effects-category__add {
 }
 
 .effect-card__statuses li {
+  display: inline-flex;
   flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
   inline-size: fit-content;
-  max-width: 100%;
+  max-inline-size: 100%;
+  block-size: 28px;
+  min-block-size: 28px;
+  max-block-size: 28px;
   padding: 2px 6px;
   border: 1px solid var(--bw-rule);
   border-radius: 999px;
@@ -695,6 +702,8 @@ button.effects-category__add {
   font-size: 0.9rem;
   font-weight: 600;
   line-height: 1.2;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 
 /* Statuses remain a compact row; rich description copy must never inherit a

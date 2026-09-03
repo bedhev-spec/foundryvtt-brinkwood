@@ -35,7 +35,7 @@ test("active effect cards render prepared details permanently", async () => {
   assert.match(styles, /\.effect-card__summary\s*\{[\s\S]*?min-height:\s*44px/);
   assert.match(styles, /\.effect-card__header\s*\{[\s\S]*?border-bottom:\s*1px solid var\(--bw-rule\)/);
   assert.match(styles, /\.effect-card__description\s*\{[\s\S]*?flex:\s*1 1 100%[\s\S]*?overflow-wrap:\s*anywhere/);
-  assert.match(styles, /\.effect-card__statuses li\s*\{[\s\S]*?flex:\s*0 0 auto[\s\S]*?inline-size:\s*fit-content[\s\S]*?max-width:\s*100%/);
+  assert.match(styles, /\.effect-card__statuses li\s*\{[\s\S]*?display:\s*inline-flex[\s\S]*?flex:\s*0 0 auto[\s\S]*?inline-size:\s*fit-content[\s\S]*?block-size:\s*28px[\s\S]*?min-block-size:\s*28px[\s\S]*?max-block-size:\s*28px/);
   assert.match(styles, /\.effect-card--compact[\s\S]*?button\.effect-control\s*\{[\s\S]*?inline-size:\s*28px !important/);
   assert.doesNotMatch(styles, /effect-card__(?:disclosure|details-toggle)|aria-expanded|\.effect-card\[open\]/);
   assert.doesNotMatch(lateStyles, /effect-card__(?:disclosure|details-toggle)|aria-expanded|disclosure/);
