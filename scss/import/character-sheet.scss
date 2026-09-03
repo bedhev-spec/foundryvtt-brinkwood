@@ -1009,6 +1009,8 @@ nav.tabs {
     .editor-content,
     prose-mirror .ProseMirror {
       box-sizing: border-box;
+      min-inline-size: 0;
+      max-inline-size: 100%;
       padding-inline: 5px;
       color: var(--bw-ink);
     }
@@ -1017,7 +1019,9 @@ nav.tabs {
     // Character notes deliberately normalize editor and preview descendants.
     .editor-content *,
     prose-mirror .ProseMirror * {
+      max-inline-size: 100%;
       color: inherit !important;
+      overflow-wrap: anywhere;
     }
 
     .editor-edit {

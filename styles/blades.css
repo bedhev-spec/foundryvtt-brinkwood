@@ -2110,12 +2110,16 @@
 .brinkwood.actor.pc.character .tab[data-tab=character-notes] .editor-content,
 .brinkwood.actor.pc.character .tab[data-tab=character-notes] prose-mirror .ProseMirror {
   box-sizing: border-box;
+  min-inline-size: 0;
+  max-inline-size: 100%;
   padding-inline: 5px;
   color: var(--bw-ink);
 }
 .brinkwood.actor.pc.character .tab[data-tab=character-notes] .editor-content *,
 .brinkwood.actor.pc.character .tab[data-tab=character-notes] prose-mirror .ProseMirror * {
+  max-inline-size: 100%;
   color: inherit !important;
+  overflow-wrap: anywhere;
 }
 .brinkwood.actor.pc.character .tab[data-tab=character-notes] .editor-edit {
   display: inline-grid;
