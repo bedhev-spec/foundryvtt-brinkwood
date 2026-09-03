@@ -1,6 +1,6 @@
 {
   "Actor": {
-  "types": ["\uD83D\uDD5B clock", "npc", "character", "mask", "rebelion"],
+  "types": ["npc", "character", "mask", "rebelion"],
   "character": {
     "alias": "",
     "look": "",
@@ -223,13 +223,6 @@
         }
       }
     }
-  },
-  "\uD83D\uDD5B clock": {
-    "name": "",
-    "type": 4,
-    "value": 0,
-    "description": "",
-    "show_description": false
   },
   "npc": {
     "name": "",

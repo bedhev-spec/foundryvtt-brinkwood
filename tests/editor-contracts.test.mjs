@@ -54,7 +54,6 @@ test("native rich-text controls submit source fields while viewers receive enric
     ["templates/mask-sheet.html", "system.description", "actor.uuid", "enrichedDescription"],
     ["templates/npc-sheet.html", "system.description", "actor.uuid", "enrichedDescription"],
     ["templates/npc-sheet.html", "system.notes", "actor.uuid", "enrichedNotes"],
-    ["templates/actors/clock-sheet.html", "system.description", "actor.uuid", "enrichedDescription"],
     ...["simple", "trait", "class", "moot_decision"].map(type => [
       `templates/items/${type}.html`, "system.description", "item.uuid", "enrichedDescription"
     ])
