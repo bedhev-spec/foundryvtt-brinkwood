@@ -2,11 +2,11 @@
 
 ## Compatibility
 
-Version 0.6.0 supports Foundry VTT v13, verified through build 13.351. The existing sheets use Foundry's supported `foundry.appv1` compatibility layer; migration to ApplicationV2 and typed data models is planned separately.
+Version 0.6.13 supports Foundry VTT v13, verified through build 13.351.
 
-The `tech/foundry-v13-compatibility` branch can be installed for testing with this manifest URL:
+Install or update the system with this manifest URL:
 
-`https://raw.githubusercontent.com/bedhev-spec/foundryvtt-brinkwood/tech/foundry-v13-compatibility/system-test.json`
+`https://raw.githubusercontent.com/bedhev-spec/foundryvtt-brinkwood/master/system.json`
 
 ## v0.5 - first "public" release
 This a barebones implementation of Brinkwood its still heavily based on megastrukturs Blades in The Dark and has *waaay* too much leftover/unused logic.

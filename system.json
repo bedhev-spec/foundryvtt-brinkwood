@@ -8,9 +8,9 @@
     "verified": "13.351",
     "maximum": "13"
   },
-  "url": "https://github.com/bedhev-spec/foundryvtt-brinkwood/tree/integration/v13-follow-up",
-  "manifest": "https://raw.githubusercontent.com/bedhev-spec/foundryvtt-brinkwood/integration/v13-follow-up/system-test.json",
-  "download": "https://github.com/bedhev-spec/foundryvtt-brinkwood/archive/refs/heads/integration/v13-follow-up.zip",
+  "url": "https://github.com/bedhev-spec/foundryvtt-brinkwood",
+  "manifest": "https://raw.githubusercontent.com/bedhev-spec/foundryvtt-brinkwood/master/system.json",
+  "download": "https://github.com/bedhev-spec/foundryvtt-brinkwood/archive/refs/tags/v0.6.13.zip",
   "authors": [
     {
       "name": "quad",
