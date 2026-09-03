@@ -1553,6 +1553,7 @@
   text-align: center;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+  transform: translateY(2px);
 }
 .brinkwood.actor.pc.character .loadout .loadout__weight.is-overloaded {
   color: #d97b76;

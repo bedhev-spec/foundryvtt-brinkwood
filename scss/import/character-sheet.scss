@@ -495,7 +495,8 @@ nav.tabs {
   .loadout__heading, .loadout__weight { margin: 0; }
   .loadout__heading { color: var(--bw-inverse); font-size: 0.82rem; line-height: 1; text-align: left; }
   .loadout__controls { display: flex; align-items: center; justify-content: center; gap: 7px; min-width: 0; }
-    .loadout__weight { display: flex; align-items: center; justify-content: center; block-size: 20px; color: var(--bw-inverse); font-size: calc(1em + 2px); line-height: 1; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    // The native select's text sits optically lower than the output glyphs.
+    .loadout__weight { display: flex; align-items: center; justify-content: center; block-size: 20px; color: var(--bw-inverse); font-size: calc(1em + 2px); line-height: 1; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; transform: translateY(2px); }
   .loadout__weight.is-overloaded { color: #d97b76; }
   .loadout__level {
     display: flex;
