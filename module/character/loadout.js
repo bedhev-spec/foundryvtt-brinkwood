@@ -9,6 +9,8 @@ const LOADOUT_CAPACITIES = Object.freeze({
 // Work is scoped to an actor and catalogue source, rather than a sheet.  Two
 // open sheets for the same actor therefore cannot create competing copies.
 const sourceQueues = new WeakMap();
+const loadLevelRevisions = new WeakMap();
+const LOAD_LEVEL_QUEUE = Symbol("load-level");
 
 function actorItems(actor) {
   return Array.from(actor?.items?.values?.() ?? actor?.items ?? []);
@@ -121,7 +123,48 @@ export function calculateLoadoutWeight(items) {
   return Math.max(0, Math.min(10, total));
 }
 
+export function updateLoadoutCapacityDisplay(html, loadout, selectedLoadLevel) {
+  const capacity = prepareLoadoutCapacity(loadout, selectedLoadLevel);
+  const display = html?.querySelector?.(".loadout__weight");
+  if (!display) return capacity;
+
+  display.textContent = `${loadout}/${capacity.loadoutCapacity}`;
+  display.classList.toggle("is-overloaded", capacity.isLoadoutOverloaded);
+  const overloadedLabel = globalThis.game?.i18n?.localize?.("BITD.Overloaded") ?? "Overloaded";
+  const ariaLabel = `${loadout}/${capacity.loadoutCapacity}${capacity.isLoadoutOverloaded ? ` — ${overloadedLabel}` : ""}`;
+  display.setAttribute("aria-label", ariaLabel);
+  if (capacity.isLoadoutOverloaded) display.setAttribute("title", overloadedLabel);
+  else display.removeAttribute("title");
+  return capacity;
+}
+
+export async function onLoadoutLevelChange(sheet, event) {
+  if (!sheet.isEditable) return;
+  const control = event.currentTarget;
+  const loadout = calculateLoadoutWeight(actorItems(sheet.actor));
+  const capacity = updateLoadoutCapacityDisplay(sheet.element, loadout, control?.value);
+  if (control) control.value = capacity.selectedLoadLevel;
+  const revision = (loadLevelRevisions.get(sheet) ?? 0) + 1;
+  loadLevelRevisions.set(sheet, revision);
+
+  try {
+    await queueFor(sheet.actor, LOAD_LEVEL_QUEUE, () => sheet.document.update(
+      { "system.selected_load_level": capacity.selectedLoadLevel },
+      { render: false },
+    ));
+  } catch (error) {
+    // A newer selection already owns the visible state and queued persistence.
+    if (loadLevelRevisions.get(sheet) !== revision) return;
+    notifyFailure(error);
+    const selectedLoadLevel = sheet.actor?.system?.selected_load_level;
+    updateLoadoutCapacityDisplay(sheet.element, loadout, selectedLoadLevel);
+    if (control) control.value = prepareLoadoutCapacity(loadout, selectedLoadLevel).selectedLoadLevel;
+  }
+}
+
 export function bindLoadoutControls(sheet, html, listenerOptions) {
+  if (sheet.isEditable) html.querySelectorAll('select[name="system.selected_load_level"]').forEach(element =>
+    element.addEventListener("change", event => onLoadoutLevelChange(sheet, event), listenerOptions));
   html.querySelectorAll(".loadout-item-open").forEach(element =>
     element.addEventListener("click", event => onLoadoutItemOpen(sheet, event), listenerOptions));
   if (sheet.isEditable) html.querySelectorAll(".loadout-item-select").forEach(element =>

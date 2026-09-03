@@ -85,6 +85,13 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
     this._itemSheetListenerController = new AbortController();
     const listenerOptions = { signal: this._itemSheetListenerController.signal };
     const html = this.element;
+    // A forced ApplicationV2 render replaces the sheet DOM.  Effect mutations
+    // queue their captured state immediately before that render; consume it
+    // here, once the replacement root is available, rather than racing the
+    // render lifecycle from the control handler.
+    const pendingViewState = this._pendingItemEffectViewState;
+    this._pendingItemEffectViewState = null;
+    if (pendingViewState && html?.isConnected) restoreSheetViewState(html, pendingViewState);
     this._bindEffectDisclosureState?.(html);
 
     if (!context.editable) {
@@ -111,24 +118,34 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
   async _onItemEffectControl(ev) {
     const control = ev.currentTarget;
     if (!control || this._pendingItemEffectControls?.has(control)) return;
-    const viewState = captureSheetViewState(this.element);
+    const action = control.dataset?.effectAction;
+    const reconcilesParent = ["create", "toggle", "delete"].includes(action);
+    const canReconcile = reconcilesParent && this.document?.isOwner && game.user.isGM;
+    const viewState = canReconcile ? captureSheetViewState(this.element) : null;
+    const listenerController = this._itemSheetListenerController;
     this._pendingItemEffectControls ??= new WeakSet();
     this._pendingItemEffectControls.add(control);
     const wasDisabled = control.disabled;
     control.disabled = true;
     try {
-      await BladesActiveEffect.onManageActiveEffect(ev, this.document, { gmOnly: true });
-      // Do not resurrect a sheet which was closed while the mutation ran.
-      if (!this._itemSheetListenerController?.signal.aborted && this.element?.isConnected) {
+      await BladesActiveEffect.onManageActiveEffect(ev, this.document, { gmOnly: true, render: false });
+      // Editing has its own ActiveEffect sheet; only document mutations need
+      // one replacement render of the parent Item sheet.
+      if (canReconcile && !this._itemSheetListenerController?.signal.aborted && this.element?.isConnected) {
+        this._pendingItemEffectViewState = viewState;
         await this.render({ force: true });
       }
     } catch (error) {
+      // A rejected render cannot consume this state.  Do not let it leak into
+      // an unrelated later render.
+      if (this._pendingItemEffectViewState === viewState) this._pendingItemEffectViewState = null;
       ui.notifications?.error?.("Unable to update this item effect.");
     } finally {
-      // Restore the actual Item-sheet form/window scroll owners after either
-      // a successful replacement render or a failed reconciliation.
-      if (!this._itemSheetListenerController?.signal.aborted && this.element?.isConnected) {
-        restoreSheetViewState(this.element, viewState);
+      // Closing while a render is in flight means no replacement DOM can
+      // consume the pending state.
+      if (this._pendingItemEffectViewState === viewState
+        && (listenerController?.signal.aborted || !this.element?.isConnected)) {
+        this._pendingItemEffectViewState = null;
       }
       this._pendingItemEffectControls.delete(control);
       if (!this._itemSheetListenerController?.signal.aborted) control.disabled = wasDisabled;

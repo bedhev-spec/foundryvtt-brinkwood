@@ -878,4 +878,69 @@ button.effects-category__add {
   }
 }
 
+// Item sheets opt into this modifier through the active-effects partial. Keep
+// the shared card default untouched: actor and mask sheets use its larger
+// presentation. This is also the single narrow-width owner for compact cards.
+.effect-card--compact {
+  .effect-card__header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .effect-card__summary {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 7px;
+    min-height: 38px;
+    padding: 5px 8px;
+  }
+
+  .effect-card__image {
+    width: 28px;
+    height: 28px;
+  }
+
+  .effect-card__identity h4 {
+    margin-bottom: 1px;
+    font-size: 0.9rem;
+  }
+
+  .effect-card__metadata {
+    gap: 2px 8px;
+    font-size: 0.78rem;
+  }
+
+  .effect-card__actions {
+    margin-right: 8px;
+    padding: 1px;
+
+    button.effect-control,
+    .effect-card__disclosure {
+      width: 28px;
+      min-width: 28px;
+      height: 28px;
+      min-height: 28px;
+      flex-basis: 28px;
+    }
+  }
+}
+
+@container (max-width: 600px) {
+  .effect-card--compact {
+    .effect-card__header {
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .effect-card__actions {
+      grid-column: auto;
+      justify-content: flex-end;
+      align-self: start;
+      flex-wrap: wrap;
+      margin: 0 8px 7px;
+    }
+  }
+}
+
 @import 'sheet-tabs.scss';

@@ -141,15 +141,15 @@ test("item-owned effects support create, edit, toggle, and delete without blocki
   const effect = {
     disabled: false,
     sheet: { render: options => calls.push(["edit", options]) },
-    update: data => calls.push(["toggle", data]),
-    delete: () => calls.push(["delete"]),
+    update: (...args) => calls.push(["toggle", ...args]),
+    delete: (...args) => calls.push(["delete", ...args]),
   };
   const owner = {
     isOwner: true,
     isEmbedded: true,
     uuid: "Actor.owner.Item.item",
     effects: new Map([["effect-1", effect]]),
-    createEmbeddedDocuments: (type, data) => calls.push(["create", type, data]),
+    createEmbeddedDocuments: (...args) => calls.push(["create", ...args]),
   };
 
   await BladesActiveEffect.onManageActiveEffect(effectEvent("create", null, "temporary"), owner, { gmOnly: true });
@@ -163,8 +163,20 @@ test("item-owned effects support create, edit, toggle, and delete without blocki
   assert.equal(calls[0][2][0]["duration.rounds"], 1);
   assert.deepEqual(calls.slice(1), [
     ["edit", { force: true }],
-    ["toggle", { disabled: true }],
-    ["delete"],
+    ["toggle", { disabled: true }, { render: true }],
+    ["delete", { render: true }],
+  ]);
+  assert.deepEqual(calls[0][3], { render: true });
+
+  calls.length = 0;
+  await BladesActiveEffect.onManageActiveEffect(effectEvent("create", null, "temporary"), owner, { gmOnly: true, render: false });
+  await BladesActiveEffect.onManageActiveEffect(effectEvent("toggle", "effect-1"), owner, { gmOnly: true, render: false });
+  await BladesActiveEffect.onManageActiveEffect(effectEvent("delete", "effect-1"), owner, { gmOnly: true, render: false });
+  assert.deepEqual(calls.map(call => call[0]), ["create", "toggle", "delete"]);
+  assert.deepEqual([calls[0][3], calls[1][2], calls[2][1]], [
+    { render: false },
+    { render: false },
+    { render: false },
   ]);
 });
 
@@ -370,9 +382,10 @@ test("item effect listener catches rejected mutations and ignores a rapid second
   }
 });
 
-test("item effect reconciliation restores the Item sheet form scroll after replacement render", async () => {
+test("item effect reconciliation restores scroll from the replacement render lifecycle", async () => {
   const originalManage = BladesActiveEffect.onManageActiveEffect;
   BladesActiveEffect.onManageActiveEffect = async () => {};
+  game.user.isGM = true;
   const firstForm = { scrollTop: 214, scrollLeft: 9 };
   const replacementForm = { scrollTop: 0, scrollLeft: 0 };
   const itemRoot = form => ({
@@ -380,15 +393,20 @@ test("item effect reconciliation restores the Item sheet form scroll after repla
     matches: () => false,
     closest: () => null,
     querySelector: selector => selector === "form" ? form : null,
+    querySelectorAll: () => [],
   });
   const firstRoot = itemRoot(firstForm);
   const replacementRoot = itemRoot(replacementForm);
-  const control = { disabled: false };
+  const control = { disabled: false, dataset: { effectAction: "create" } };
   const sheet = Object.assign(Object.create(BladesItemSheet.prototype), {
     element: firstRoot,
-    document: {},
+    document: { isOwner: true },
     _itemSheetListenerController: new AbortController(),
-    render: async () => { sheet.element = replacementRoot; },
+    _bindEffectDisclosureState() {},
+    render: async () => {
+      sheet.element = replacementRoot;
+      await sheet._onRender({ editable: false }, {});
+    },
   });
   try {
     await sheet._onItemEffectControl({ currentTarget: control, preventDefault() {} });
@@ -396,6 +414,83 @@ test("item effect reconciliation restores the Item sheet form scroll after repla
       { scrollTop: replacementForm.scrollTop, scrollLeft: replacementForm.scrollLeft },
       { scrollTop: 214, scrollLeft: 9 },
     );
+  } finally {
+    BladesActiveEffect.onManageActiveEffect = originalManage;
+  }
+});
+
+test("item effect edit opens the Effect sheet without replacing its parent", async () => {
+  game.user.isGM = true;
+  let effectSheetRenders = 0;
+  let parentRenders = 0;
+  const effect = { sheet: { render: () => { effectSheetRenders += 1; } } };
+  const control = {
+    disabled: false,
+    dataset: { effectAction: "edit" },
+    closest(selector) {
+      return selector === "[data-effect-id]" ? { dataset: { effectId: "effect-1" } } : null;
+    }
+  };
+  const sheet = Object.assign(Object.create(BladesItemSheet.prototype), {
+    element: { isConnected: true, matches: () => false, closest: () => null, querySelector: () => null },
+    document: { isOwner: true, effects: new Map([["effect-1", effect]]) },
+    render: async () => { parentRenders += 1; },
+  });
+
+  await sheet._onItemEffectControl({ currentTarget: control, preventDefault() {} });
+
+  assert.equal(effectSheetRenders, 1);
+  assert.equal(parentRenders, 0);
+});
+
+test("item effect controls do not reconcile the parent when GM-only mutation is denied", async () => {
+  game.user.isGM = false;
+  let parentRenders = 0;
+  const control = { disabled: false, dataset: { effectAction: "create" }, closest: () => null };
+  const sheet = Object.assign(Object.create(BladesItemSheet.prototype), {
+    element: { isConnected: true, matches: () => false, closest: () => null, querySelector: () => null },
+    document: { isOwner: true },
+    render: async () => { parentRenders += 1; },
+  });
+
+  await sheet._onItemEffectControl({ currentTarget: control, preventDefault() {} });
+
+  assert.equal(parentRenders, 0);
+  assert.equal(control.disabled, false);
+});
+
+test("item effect mutations each schedule exactly one parent replacement render", async () => {
+  const originalManage = BladesActiveEffect.onManageActiveEffect;
+  const managed = [];
+  BladesActiveEffect.onManageActiveEffect = async (event, _document, options) => {
+    managed.push([event.currentTarget.dataset.effectAction, options]);
+  };
+  game.user.isGM = true;
+  try {
+    for (const action of ["create", "toggle", "delete"]) {
+      let renders = 0;
+      const control = { disabled: false, dataset: { effectAction: action } };
+      const root = {
+        isConnected: true,
+        matches: () => false,
+        closest: () => null,
+        querySelector: () => null,
+      };
+      const sheet = Object.assign(Object.create(BladesItemSheet.prototype), {
+        element: root,
+        document: { isOwner: true },
+        _itemSheetListenerController: new AbortController(),
+        render: async () => { renders += 1; },
+      });
+
+      await sheet._onItemEffectControl({ currentTarget: control, preventDefault() {} });
+      assert.equal(renders, 1, `${action} should replace the parent sheet once`);
+    }
+    assert.deepEqual(managed, [
+      ["create", { gmOnly: true, render: false }],
+      ["toggle", { gmOnly: true, render: false }],
+      ["delete", { gmOnly: true, render: false }],
+    ]);
   } finally {
     BladesActiveEffect.onManageActiveEffect = originalManage;
   }

@@ -232,6 +232,7 @@ position: { width: 700, height: 1170 },
     const control = event.currentTarget;
     // Clock radios have toggle-to-zero semantics in _onClockClick; a later
     // generic focus/change save would otherwise restore the selected segment.
+    if (control.matches('select[name="system.selected_load_level"]')) return;
     if (control.matches('input[name="system.scars"], input[name="system.oath"], [data-path]')) return;
     const update = formControlUpdate(control);
     if (update) {

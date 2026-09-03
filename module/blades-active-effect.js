@@ -49,7 +49,7 @@ export class BladesActiveEffect extends foundry.documents.ActiveEffect {
    * @param {MouseEvent} event      The left-click event on the effect control
    * @param {Actor|Item} owner      The owning entity which manages this effect
    */
-  static onManageActiveEffect(event, owner, { gmOnly = false } = {}) {
+  static onManageActiveEffect(event, owner, { gmOnly = false, render = true } = {}) {
     event.preventDefault();
     if (!owner?.isOwner) return;
     if (gmOnly && !game.user.isGM) return;
@@ -69,13 +69,13 @@ export class BladesActiveEffect extends foundry.documents.ActiveEffect {
           origin: owner.uuid,
           "duration.rounds": categoryElement?.dataset.effectType === "temporary" ? 1 : undefined,
           disabled: categoryElement?.dataset.effectType === "inactive",
-        }]);
+        }], { render });
       case "edit":
         return effect?.sheet.render({ force: true });
       case "delete":
-        return effect.delete();
+        return effect.delete({ render });
       case "toggle":
-        return effect.update({ disabled: !effect.disabled });
+        return effect.update({ disabled: !effect.disabled }, { render });
     }
   }
 

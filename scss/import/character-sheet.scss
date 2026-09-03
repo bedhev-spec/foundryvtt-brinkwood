@@ -498,7 +498,9 @@ nav.tabs {
     .loadout__level {
       min-width: 0;
       select {
-      min-width: 72px; min-height: 22px; padding: 1px 18px 1px 5px; border: 1px solid var(--bw-rule); border-radius: 2px; background: var(--bw-paper); color: var(--bw-ink); cursor: pointer; font-family: Georgia, "Bitstream Charter", "Times New Roman", serif; font-size: 0.68rem; font-weight: 700; line-height: 1; text-align: center; text-align-last: center; text-transform: uppercase;
+      // `field-sizing` follows localized option text where supported. The minimum
+      // remains large enough for the Normal tier on older Foundry shells.
+      field-sizing: content; min-width: 82px; max-width: 100%; min-height: 22px; padding: 1px 18px 1px 5px; border: 1px solid var(--bw-rule); border-radius: 2px; background: var(--bw-paper); color: var(--bw-ink); cursor: pointer; font-family: Georgia, "Bitstream Charter", "Times New Roman", serif; font-size: 0.68rem; font-weight: 700; line-height: 1; text-align: center; text-align-last: center; text-transform: uppercase;
         option { text-align: center; }
         &:focus-visible { outline: 3px solid var(--bw-focus); outline-offset: 2px; }
         &:disabled { cursor: default; opacity: 0.65; }

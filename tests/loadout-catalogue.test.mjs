@@ -45,10 +45,78 @@ const {
   calculateLoadoutWeight,
   onLoadoutItemLoadChange,
   onLoadoutItemLoadKeydown,
+  onLoadoutLevelChange,
   onLoadoutItemOpen,
   onLoadoutItemToggle,
   prepareLoadoutCatalogue,
 } = await import("../module/character/loadout.js");
+
+test("load tier immediately projects capacity and overload state through the loadout owner", async () => {
+  const attributes = new Map();
+  const display = {
+    textContent: "6/6",
+    classList: { values: new Set(), toggle(name, enabled) { enabled ? this.values.add(name) : this.values.delete(name); } },
+    setAttribute(name, value) { attributes.set(name, value); },
+    removeAttribute(name) { attributes.delete(name); },
+  };
+  const control = { value: "BITD.Normal" };
+  const updates = [];
+  const sheet = {
+    isEditable: true,
+    actor: { items: [{ type: "item", system: { equipped: true, load: 6 } }] },
+    element: { querySelector: selector => selector === ".loadout__weight" ? display : null },
+    document: { update: async (update, options) => updates.push({ update, options }) },
+  };
+
+  await onLoadoutLevelChange(sheet, { currentTarget: control });
+
+  assert.equal(display.textContent, "6/5");
+  assert.equal(display.classList.values.has("is-overloaded"), true);
+  assert.equal(attributes.get("aria-label"), "6/5 — Overloaded");
+  assert.equal(attributes.get("title"), "Overloaded");
+  assert.deepEqual(updates, [{
+    update: { "system.selected_load_level": "BITD.Normal" },
+    options: { render: false },
+  }]);
+});
+
+test("rapid load-tier changes serialize persistence and stale failure cannot roll back the latest choice", async () => {
+  let rejectFirst;
+  const firstUpdate = new Promise((_resolve, reject) => { rejectFirst = reject; });
+  const persisted = [];
+  const display = {
+    textContent: "0/3",
+    classList: { toggle() {} },
+    setAttribute() {},
+    removeAttribute() {},
+  };
+  const sheet = {
+    isEditable: true,
+    actor: { items: [], system: { selected_load_level: "BITD.Light" } },
+    element: { querySelector: selector => selector === ".loadout__weight" ? display : null },
+    document: {
+      update(update) {
+        persisted.push(update["system.selected_load_level"]);
+        return persisted.length === 1 ? firstUpdate : Promise.resolve();
+      },
+    },
+  };
+  const normal = { value: "BITD.Normal" };
+  const heavy = { value: "BITD.Heavy" };
+
+  const first = onLoadoutLevelChange(sheet, { currentTarget: normal });
+  const second = onLoadoutLevelChange(sheet, { currentTarget: heavy });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(persisted, ["BITD.Normal"], "the second write waits for the first");
+  assert.equal(display.textContent, "0/6", "the latest selection owns the optimistic display");
+
+  rejectFirst(new Error("stale failure"));
+  await Promise.all([first, second]);
+
+  assert.deepEqual(persisted, ["BITD.Normal", "BITD.Heavy"]);
+  assert.equal(display.textContent, "0/6", "a stale failure cannot roll back the newer selection");
+  assert.equal(heavy.value, "BITD.Heavy");
+});
 
 const standardItem = (id, name, load = 1) => ({
   _id: id, name, type: "item", system: { load }, flags: {},

@@ -5,6 +5,17 @@ import test from "node:test";
 const root = new URL("../", import.meta.url);
 const read = file => readFile(new URL(file, root), "utf8");
 
+function renderEffectCardOpeningTag(partial, rootContext, section, effect) {
+  const openingTag = partial.match(/<article class="[^"]+" data-effect-id="\{\{effect\.id\}\}">/)?.[0];
+  assert.ok(openingTag, "active-effect partial has an effect-card opening tag");
+  const contexts = [rootContext, section, effect];
+  return openingTag.replace(/\{\{#if ([^}]+)\}\}([\s\S]*?)\{\{\/if\}\}/g, (_match, path, content) => {
+    const parents = path.split("../").length - 1;
+    const key = path.replace(/^(\.\.\/)+/, "");
+    return contexts.at(-1 - parents)?.[key] ? content : "";
+  });
+}
+
 test("item sheets keep their content scrollable and their portrait bounded", async () => {
   const [controller, template, source, compiled] = await Promise.all([
     read("module/blades-item-sheet.js"),
@@ -51,6 +62,28 @@ test("legacy item sheets share bounded headers and scrolling content", async () 
   assert.match(compiled, /\.brinkwood\.item\.sheet \.window-content > \.legacy-item-sheet\s*\{[\s\S]*?overflow-y: auto/);
 });
 
+test("item sheets opt into compact active-effect cards without changing shared sheets", async () => {
+  const [partial, item, simple, trait, klass, styles] = await Promise.all([
+    read("templates/parts/active-effects.html"),
+    read("templates/items/item.html"),
+    read("templates/items/simple.html"),
+    read("templates/items/trait.html"),
+    read("templates/items/class.html"),
+    read("scss/import/general-styles.scss"),
+  ]);
+
+  const compactCard = renderEffectCardOpeningTag(partial, { compact: true }, {}, { disabled: false });
+  const defaultCard = renderEffectCardOpeningTag(partial, {}, {}, { disabled: false });
+  assert.match(compactCard, /class="effect-card effect-card--compact"/);
+  assert.doesNotMatch(defaultCard, /effect-card--compact/);
+  for (const template of [item, simple, trait, klass]) {
+    assert.match(template, /active-effects\.html" compact=true/);
+  }
+  assert.match(styles, /\.effect-card--compact\s*\{[\s\S]*?\.effect-card__image\s*\{[\s\S]*?width:\s*28px/);
+  assert.match(styles, /\.effect-card--compact\s*\{[\s\S]*?button\.effect-control,[\s\S]*?height:\s*28px/);
+  assert.match(styles, /@container \(max-width: 600px\)\s*\{[\s\S]*?\.effect-card--compact[\s\S]*?flex-wrap:\s*wrap/);
+});
+
 test("loadout items use v13 form editing and accessible active-effect controls", async () => {
   const [controller, template, source] = await Promise.all([
     read("module/blades-item-sheet.js"),
@@ -65,9 +98,9 @@ test("loadout items use v13 form editing and accessible active-effect controls",
   assert.match(template, /<textarea id="item-description" name="system\.description" aria-labelledby="item-\{\{_id\}\}-description-heading">\{\{system\.description\}\}<\/textarea>/);
   assert.doesNotMatch(template, /<prose-mirror name="system\.description"/);
   assert.match(template, /aria-labelledby="item-\{\{_id\}\}-effects-heading"/);
-  assert.match(template, /\{\{> "systems\/brinkwood\/templates\/parts\/active-effects\.html"\}\}/);
+  assert.match(template, /\{\{> "systems\/brinkwood\/templates\/parts\/active-effects\.html" compact=true\}\}/);
   assert.match(controller, /_bindEffectDisclosureState\(html\)/);
-  assert.match(controller, /BladesActiveEffect\.onManageActiveEffect\(ev, this\.document, \{ gmOnly: true \}\)/);
+  assert.match(controller, /BladesActiveEffect\.onManageActiveEffect\(ev, this\.document, \{ gmOnly: true, render: false \}\)/);
   assert.match(controller, /const canEditFields = Boolean\(isGM && sheetEditable\)/);
   assert.match(controller, /if \(!context\.editable\)[\s\S]*?lockSheetFormControls\(html\)[\s\S]*?return/);
   assert.match(template, /name="system\.load"[\s\S]*?\{\{#unless canEditLoad\}\} disabled aria-disabled="true"/);

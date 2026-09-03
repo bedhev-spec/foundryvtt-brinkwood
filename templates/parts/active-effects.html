@@ -31,7 +31,7 @@
 
       <div class="effects-category__list">
         {{#each section.effects as |effect|}}
-          <article class="effect-card {{#if effect.disabled}}effect-card--disabled{{/if}}" data-effect-id="{{effect.id}}">
+          <article class="effect-card{{#if ../../compact}} effect-card--compact{{/if}}{{#if effect.disabled}} effect-card--disabled{{/if}}" data-effect-id="{{effect.id}}">
         <div class="effect-card__header">
           <div class="effect-card__summary">
             <img class="effect-card__image" src="{{effect.img}}" alt="">
