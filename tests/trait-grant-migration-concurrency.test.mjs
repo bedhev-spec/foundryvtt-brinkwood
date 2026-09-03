@@ -300,3 +300,21 @@ test("a failed character migration leaves its version unchanged and retries with
   assert.equal(migratedActor.items.filter(item => item.type === "trait").length, 1);
   assert.equal(failingActor.items.filter(item => item.type === "trait").length, 1);
 });
+
+test("a missing trait-reconciliation command blocks the version write and retries once restored", async () => {
+  const actor = character("missing-command");
+  delete actor.reconcileTraitGrants;
+  const migration = installMigrationGame({ actors: [actor] });
+
+  await assert.rejects(migrateWorld(), /missing-command.*reconcileTraitGrants/);
+  assert.equal(migration.migrationVersion(), "0.6.12");
+  assert.deepEqual(migration.writes, []);
+  assert.equal(actor.items.filter(item => item.type === "trait").length, 0);
+
+  actor.reconcileTraitGrants = BladesActor.prototype.reconcileTraitGrants;
+  await migrateWorld();
+
+  assert.equal(migration.migrationVersion(), "0.6.13");
+  assert.deepEqual(migration.writes, ["0.6.13"]);
+  assert.equal(actor.items.filter(item => item.type === "trait").length, 1);
+});

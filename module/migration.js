@@ -74,7 +74,11 @@ export const migrateWorld = async function() {
   // source deletion use the actor's authoritative embedded-document path.
   if (foundry.utils.isNewerVersion("0.6.13", currentVersion)) {
     for (const actor of game.actors) {
-      if (actor.type === "character") await actor.reconcileTraitGrants?.();
+      if (actor.type !== "character") continue;
+      if (typeof actor.reconcileTraitGrants !== "function") {
+        throw new Error(`Character actor ${actor.id ?? actor.name ?? "<unknown>"} must implement reconcileTraitGrants for migration.`);
+      }
+      await actor.reconcileTraitGrants();
     }
   }
 
