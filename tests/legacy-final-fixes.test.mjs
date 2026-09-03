@@ -29,13 +29,6 @@ test("Legacy tabs receive their final equal-width layout from the base styleshee
   }
 });
 
-test("Legacy Notes rerender their enriched closed state after save", async () => {
-  const controller = await read("module/blades-actor-sheet.js");
-
-  assert.match(controller, /if \(!control\.matches\("prose-mirror\[name\]"\)\)/);
-  assert.match(controller, /render:\s*control\.matches\("prose-mirror\[name\]"\)/);
-});
-
 test("Legacy tall tabs scroll inside the bounded tab viewport", async () => {
  const styles = await read("scss/import/character-sheet.scss");
 

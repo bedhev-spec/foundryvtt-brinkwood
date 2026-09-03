@@ -175,8 +175,6 @@ position: { width: 700, height: 1170 },
 
        html.querySelectorAll('input[name], select[name], textarea[name], prose-mirror[name]').forEach(control => {
         control.addEventListener("change", event => this._persistFormControl(event), listenerOptions);
-        if (!control.matches("prose-mirror[name]")) {
-        }
       });
 
     // Open Inventory Item sheet

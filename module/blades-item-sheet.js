@@ -3,8 +3,7 @@
  * @extends {ItemSheetV2}
  */
 import { BladesActiveEffect } from "./blades-active-effect.js";
-import { lockSheetFormControls } from "./blades-sheet.js";
-import { captureSheetViewState, getSheetScrollContainers, restoreSheetViewState } from "./sheet-view-state.js";
+import { lockSheetFormControls } from "./sheet-dom.js";
 
 /** Brinkwood item fields, including Load, remain GM-authored. */
 export function prepareItemSheetPermissions(doc, { isGM = game.user.isGM, sheetEditable = true } = {}) {
@@ -37,11 +36,11 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
    * All known PARTS; _configureRenderOptions selects the active one per render.
    */
   static PARTS = {
-    simple:        { template: "systems/brinkwood/templates/items/simple.html" },
-    item:          { template: "systems/brinkwood/templates/items/item.html" },
-    class:         { template: "systems/brinkwood/templates/items/class.html" },
-    trait:         { template: "systems/brinkwood/templates/items/trait.html" },
-    moot_decision: { template: "systems/brinkwood/templates/items/moot_decision.html" },
+    simple:        { template: "systems/brinkwood/templates/items/simple.html", scrollable: [""] },
+    item:          { template: "systems/brinkwood/templates/items/item.html", scrollable: [""] },
+    class:         { template: "systems/brinkwood/templates/items/class.html", scrollable: [""] },
+    trait:         { template: "systems/brinkwood/templates/items/trait.html", scrollable: [""] },
+    moot_decision: { template: "systems/brinkwood/templates/items/moot_decision.html", scrollable: [""] },
   };
 
   /* -------------------------------------------- */
@@ -85,24 +84,6 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
     this._itemSheetListenerController = new AbortController();
     const listenerOptions = { signal: this._itemSheetListenerController.signal };
     const html = this.element;
-    // A forced ApplicationV2 render replaces the sheet DOM.  Effect mutations
-    // queue their captured state immediately before that render; consume it
-    // here, once the replacement root is available, rather than racing the
-    // render lifecycle from the control handler.
-    const pendingViewState = this._pendingItemEffectViewState ?? this._itemSheetViewState;
-    this._pendingItemEffectViewState = null;
-    if (pendingViewState && html?.isConnected) {
-      const renderController = this._itemSheetListenerController;
-      const restore = () => {
-        if (renderController.signal.aborted || !html.isConnected || this.element !== html) return;
-        restoreSheetViewState(html, pendingViewState);
-      };
-      if (typeof requestAnimationFrame === "function") requestAnimationFrame(restore);
-      else restore();
-    }
-    getSheetScrollContainers(html).forEach(([, container]) => container.addEventListener("scroll", () => {
-      this._itemSheetViewState = captureSheetViewState(html);
-    }, listenerOptions));
     this._bindEffectDisclosureState?.(html);
 
     if (!context.editable) {
@@ -129,39 +110,14 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
   async _onItemEffectControl(ev) {
     const control = ev.currentTarget;
     if (!control || this._pendingItemEffectControls?.has(control)) return;
-    const action = control.dataset?.effectAction;
-    const reconcilesParent = ["create", "toggle", "delete"].includes(action);
-    const canManage = this.document?.isOwner && game.user.isGM;
-    const canReconcile = reconcilesParent && canManage;
-    const viewState = canManage ? captureSheetViewState(this.element) : null;
-    if (viewState) this._itemSheetViewState = viewState;
-    const listenerController = this._itemSheetListenerController;
     this._pendingItemEffectControls ??= new WeakSet();
     this._pendingItemEffectControls.add(control);
-    const wasDisabled = control.disabled;
-    control.disabled = true;
     try {
-      await BladesActiveEffect.onManageActiveEffect(ev, this.document, { gmOnly: true, render: false });
-      // Editing has its own ActiveEffect sheet; only document mutations need
-      // one replacement render of the parent Item sheet.
-      if (canReconcile && !this._itemSheetListenerController?.signal.aborted && this.element?.isConnected) {
-        this._pendingItemEffectViewState = viewState;
-        await this.render({ force: true });
-      }
+      await BladesActiveEffect.onManageActiveEffect(ev, this.document, { gmOnly: true });
     } catch (error) {
-      // A rejected render cannot consume this state.  Do not let it leak into
-      // an unrelated later render.
-      if (this._pendingItemEffectViewState === viewState) this._pendingItemEffectViewState = null;
       ui.notifications?.error?.("Unable to update this item effect.");
     } finally {
-      // Closing while a render is in flight means no replacement DOM can
-      // consume the pending state.
-      if (this._pendingItemEffectViewState === viewState
-        && (listenerController?.signal.aborted || !this.element?.isConnected)) {
-        this._pendingItemEffectViewState = null;
-      }
       this._pendingItemEffectControls.delete(control);
-      if (!this._itemSheetListenerController?.signal.aborted) control.disabled = wasDisabled;
     }
   }
 
@@ -180,8 +136,6 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
 
   async _onClose(options) {
     this._itemSheetListenerController?.abort();
-    this._pendingItemEffectViewState = null;
-    this._itemSheetViewState = null;
     return super._onClose(options);
   }
 

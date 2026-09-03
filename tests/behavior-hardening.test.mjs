@@ -382,93 +382,6 @@ test("item effect listener catches rejected mutations and ignores a rapid second
   }
 });
 
-test("item effect reconciliation restores scroll from the replacement render lifecycle", async () => {
-  const originalManage = BladesActiveEffect.onManageActiveEffect;
-  const originalRequestAnimationFrame = globalThis.requestAnimationFrame;
-  const frames = [];
-  BladesActiveEffect.onManageActiveEffect = async () => {};
-  globalThis.requestAnimationFrame = callback => { frames.push(callback); return frames.length; };
-  game.user.isGM = true;
-  const firstForm = { scrollTop: 214, scrollLeft: 9 };
-  const replacementForm = { scrollTop: 0, scrollLeft: 0, addEventListener() {} };
-  const itemRoot = form => ({
-    isConnected: true,
-    matches: () => false,
-    closest: () => null,
-    querySelector: selector => selector === "form" ? form : null,
-    querySelectorAll: () => [],
-  });
-  const firstRoot = itemRoot(firstForm);
-  const replacementRoot = itemRoot(replacementForm);
-  const control = { disabled: false, dataset: { effectAction: "create" } };
-  const sheet = Object.assign(Object.create(BladesItemSheet.prototype), {
-    element: firstRoot,
-    document: { isOwner: true },
-    _itemSheetListenerController: new AbortController(),
-    _bindEffectDisclosureState() {},
-    render: async () => {
-      sheet.element = replacementRoot;
-      await sheet._onRender({ editable: false }, {});
-    },
-  });
-  try {
-    await sheet._onItemEffectControl({ currentTarget: control, preventDefault() {} });
-    // Foundry's deferred focus work can run after ApplicationV2's _onRender.
-    replacementForm.scrollTop = replacementForm.scrollLeft = 0;
-    assert.equal(frames.length, 1);
-    frames.shift()();
-    assert.deepEqual(
-      { scrollTop: replacementForm.scrollTop, scrollLeft: replacementForm.scrollLeft },
-      { scrollTop: 214, scrollLeft: 9 },
-    );
-  } finally {
-    BladesActiveEffect.onManageActiveEffect = originalManage;
-    if (originalRequestAnimationFrame) globalThis.requestAnimationFrame = originalRequestAnimationFrame;
-    else delete globalThis.requestAnimationFrame;
-  }
-});
-
-test("item sheets retain viewport state through later document-driven renders", async () => {
-  const originalRequestAnimationFrame = globalThis.requestAnimationFrame;
-  const frames = [];
-  globalThis.requestAnimationFrame = callback => { frames.push(callback); return frames.length; };
-  let firstScrollListener;
-  const firstForm = {
-    scrollTop: 214,
-    scrollLeft: 9,
-    addEventListener(type, listener) { if (type === "scroll") firstScrollListener = listener; },
-  };
-  const replacementForm = { scrollTop: 0, scrollLeft: 0, addEventListener() {} };
-  const root = form => ({
-    isConnected: true,
-    matches: () => false,
-    closest: () => null,
-    querySelector: selector => selector === "form" ? form : null,
-    querySelectorAll: () => [],
-  });
-  const sheet = Object.assign(Object.create(BladesItemSheet.prototype), {
-    element: root(firstForm),
-    _bindEffectDisclosureState() {},
-  });
-
-  try {
-    await sheet._onRender({ editable: false }, {});
-    firstScrollListener();
-    sheet.element = root(replacementForm);
-    await sheet._onRender({ editable: false }, {});
-    replacementForm.scrollTop = replacementForm.scrollLeft = 0;
-    assert.equal(frames.length, 1);
-    frames.shift()();
-    assert.deepEqual(
-      { scrollTop: replacementForm.scrollTop, scrollLeft: replacementForm.scrollLeft },
-      { scrollTop: 214, scrollLeft: 9 },
-    );
-  } finally {
-    if (originalRequestAnimationFrame) globalThis.requestAnimationFrame = originalRequestAnimationFrame;
-    else delete globalThis.requestAnimationFrame;
-  }
-});
-
 test("item effect edit opens the Effect sheet without replacing its parent", async () => {
   game.user.isGM = true;
   let effectSheetRenders = 0;
@@ -507,43 +420,6 @@ test("item effect controls do not reconcile the parent when GM-only mutation is 
 
   assert.equal(parentRenders, 0);
   assert.equal(control.disabled, false);
-});
-
-test("item effect mutations each schedule exactly one parent replacement render", async () => {
-  const originalManage = BladesActiveEffect.onManageActiveEffect;
-  const managed = [];
-  BladesActiveEffect.onManageActiveEffect = async (event, _document, options) => {
-    managed.push([event.currentTarget.dataset.effectAction, options]);
-  };
-  game.user.isGM = true;
-  try {
-    for (const action of ["create", "toggle", "delete"]) {
-      let renders = 0;
-      const control = { disabled: false, dataset: { effectAction: action } };
-      const root = {
-        isConnected: true,
-        matches: () => false,
-        closest: () => null,
-        querySelector: () => null,
-      };
-      const sheet = Object.assign(Object.create(BladesItemSheet.prototype), {
-        element: root,
-        document: { isOwner: true },
-        _itemSheetListenerController: new AbortController(),
-        render: async () => { renders += 1; },
-      });
-
-      await sheet._onItemEffectControl({ currentTarget: control, preventDefault() {} });
-      assert.equal(renders, 1, `${action} should replace the parent sheet once`);
-    }
-    assert.deepEqual(managed, [
-      ["create", { gmOnly: true, render: false }],
-      ["toggle", { gmOnly: true, render: false }],
-      ["delete", { gmOnly: true, render: false }],
-    ]);
-  } finally {
-    BladesActiveEffect.onManageActiveEffect = originalManage;
-  }
 });
 
 test("legacy actor sheets retain the form viewport, wrapper viewport, and selected tabs across a render", () => {

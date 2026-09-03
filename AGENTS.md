@@ -7,6 +7,12 @@
 
 See `scss/README.md` for ownership and build details.
 
+## ApplicationV2 scroll ownership
+
+- Every `BladesItemSheet.PARTS` descriptor must declare `scrollable: [""]`. Each Item template renders one root `<form>`, and that root is the vertical scroll owner; in Foundry v13 a blank selector means the template-part root, while `"form"` would search only descendants.
+- Item Effect create, edit, toggle, and delete actions use the embedded document's normal render path. Do not force a parent Item-sheet render, disable the focused Effect control, or repair scroll with `requestAnimationFrame`, timeouts, or post-render capture/restore code.
+- Preserve this contract with `tests/item-effect-scroll-lifecycle.test.mjs` and a live Foundry regression covering every Effect section `+`, existing Effect actions, and Edit followed by a nested Effect save. A stubbed Handlebars mixin cannot prove replacement-DOM scroll behavior.
+
 ## Automatic trait loading boundaries
 
 - A sheet or controller delegates automatic trait loading through one actor command; it does not reproduce grant logic, call migration code, or persist traits itself.

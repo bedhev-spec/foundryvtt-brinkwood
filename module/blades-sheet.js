@@ -8,6 +8,7 @@ import { BladesHelpers } from "./blades-helpers.js";
 import { escapeHTML } from "./html-utils.js";
 import { renderItemTooltip } from "./item-tooltip.js";
 import { showRollStatistics } from "./roll-statistics.js";
+import { lockSheetFormControls } from "./sheet-dom.js";
 import {
   activateEffectTab,
   bindEffectTabs,
@@ -16,17 +17,6 @@ import {
   normalizeEffectTab,
   restoreSheetViewState,
 } from "./sheet-view-state.js";
-
-export function lockSheetFormControls(html) {
-  html.querySelectorAll("input, select").forEach(control => {
-    control.disabled = true;
-    control.setAttribute("aria-disabled", "true");
-  });
-  html.querySelectorAll("textarea").forEach(control => {
-    control.readOnly = true;
-    control.setAttribute("aria-readonly", "true");
-  });
-}
 
 /** Read checked item picker inputs from either DialogV2 callback root. */
 export function readItemPickerSelection(button, dialog) {
@@ -223,26 +213,6 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
     this._activeEffectTab = normalizeEffectTab(context.effects, this._activeEffectTab, fallback);
     context.isEffectTabbed = true;
     context.activeEffectTab = this._activeEffectTab;
-  }
-
-  _onEffectTabClick(event) {
-    event.preventDefault();
-    this._activateEffectTab(event.currentTarget.dataset.effectTab);
-  }
-
-  _onEffectTabKeydown(event) {
-    // Kept as a public subclass hook; bindings are provided by _bindEffectTabs.
-    const tabs = Array.from(event.currentTarget.closest('[role="tablist"]')?.querySelectorAll("[data-effect-tab]") ?? []);
-    const current = tabs.indexOf(event.currentTarget);
-    const target = event.key === "Home" ? tabs[0]
-      : event.key === "End" ? tabs.at(-1)
-      : event.key === "ArrowRight" || event.key === "ArrowDown" ? tabs[(current + 1) % tabs.length]
-      : event.key === "ArrowLeft" || event.key === "ArrowUp" ? tabs[(current - 1 + tabs.length) % tabs.length]
-      : null;
-    if (!target) return;
-    event.preventDefault();
-    target.focus();
-    this._activateEffectTab(target.dataset.effectTab);
   }
 
   _activateEffectTab(type) {
