@@ -73,8 +73,6 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
     this._brinkwoodListenerController?.abort();
     this._brinkwoodListenerController = new AbortController();
     const listenerOptions = { signal: this._brinkwoodListenerController.signal };
-    this._bindEffectDisclosureState(html, listenerOptions);
-
     html.querySelectorAll('[role="tab"][data-action="tab"]').forEach(tab =>
       tab.addEventListener("keydown", event => {
         const tabs = Array.from(tab.closest('[role="tablist"]')?.querySelectorAll('[role="tab"]') ?? []);
@@ -122,41 +120,6 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
     html.querySelectorAll(".roll-statistics-control").forEach(el =>
       el.addEventListener("click", () => showRollStatistics(), listenerOptions)
     );
-  }
-
-  /** Preserve native Active Effect disclosure state without mutating documents. */
-  _captureEffectDisclosureState(root = this.element) {
-    this._effectDisclosureState = new Map(
-      Array.from(root?.querySelectorAll?.('.effect-card[data-effect-id]') ?? [], card => [
-        card.dataset.effectId,
-        !card.querySelector('[data-effect-details]')?.hidden,
-      ])
-    );
-  }
-
-  _restoreEffectDisclosureState(root = this.element) {
-    root?.querySelectorAll?.('.effect-card[data-effect-id]').forEach(card => {
-      const expanded = this._effectDisclosureState?.get(card.dataset.effectId) ?? false;
-      const details = card.querySelector('[data-effect-details]');
-      const toggle = card.querySelector('[data-effect-details-toggle]');
-      if (details) details.hidden = !expanded;
-      toggle?.setAttribute("aria-expanded", String(expanded));
-    });
-  }
-
-  _bindEffectDisclosureState(html, listenerOptions) {
-    this._restoreEffectDisclosureState(html);
-    html.querySelectorAll('.effect-card[data-effect-id] [data-effect-details-toggle]').forEach(toggle => {
-      toggle.addEventListener("click", event => {
-        event.preventDefault();
-        const card = event.currentTarget.closest('.effect-card[data-effect-id]');
-        const details = card?.querySelector('[data-effect-details]');
-        if (!details) return;
-        details.hidden = !details.hidden;
-        event.currentTarget.setAttribute("aria-expanded", String(!details.hidden));
-        this._captureEffectDisclosureState(html);
-      }, listenerOptions);
-    });
   }
 
   /** Capture only transient UI state; Foundry remains responsible for tabs. */

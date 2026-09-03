@@ -27,8 +27,8 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
 
   static DEFAULT_OPTIONS = {
     classes: ["brinkwood", "sheet", "item"],
-    position: { width: 560, height: 700 },
-    window: { resizable: true },
+    position: { width: 720, height: 700 },
+    window: { resizable: false },
     form: { closeOnSubmit: false, submitOnChange: true },
   };
 
@@ -84,8 +84,6 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
     this._itemSheetListenerController = new AbortController();
     const listenerOptions = { signal: this._itemSheetListenerController.signal };
     const html = this.element;
-    this._bindEffectDisclosureState?.(html);
-
     if (!context.editable) {
       lockSheetFormControls(html);
       return;
@@ -119,19 +117,6 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
     } finally {
       this._pendingItemEffectControls.delete(control);
     }
-  }
-
-  _bindEffectDisclosureState(html) {
-    html.querySelectorAll('[data-effect-details-toggle]').forEach(toggle => {
-      toggle.addEventListener("click", event => {
-        event.preventDefault();
-        const card = event.currentTarget.closest('[data-effect-id]');
-        const details = card?.querySelector('[data-effect-details]');
-        if (!details) return;
-        details.hidden = !details.hidden;
-        event.currentTarget.setAttribute("aria-expanded", String(!details.hidden));
-      }, { signal: this._itemSheetListenerController?.signal });
-    });
   }
 
   async _onClose(options) {

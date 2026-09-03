@@ -297,23 +297,3 @@
   }
   .brinkwood.actor.pc.character .effects-tab { flex-basis: 100%; }
 }
-
-/* This file loads after blades.css. Keep the effect disclosure control's
- * neutral toolbar state intact when it is hosted on the legacy character sheet. */
-.brinkwood.actor.pc.character .effect-card__actions button.effect-control.effect-card__details-toggle,
-.brinkwood.actor.pc.character .effect-card__actions button.effect-control.effect-card__details-toggle:hover,
-.brinkwood.actor.pc.character .effect-card__actions button.effect-control.effect-card__details-toggle:active,
-.brinkwood.actor.pc.character .effect-card__actions button.effect-control.effect-card__details-toggle:focus,
-.brinkwood.actor.pc.character .effect-card__actions button.effect-control.effect-card__details-toggle[aria-expanded="true"] {
-  border-color: transparent !important;
-  border-left-color: var(--bw-rule) !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  outline: none;
-}
-
-.brinkwood.actor.pc.character .effect-card__actions button.effect-control.effect-card__details-toggle:focus-visible {
-  background: var(--bw-paper-deep) !important;
-  outline: 2px solid var(--bw-ink-soft) !important;
-  outline-offset: -2px;
-}

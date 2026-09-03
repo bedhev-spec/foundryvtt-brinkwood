@@ -310,8 +310,6 @@ test("read-only sheets disable every input type while retaining read-only text a
         return [];
       }
     },
-    _restoreEffectDisclosureState: BladesSheet.prototype._restoreEffectDisclosureState,
-    _bindEffectDisclosureState: BladesSheet.prototype._bindEffectDisclosureState,
   };
 
   await BladesSheet.prototype._onRender.call(sheet, {}, {});
@@ -365,7 +363,6 @@ test("item effect listener catches rejected mutations and ignores a rapid second
     element: { isConnected: true, querySelectorAll: selector =>
       selector === ".effect-control[data-effect-action]" ? [control] : [] },
     document: {},
-    _bindEffectDisclosureState() {},
     render: async () => assert.fail("a rejected mutation must not reconcile"),
   });
   try {
@@ -456,43 +453,6 @@ test("legacy actor sheets retain the form viewport, wrapper viewport, and select
   assert.equal(sheet.restoredEffectTab, "passive");
 });
 
-test("effect disclosure state defaults collapsed and survives a replacement DOM without document state", () => {
-  const listeners = new Map();
-  const card = (id, open) => {
-    const details = { hidden: !open };
-    const entry = { dataset: { effectId: id }, querySelector(selector) {
-      if (selector === "[data-effect-details]") return details;
-      if (selector === "[data-effect-details-toggle]") return entry.toggle;
-      return null;
-    } };
-    entry.toggle = {
-      setAttribute(name, value) { this[name] = value; },
-      closest: () => entry,
-      addEventListener(type, listener) { listeners.set(id, listener); },
-    };
-    return entry;
-  };
-  const root = cards => ({
-    querySelectorAll(selector) {
-      return selector.includes("data-effect-details-toggle") ? cards.map(entry => entry.toggle) : cards;
-    },
-  });
-  const firstCards = [card("keep-open", true), card("collapsed", false)];
-  const sheet = {
-    _captureEffectDisclosureState: BladesSheet.prototype._captureEffectDisclosureState,
-    _restoreEffectDisclosureState: BladesSheet.prototype._restoreEffectDisclosureState,
-    _bindEffectDisclosureState: BladesSheet.prototype._bindEffectDisclosureState,
-  };
-
-  sheet._bindEffectDisclosureState(root(firstCards), {});
-  assert.equal(firstCards[0].querySelector("[data-effect-details]").hidden, true);
-  assert.equal(firstCards[1].querySelector("[data-effect-details]").hidden, true);
-  listeners.get("collapsed")({ preventDefault() {}, currentTarget: firstCards[1].toggle });
-
-  const rerenderedCards = [card("keep-open", false), card("collapsed", true), card("new-effect", false)];
-  sheet._restoreEffectDisclosureState(root(rerenderedCards));
-  assert.deepEqual(rerenderedCards.map(entry => entry.querySelector("[data-effect-details]").hidden), [true, false, true]);
-});
 
 test("legacy scroll capture forwards main-tab clicks for immediate native activation", async () => {
   const listeners = new Map();
@@ -517,8 +477,6 @@ test("legacy scroll capture forwards main-tab clicks for immediate native activa
     element: html,
     _captureSheetViewState: BladesSheet.prototype._captureSheetViewState,
     _restoreSheetViewState: BladesSheet.prototype._restoreSheetViewState,
-    _restoreEffectDisclosureState: BladesSheet.prototype._restoreEffectDisclosureState,
-    _bindEffectDisclosureState: BladesSheet.prototype._bindEffectDisclosureState,
     _bindEffectTabs: BladesSheet.prototype._bindEffectTabs,
     _bindSheetViewState: BladesSheet.prototype._bindSheetViewState
   };

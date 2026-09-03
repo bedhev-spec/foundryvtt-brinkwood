@@ -49,17 +49,14 @@
               </dl>
             </div>
           </div>
+          {{#if ../../editable}}
           <div class="effect-card__actions" aria-label="{{localize 'BITD.EffectActions'}}">
-            {{#if ../../editable}}
             <button type="button" class="effect-control" data-effect-action="toggle" title="{{#if effect.disabled}}{{localize 'BITD.EffectEnable'}}{{else}}{{localize 'BITD.EffectDisable'}}{{/if}}" aria-label="{{#if effect.disabled}}{{localize 'BITD.EffectEnable'}}{{else}}{{localize 'BITD.EffectDisable'}}{{/if}}">
               <i class="fas {{#if effect.disabled}}fa-toggle-off{{else}}fa-toggle-on{{/if}}" aria-hidden="true"></i>
             </button>
             <button type="button" class="effect-control" data-effect-action="edit" title="{{localize 'BITD.EffectEdit'}}" aria-label="{{localize 'BITD.EffectEdit'}}">
               <i class="fas fa-edit" aria-hidden="true"></i>
             </button>
-            {{/if}}
-            <button type="button" class="effect-control effect-card__disclosure effect-card__details-toggle" data-effect-details-toggle aria-controls="{{effect.detailsId}}" aria-expanded="false" title="{{localize 'BITD.EffectDetails'}}" aria-label="{{localize 'BITD.EffectDetails'}}"><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
-            {{#if ../../editable}}
             <button type="button" class="effect-control effect-control--danger" data-effect-action="delete" title="{{localize 'BITD.EffectDelete'}}" aria-label="{{localize 'BITD.EffectDelete'}}">
               <i class="fas fa-trash" aria-hidden="true"></i>
             </button>
@@ -67,7 +64,7 @@
           {{/if}}
         </div>
 
-            <div id="{{effect.detailsId}}" class="effect-card__details" data-effect-details hidden>
+            <div class="effect-card__details">
               {{#if effect.hasStatuses}}
               <div class="effect-card__detail-group effect-card__status-group">
                 <h5>{{localize "BITD.EffectStatuses"}}</h5>

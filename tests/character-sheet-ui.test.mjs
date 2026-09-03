@@ -109,9 +109,9 @@ test("Character tabs retain a valid selection and contain Downtime within the fi
   assert.doesNotMatch(styles, /\.tab\.downtime,[\s\S]*?\.downtime-action\s*\{[\s\S]*?border-left/);
   assert.doesNotMatch(styles, /\.downtime-action\s*\{[\s\S]*?(?:padding|font-family|overflow-wrap):/);
   assert.match(styles, /\.window-content\s*\{[^}]*overflow-y:\s*hidden/);
-  assert.match(styles, /character-sheet__workspace > \.tab-content\s*\{[^}]*overflow-y:\s*auto[^}]*scrollbar-gutter:\s*auto[^}]*scrollbar-width:\s*thin/);
+  assert.match(styles, /character-sheet__workspace > \.tab-content\s*\{[^}]*overflow-y:\s*auto[^}]*scrollbar-gutter:\s*stable[^}]*scrollbar-width:\s*thin/);
   assert.match(styles, /form\.actor-sheet\s*\{[\s\S]*?overflow:\s*visible/);
-  assert.match(compiled, /\.brinkwood\.actor\.pc\.character \.character-sheet__workspace > \.tab-content\s*\{[^}]*scrollbar-gutter:\s*auto[^}]*scrollbar-width:\s*thin/);
+  assert.match(compiled, /\.brinkwood\.actor\.pc\.character \.character-sheet__workspace > \.tab-content\s*\{[^}]*scrollbar-gutter:\s*stable[^}]*scrollbar-width:\s*thin/);
   assert.match(compiled, /\.brinkwood \.bw-ruled-card\s*\{[\s\S]*?border-left:\s*5px solid var\(--bw-accent\)/);
 });
 

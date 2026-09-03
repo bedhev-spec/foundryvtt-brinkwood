@@ -499,8 +499,6 @@ button.effects-category__add {
   }
 }
 
-/* A native disclosure keeps effect summaries compact while preserving
- * keyboard and screen-reader expand/collapse behavior without sheet JS. */
 .effect-card {
   display: block;
 
@@ -527,28 +525,6 @@ button.effects-category__add {
     outline: 3px solid var(--bw-focus);
     outline-offset: -3px;
   }
-}
-
-.effect-card[open] .effect-card__summary {
-  border-bottom: 1px solid var(--bw-rule);
-}
-
-.effect-card__disclosure {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--bw-ink-soft);
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-
-  i {
-    transition: transform 120ms ease;
-  }
-}
-
-.effect-card[open] .effect-card__disclosure i {
-  transform: rotate(180deg);
 }
 
 .effect-card__details {
@@ -585,6 +561,9 @@ button.effects-category__add {
 }
 
 .effect-card__statuses li {
+  flex: 0 0 auto;
+  inline-size: fit-content;
+  max-width: 100%;
   padding: 2px 6px;
   border: 1px solid var(--bw-rule);
   border-radius: 999px;
@@ -667,14 +646,8 @@ button.effects-category__add {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .effect-card__disclosure i {
-    transition-duration: 0.01ms;
-  }
-}
-
-/* Active-effect card controls live beside the disclosure, not in the content
- * area: this reserves the full detail width for readable descriptions. */
+/* Active-effect controls live beside the summary, leaving the full detail
+ * width available for readable descriptions. */
 .effect-card__header {
   display: flex;
   align-items: stretch;
@@ -686,11 +659,7 @@ button.effects-category__add {
   min-width: 0;
 }
 
-.effect-card[open] .effect-card__summary {
-  border-bottom: 0;
-}
-
-.effect-card[open] .effect-card__header {
+.effect-card__header {
   border-bottom: 1px solid var(--bw-rule);
 }
 
@@ -771,103 +740,12 @@ button.effects-category__add {
     &[data-effect-action="edit"] { order: 2; }
 
     &.effect-control--danger {
-      order: 4;
+      order: 3;
       margin-left: 4px;
       border-left: 1px solid var(--bw-rule);
     }
   }
 
-  .effect-card__disclosure {
-    order: 3;
-    display: grid;
-    flex: 0 0 32px;
-    place-items: center;
-    justify-content: center;
-    width: 32px;
-    min-width: 32px;
-    height: 32px;
-    padding: 0;
-    gap: 0;
-    border-left: 1px solid var(--bw-rule);
-    background: transparent;
-    color: var(--bw-ink-soft);
-    line-height: 1;
-
-    span { display: none; }
-
-    i {
-      display: block;
-      width: 1em;
-      height: 1em;
-      line-height: 1;
-      transform-origin: center;
-    }
-
-    &:hover,
-    &:active,
-    &[aria-expanded="true"] {
-      background: transparent;
-      color: var(--bw-ink-soft);
-    }
-
-    &:focus-visible {
-      background: var(--bw-paper-deep);
-      color: var(--bw-ink);
-      outline: 2px solid var(--bw-ink-soft);
-      outline-offset: -2px;
-    }
-
-    &[aria-expanded="true"] i { transform: rotate(180deg); }
-  }
-
-  .effect-card:has(.effect-card__details-toggle:focus) {
-    border-color: var(--bw-rule);
-  }
-
-  /* Final disclosure control reset: it must remain a neutral toolbar cell
-   * even when Foundry applies its generic button focus/active treatments. */
-  button.effect-control.effect-card__details-toggle,
-  button.effect-control.effect-card__details-toggle:hover,
-  button.effect-control.effect-card__details-toggle:active,
-  button.effect-control.effect-card__details-toggle:focus,
-  button.effect-control.effect-card__details-toggle[aria-expanded="true"] {
-    position: relative;
-    display: block;
-    flex: 0 0 32px;
-    width: 32px;
-    min-width: 32px;
-    height: 32px;
-    margin: 0;
-    padding: 0;
-    border-color: transparent !important;
-    border-left-color: var(--bw-rule) !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    color: var(--bw-ink-soft);
-    outline: none;
-  }
-
-  button.effect-control.effect-card__details-toggle i {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 1em;
-    height: 1em;
-    line-height: 1;
-    transform: translate(-50%, -50%);
-    transform-origin: center;
-  }
-
-  button.effect-control.effect-card__details-toggle[aria-expanded="true"] i {
-    transform: translate(-50%, -50%) rotate(180deg);
-  }
-
-  button.effect-control.effect-card__details-toggle:focus-visible {
-    background: var(--bw-paper-deep) !important;
-    color: var(--bw-ink);
-    outline: 2px solid var(--bw-ink-soft) !important;
-    outline-offset: -2px;
-  }
 }
 
 @container (max-width: 600px) {
@@ -919,8 +797,7 @@ button.effects-category__add {
     margin-right: 8px;
     padding: 1px;
 
-    button.effect-control,
-    .effect-card__disclosure {
+    button.effect-control {
       box-sizing: border-box;
       inline-size: 28px !important;
       min-inline-size: 28px !important;

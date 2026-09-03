@@ -481,7 +481,7 @@ nav.tabs {
 
   // Traits borrow the Effects sheet's paper-and-rule treatment, but remain
   // static records: their description is always present and no card chrome
-  // reserves space for actions or a disclosure control.
+  // reserves no space for actions.
 .loadout {
   min-width: 0;
 
@@ -697,6 +697,11 @@ nav.tabs {
     margin: 0;
   }
 
+  // Tighten only the Attributes → Bans/Armor transition.
+  form.actor-sheet > .character-attributes {
+    margin-block-end: -10px;
+  }
+
   .character-sheet__workspace > nav.tabs {
     min-height: 0;
   }
@@ -710,7 +715,7 @@ nav.tabs {
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
-    scrollbar-gutter: auto;
+    scrollbar-gutter: stable;
     scrollbar-width: thin;
   }
 

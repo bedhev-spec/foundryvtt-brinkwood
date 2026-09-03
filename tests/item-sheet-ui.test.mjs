@@ -25,7 +25,7 @@ test("item sheets keep their content scrollable and their portrait bounded", asy
   ]);
 
   assert.match(template, /class="\{\{cssClass\}\} loadout-item-sheet"/);
-  assert.match(controller, /position:\s*\{ width:\s*560, height:\s*700 \}/);
+  assert.match(controller, /position:\s*\{ width:\s*720, height:\s*700 \}[\s\S]*?resizable:\s*false/);
   assert.match(source, /\.window-content\s*\{[\s\S]*?container-type:\s*inline-size/);
   assert.match(source, /\.window-content\s*\{[\s\S]*?height:\s*100%/);
   assert.match(source, /\.window-content\s*\{[\s\S]*?min-height:\s*0[\s\S]*?overflow:\s*hidden/);
@@ -81,9 +81,9 @@ test("item sheets opt into compact active-effect cards without changing shared s
     assert.match(template, /active-effects\.html" compact=true/);
   }
   assert.match(styles, /\.effect-card--compact\s*\{[\s\S]*?\.effect-card__image\s*\{[\s\S]*?width:\s*28px/);
-  assert.match(styles, /\.effect-card--compact\s*\{[\s\S]*?button\.effect-control,[\s\S]*?block-size:\s*28px !important/);
+  assert.match(styles, /\.effect-card--compact\s*\{[\s\S]*?button\.effect-control\s*\{[\s\S]*?block-size:\s*28px !important/);
   assert.match(styles, /\.effect-card--compact\s*\{[\s\S]*?inline-size:\s*fit-content[\s\S]*?justify-self:\s*end/);
-  assert.match(styles, /button\.effect-control,[\s\S]*?inline-size:\s*28px !important[\s\S]*?flex:\s*0 0 28px !important/);
+  assert.match(styles, /\.effect-card--compact[\s\S]*?button\.effect-control\s*\{[\s\S]*?inline-size:\s*28px !important[\s\S]*?flex:\s*0 0 28px !important/);
   assert.match(styles, /@container \(max-width: 600px\)\s*\{[\s\S]*?\.effect-card--compact[\s\S]*?flex-wrap:\s*wrap/);
   assert.match(characterStyles, /\.loadout__controls\s*\{[\s\S]*?align-items:\s*center[\s\S]*?justify-content:\s*center[\s\S]*?gap:\s*7px/);
   assert.match(characterStyles, /\.loadout__weight\s*\{[\s\S]*?align-items:\s*center[\s\S]*?block-size:\s*20px[\s\S]*?font-size:\s*calc\(1em \+ 2px\)[\s\S]*?transform:\s*translateY\(2px\)/);
