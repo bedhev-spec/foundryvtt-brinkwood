@@ -1737,9 +1737,49 @@
   width: 100%;
   box-sizing: border-box;
 }
+.brinkwood.actor.pc.character .character-sheet__workspace > .tab-content {
+  grid-column: 1;
+  width: 100%;
+  min-width: 0;
+}
+.brinkwood.actor.pc.character .character-sheet__workspace > .tab-content > .tab[data-tab] {
+  margin-top: 0;
+  padding-top: 10px;
+}
 .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item {
   flex: 1 1 0;
   min-width: 0;
+}
+.brinkwood.actor.pc.character .character-attributes {
+  display: block;
+  align-self: stretch;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+.brinkwood.actor.pc.character .character-attributes > .attributes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  flex: 1 1 100%;
+  gap: 12px;
+}
+.brinkwood.actor.pc.character .character-attributes > .attributes .attribute {
+  width: 100%;
+  min-width: 0;
+}
+.brinkwood.actor.pc.character .character-attributes > .attributes .attribute > .flex-horizontal {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+.brinkwood.actor.pc.character .character-attributes > .attributes .attributes-exp {
+  margin-top: 0;
 }
 .brinkwood.actor.pc.character {
   --bw-paper: #eeeae0;
@@ -2221,6 +2261,16 @@
   .brinkwood.actor.pc.character .character-scars-clock .blades-clock *:nth-child(9),
   .brinkwood.actor.pc.character .character-oath-clock .blades-clock *:nth-child(9) {
     transform: rotate(270deg) skewY(180deg);
+  }
+}
+@container (max-width: 570px) {
+  .brinkwood.actor.pc.character .character-attributes > .attributes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container (max-width: 410px) {
+  .brinkwood.actor.pc.character .character-attributes > .attributes {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 .brinkwood.actor.mask {
@@ -3631,6 +3681,7 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   box-shadow: 0 8px 24px rgba(25, 18, 19, 0.35);
   font-family: "Crimson Text", serif;
   font-size: var(--font-size-14);
+  line-height: 1.35;
   text-align: left !important;
 }
 
@@ -3658,7 +3709,26 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   color: #cfc4c0;
 }
 
-.brinkwood-item-tooltip p {
+.brinkwood-item-tooltip__description {
+  margin-top: 8px;
+}
+.brinkwood-item-tooltip__description p {
+  margin: 0 0 0.8em;
+}
+.brinkwood-item-tooltip__description p:last-child {
+  margin-bottom: 0;
+}
+
+.brinkwood-item-tooltip__stats + .brinkwood-item-tooltip__description {
+  padding-top: 7px;
+  border-top: 1px solid rgba(247, 244, 237, 0.2);
+}
+
+.brinkwood-item-tooltip--description-only .brinkwood-item-tooltip__description {
+  margin-top: 0;
+}
+
+.brinkwood-item-tooltip > p {
   margin: 8px 0 0;
   padding-top: 7px;
   border-top: 1px solid rgba(247, 244, 237, 0.2);
@@ -3893,67 +3963,6 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   gap: 4px;
   margin-bottom: 8px;
   padding: 4px;
-}
-
-.brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs {
-  grid-column: 1/-1;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.brinkwood.actor.pc.character .character-sheet__workspace > .tab-content {
-  grid-column: 1;
-  width: 100%;
-  min-width: 0;
-}
-
-.brinkwood.actor.pc.character .character-sheet__workspace > .tab-content > .tab[data-tab] {
-  margin-top: 0;
-  padding-top: 10px;
-}
-
-.brinkwood.actor.pc.character .character-sheet__workspace {
-  grid-template-columns: minmax(0, 1fr);
-  row-gap: 0;
-}
-
-.brinkwood.actor.pc.character .character-attributes > .attributes {
-  display: grid;
-  /* Match the Bans region: each attribute family owns an equal horizontal
-   * column while its dot track and label remain together. */
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-  /* Override the v11 fixed 200px flex basis at the live element. */
-  flex: 1 1 100%;
-  gap: 12px;
-}
-
-.brinkwood.actor.pc.character .character-attributes {
-  display: block;
-  align-self: stretch;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  flex: 0 0 auto;
-}
-
-.brinkwood.actor.pc.character .character-attributes > .attributes .attribute {
-  width: 100%;
-  min-width: 0;
-}
-
-.brinkwood.actor.pc.character .character-attributes > .attributes .attribute > .flex-horizontal {
-  display: block;
-  width: 100%;
-  min-width: 0;
-}
-
-.brinkwood.actor.pc.character .character-attributes > .attributes .attributes-exp {
-  margin-top: 0;
 }
 
 .brinkwood.actor.pc.character .effects-tab {
@@ -4238,15 +4247,7 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   place-items: center;
 }
 
-@container (max-width: 570px) {
-  .brinkwood.actor.pc.character .character-attributes > .attributes {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
 @container (max-width: 410px) {
-  .brinkwood.actor.pc.character .character-attributes > .attributes {
-    grid-template-columns: minmax(0, 1fr);
-  }
   .brinkwood.actor.pc.character .effects-tab {
     flex-basis: 100%;
   }

@@ -22,11 +22,11 @@
 
         <div class="item-block flex-horizontal">
           <div class="item-class-label">
-	          <a class="item-add-popup" data-distinct="true" data-item-type="upbringing">{{localize "BITD.Upbringing"}}</a>
+	          <a class="item-add-popup tooltip" data-distinct="true" data-item-type="upbringing" data-tooltip="BITD.UpbringingGrantSummary" data-tooltip-direction="RIGHT">{{localize "BITD.Upbringing"}}</a>
           </div>
           {{#each items as |item id|}}
             {{#if (eq item.type "upbringing")}}
-            <div class="item flex-horizontal tooltip identity-choice__value" data-item-id="{{item._id}}" data-tooltip="Actor.Upbringings.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
+            <div class="item flex-horizontal tooltip identity-choice__value" data-item-id="{{item._id}}" data-tooltip-html="{{item.identityTooltipHtml}}" data-tooltip-class="brinkwood-item-tooltip-shell" data-tooltip-direction="RIGHT">
 <div class="item-body flex-horizontal"{{#if editable}} role="button" tabindex="0"{{/if}}>
 								<div class="item-name">{{item.name}}</div>
                 </div>
@@ -40,11 +40,11 @@
 
         <div class="item-block flex-horizontal">
           <div class="item-class-label">
-						<a class="item-add-popup" data-distinct="true" data-item-type="profession">{{localize "BITD.Profession"}}</a>
+						<a class="item-add-popup tooltip" data-distinct="true" data-item-type="profession" data-tooltip="BITD.ProfessionGrantSummary" data-tooltip-direction="RIGHT">{{localize "BITD.Profession"}}</a>
 					</div>
           {{#each items as |item id|}}
             {{#if (eq item.type "profession")}}
-            <div class="item flex-horizontal tooltip identity-choice__value" data-item-id="{{item._id}}" data-tooltip="Actor.Professions.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
+            <div class="item flex-horizontal tooltip identity-choice__value" data-item-id="{{item._id}}" data-tooltip-html="{{item.identityTooltipHtml}}" data-tooltip-class="brinkwood-item-tooltip-shell" data-tooltip-direction="RIGHT">
 <div class="item-body flex-horizontal"{{#if editable}} role="button" tabindex="0"{{/if}}>
                 <div class="item-name">{{item.name}}</div>
               </div>
@@ -57,10 +57,10 @@
         </div>
 
         <div class="item-block flex-horizontal">
-          <div class="item-class-label"><a class="item-add-popup" data-distinct="true" data-item-type="class">{{localize "BITD.Class"}}</a></div>
+          <div class="item-class-label"><a class="item-add-popup tooltip" data-distinct="true" data-item-type="class" data-tooltip="BITD.ClassGrantSummary" data-tooltip-direction="RIGHT">{{localize "BITD.Class"}}</a></div>
             {{#each items as |item id|}}
                 {{#if (eq item.type "class")}}
-            <div class="item flex-horizontal tooltip identity-choice__value" data-item-id="{{item._id}}" data-tooltip="Actor.Classes.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
+            <div class="item flex-horizontal tooltip identity-choice__value" data-item-id="{{item._id}}" data-tooltip-html="{{item.identityTooltipHtml}}" data-tooltip-class="brinkwood-item-tooltip-shell" data-tooltip-direction="RIGHT">
 <div class="item-body flex-horizontal"{{#if editable}} role="button" tabindex="0"{{/if}}>
                     <div class="item-name">{{item.name}}</div>
                   </div>
@@ -76,7 +76,7 @@
           <div class="item-class-label"><a class="item-add-popup" data-distinct="true" data-item-type="pact">{{localize "BITD.Pact"}}</a></div>
             {{#each items as |item id|}}
                 {{#if (eq item.type "pact")}}
-            <div class="item flex-horizontal tooltip identity-choice__value" data-item-id="{{item._id}}" data-tooltip="Actor.Pacts.{{item.name}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
+            <div class="item flex-horizontal tooltip identity-choice__value" data-item-id="{{item._id}}" data-tooltip-html="{{item.identityTooltipHtml}}" data-tooltip-class="brinkwood-item-tooltip-shell" data-tooltip-direction="RIGHT">
 <div class="item-body flex-horizontal"{{#if editable}} role="button" tabindex="0"{{/if}}>
                     <div class="item-name">{{item.name}}</div>
                   </div>

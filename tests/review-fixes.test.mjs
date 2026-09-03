@@ -209,9 +209,9 @@ test("item-picker interpolations are escaped before entering HTML", async () => 
   const professionTooltip = renderItemTooltip({ type: "profession", name: "Bard" });
   const classTooltip = renderItemTooltip({ type: "class", name: "Commander" });
   const pactTooltip = renderItemTooltip({ type: "pact", name: "A Pact" });
-  assert.match(upbringingTooltip, /BITD\.UpbringingGrantSummary/);
-  assert.match(professionTooltip, /BITD\.ProfessionGrantSummary/);
-  assert.match(classTooltip, /BITD\.ClassGrantSummary/);
+  assert.doesNotMatch(upbringingTooltip, /GrantSummary/);
+  assert.doesNotMatch(professionTooltip, /GrantSummary/);
+  assert.doesNotMatch(classTooltip, /GrantSummary/);
   assert.doesNotMatch(pactTooltip, /GrantSummary/);
 });
 

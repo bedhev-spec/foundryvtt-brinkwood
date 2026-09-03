@@ -1,14 +1,50 @@
 import { escapeHTML } from "./html-utils.js";
 
-const TYPE_GRANT_SUMMARY_KEYS = Object.freeze({
-  upbringing: "BITD.UpbringingGrantSummary",
-  profession: "BITD.ProfessionGrantSummary",
-  class: "BITD.ClassGrantSummary"
-});
+function formatTooltipDescription(description) {
+  const match = description.match(/^<p(?:\s[^>]*)?>([\s\S]*)<\/p>$/i);
+  if (!match || (description.match(/<p(?:\s[^>]*)?>/gi) ?? []).length !== 1) return description;
 
-export function renderItemTooltip(item, localize = key => key) {
+  const sentences = match[1]
+    .split(/(?<=[.!?])\s+(?=(?:<[^>]+>)*[A-ZÀ-ÖØ-Þ])/u)
+    .map(sentence => sentence.trim())
+    .filter(Boolean);
+  if (sentences.length < 3) return description;
+
+  const paragraphs = [];
+  for (let index = 0; index < sentences.length; index += 2) {
+    paragraphs.push(`<p>${sentences.slice(index, index + 2).join(" ")}</p>`);
+  }
+  return paragraphs.join("");
+}
+
+function renderTooltipDescriptionBlock(description, enrichDescription) {
+  const enriched = String(enrichDescription(String(description ?? "")) ?? "").trim();
+  if (!enriched) return "";
+  return `<div class="brinkwood-item-tooltip__description">${formatTooltipDescription(enriched)}</div>`;
+}
+
+export function renderDescriptionTooltip(
+  description,
+  enrichDescription = value => `<p>${escapeHTML(value)}</p>`,
+) {
+  const descriptionBlock = renderTooltipDescriptionBlock(description, enrichDescription);
+  if (!descriptionBlock) return "";
+  return `<section class="brinkwood-item-tooltip brinkwood-item-tooltip--description-only">${descriptionBlock}</section>`;
+}
+
+/**
+ * Render the information shown by an item-picker help control.
+ *
+ * `enrichDescription` is deliberately supplied by the Foundry caller: it
+ * can use Foundry's rich-text enricher while keeping this formatter testable and
+ * safe when used outside a rendered Foundry application.
+ */
+export function renderItemTooltip(
+  item,
+  localize = key => key,
+  enrichDescription = escapeHTML,
+) {
   const system = item?.system ?? {};
-  const grantSummaryKey = TYPE_GRANT_SUMMARY_KEYS[item?.type];
   const fields = [
     ["BITD.Load", system.load],
     ["BITD.Uses", system.uses],
@@ -22,12 +58,13 @@ export function renderItemTooltip(item, localize = key => key) {
       <strong>${escapeHTML(value)}</strong>
     </div>`).join("");
   const additionalInfo = String(system.additional_info ?? "").trim();
+  const description = renderTooltipDescriptionBlock(system.description, enrichDescription);
 
   return `
     <section class="brinkwood-item-tooltip">
       <header>${escapeHTML(localize(item?.name ?? ""))}</header>
-      <div class="brinkwood-item-tooltip__stats">${rows}</div>
-      ${grantSummaryKey ? `<p>${escapeHTML(localize(grantSummaryKey))}</p>` : ""}
+      ${rows ? `<div class="brinkwood-item-tooltip__stats">${rows}</div>` : ""}
+      ${description}
       ${additionalInfo ? `<p>${escapeHTML(additionalInfo)}</p>` : ""}
     </section>`;
 }

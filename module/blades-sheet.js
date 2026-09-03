@@ -197,7 +197,7 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
     const items = await BladesHelpers.getAllItemsByType(item_type, game);
 
     let htmlContent = `<form><div class="items-to-add">`;
-    items.forEach(e => {
+    for (const e of items) {
       let addition_price_load = ``;
       if (typeof e.system.load !== "undefined") {
         addition_price_load += `(${e.system.load})`;
@@ -207,7 +207,16 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
       const itemId = escapeHTML(e._id);
       const itemName = escapeHTML(game.i18n.localize(e.name));
       const itemDetails = escapeHTML(addition_price_load);
-      const itemTooltip = escapeHTML(renderItemTooltip(e, key => game.i18n.localize(key)));
+      const enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+        String(e.system.description ?? ""),
+        this.document,
+        this.document.isOwner,
+      );
+      const itemTooltip = escapeHTML(renderItemTooltip(
+        e,
+        key => game.i18n.localize(key),
+        () => enrichedDescription,
+      ));
       const itemTooltipLabel = escapeHTML(game.i18n.localize("BITD.ItemDetails"));
       htmlContent += `<div class="item-picker-row">
         <input id="select-item-${itemId}" type="${input_type}" name="select_items" value="${itemId}">
@@ -218,7 +227,7 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
           data-tooltip-html="${itemTooltip}" data-tooltip-class="brinkwood-item-tooltip-shell"
           data-tooltip-direction="RIGHT"></i>
       </div>`;
-    });
+    }
     htmlContent += `</div></form>`;
 
     const selectedIds = await foundry.applications.api.DialogV2.prompt({

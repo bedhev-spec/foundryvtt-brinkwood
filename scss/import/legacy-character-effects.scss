@@ -7,58 +7,6 @@
   margin-bottom: 8px;
   padding: 4px;
 }
-.brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs {
- grid-column: 1 / -1;
- width: 100%;
- box-sizing: border-box;
-}
-.brinkwood.actor.pc.character .character-sheet__workspace > .tab-content {
- grid-column: 1;
- width: 100%;
- min-width: 0;
-}
-.brinkwood.actor.pc.character .character-sheet__workspace > .tab-content > .tab[data-tab] {
- margin-top: 0;
- padding-top: 10px;
-}
-.brinkwood.actor.pc.character .character-sheet__workspace {
- grid-template-columns: minmax(0, 1fr);
- row-gap: 0;
-}
-.brinkwood.actor.pc.character .character-attributes > .attributes {
- display: grid;
- /* Match the Bans region: each attribute family owns an equal horizontal
-  * column while its dot track and label remain together. */
- grid-template-columns: repeat(3, minmax(0, 1fr));
- width: 100%;
- max-width: 100%;
- min-width: 0;
- box-sizing: border-box;
- /* Override the v11 fixed 200px flex basis at the live element. */
- flex: 1 1 100%;
- gap: 12px;
-}
-.brinkwood.actor.pc.character .character-attributes {
- display: block;
- align-self: stretch;
- box-sizing: border-box;
- width: 100%;
- max-width: 100%;
- min-width: 0;
- flex: 0 0 auto;
-}
-.brinkwood.actor.pc.character .character-attributes > .attributes .attribute {
- width: 100%;
- min-width: 0;
-}
-.brinkwood.actor.pc.character .character-attributes > .attributes .attribute > .flex-horizontal {
- display: block;
- width: 100%;
- min-width: 0;
-}
-.brinkwood.actor.pc.character .character-attributes > .attributes .attributes-exp {
- margin-top: 0;
-}
 .brinkwood.actor.pc.character .effects-tab {
   flex: 1 1 8rem;
   min-height: 34px;
@@ -286,14 +234,6 @@
 .brinkwood.actor.pc.character button.effects-category__add {
   display: inline-grid; flex: 0 0 32px; width: 32px; min-width: 32px; height: 32px; min-height: 32px; margin: 0; padding: 0; line-height: 1; place-items: center;
 }
-@container (max-width: 570px) {
- .brinkwood.actor.pc.character .character-attributes > .attributes {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
- }
-}
 @container (max-width: 410px) {
- .brinkwood.actor.pc.character .character-attributes > .attributes {
-    grid-template-columns: minmax(0, 1fr);
-  }
   .brinkwood.actor.pc.character .effects-tab { flex-basis: 100%; }
 }

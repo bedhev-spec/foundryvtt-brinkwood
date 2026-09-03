@@ -150,14 +150,17 @@ test("Character sheet commits generic controls once and completes tab-panel cont
   assert.match(template, /\{\{#if isGM\}\}[\s\S]*?id="character-\{\{_id\}\}-tab-effects"[\s\S]*?\{\{\/if\}\}[\s\S]*?\{\{#if isGM\}\}[\s\S]*?id="character-\{\{_id\}\}-effects"[\s\S]*?\{\{\/if\}\}/);
 });
 
-test("attribute groups use the Bans width in horizontal, responsive columns", async () => {
-  const styles = await read("scss/import/legacy-character-effects.scss");
+test("Character sheet owns Attribute-grid geometry and breakpoints", async () => {
+  const [styles, legacyStyles] = await Promise.all([
+    read("scss/import/character-sheet.scss"),
+    read("scss/import/legacy-character-effects.scss"),
+  ]);
 
  assert.match(styles, /\.character-attributes > \.attributes\s*\{[\s\S]*?grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)[\s\S]*?width:\s*100%[\s\S]*?max-width:\s*100%[\s\S]*?box-sizing:\s*border-box[\s\S]*?flex:\s*1 1 100%/);
  assert.match(styles, /\.character-attributes\s*\{[\s\S]*?align-self:\s*stretch[\s\S]*?width:\s*100%[\s\S]*?flex:\s*0 0 auto/);
  assert.match(styles, /\.attribute > \.flex-horizontal\s*\{[\s\S]*?display:\s*block[\s\S]*?width:\s*100%/);
- assert.match(styles, /\.attributes \.attributes-container\s*\{[\s\S]*?display:\s*grid[\s\S]*?grid-template-columns:\s*repeat\(4, 28px\) minmax\(0, 1fr\)[\s\S]*?width:\s*100%[\s\S]*?min-width:\s*0/);
- assert.match(styles, /\.attributes \.attribute-skill-label\s*\{[\s\S]*?min-width:\s*0[\s\S]*?text-overflow:\s*ellipsis[\s\S]*?white-space:\s*nowrap/);
  assert.match(styles, /@container \(max-width: 570px\)\s*\{[\s\S]*?\.character-attributes > \.attributes\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
  assert.match(styles, /@container \(max-width: 410px\)\s*\{[\s\S]*?\.character-attributes > \.attributes\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
+ assert.doesNotMatch(legacyStyles, /character-sheet__workspace > (?:nav\.tabs|\.tab-content)/);
+ assert.doesNotMatch(legacyStyles, /character-attributes(?: > \.attributes)?\s*\{/);
 });

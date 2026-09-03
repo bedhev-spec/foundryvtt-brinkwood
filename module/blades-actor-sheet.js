@@ -10,6 +10,8 @@ import { encumbranceLevelForLoadout, hasMuleAbility } from "./encumbrance.js";
 import { BladesHelpers } from "./blades-helpers.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
 import { preloadClockImages } from "./clock-utils.js";
+import { escapeHTML } from "./html-utils.js";
+import { renderDescriptionTooltip } from "./item-tooltip.js";
 import { formControlUpdate } from "./sheet-dom.js";
 
 export { prepareLoadoutCapacity } from "./character/loadout.js";
@@ -85,6 +87,20 @@ position: { width: 700, height: 1170 },
     this._prepareEffectTabs(context);
 
     this.setAttrLabels(context.system.attributes);
+
+    const identityDescriptionRoots = {
+      upbringing: "Actor.Upbringings",
+      profession: "Actor.Professions",
+      class: "Actor.Classes",
+      pact: "Actor.Pacts",
+    };
+    for (const item of context.items) {
+      const descriptionRoot = identityDescriptionRoots[item.type];
+      if (!descriptionRoot) continue;
+      item.identityTooltipHtml = escapeHTML(
+        renderDescriptionTooltip(game.i18n.localize(`${descriptionRoot}.${item.name}`)),
+      );
+    }
 
     context.traits = context.items
       .filter(i => i.type === "trait")

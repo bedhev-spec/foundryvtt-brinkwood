@@ -1,0 +1,2 @@
+# Foundry v13 compendium directories are LevelDB stores, not text assets.
+packs/*/** -text

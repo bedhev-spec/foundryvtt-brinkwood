@@ -448,3 +448,15 @@ test("queued toggle and GM load edit reconcile one actor copy without duplicates
   assert.equal(created[0].system.equipped, true);
   assert.equal(created[0].system.load, 4);
 });
+
+test("loadout pack entries have concise descriptions", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const source = await readFile(new URL("../packs/items.db", import.meta.url), "utf8");
+  const entries = source.trim().split(/\r?\n/).filter(Boolean).map(JSON.parse);
+  assert.equal(entries.length, 27);
+  for (const entry of entries) {
+    const description = entry.system?.description?.trim() ?? "";
+    assert.ok(description, `${entry.name} must have a description`);
+    assert.ok(description.split(/\s+/).length <= 10, `${entry.name} exceeds 10 words`);
+  }
+});

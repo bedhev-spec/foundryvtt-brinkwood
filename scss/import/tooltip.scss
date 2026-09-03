@@ -53,6 +53,7 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   box-shadow: 0 8px 24px rgba(25, 18, 19, 0.35);
   font-family: "Crimson Text", serif;
   font-size: var(--font-size-14);
+  line-height: 1.35;
   text-align: left !important;
 }
 
@@ -81,7 +82,28 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   }
 }
 
-.brinkwood-item-tooltip p {
+.brinkwood-item-tooltip__description {
+  margin-top: 8px;
+
+  p {
+    margin: 0 0 .8em;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.brinkwood-item-tooltip__stats + .brinkwood-item-tooltip__description {
+  padding-top: 7px;
+  border-top: 1px solid rgba(247, 244, 237, 0.2);
+}
+
+.brinkwood-item-tooltip--description-only .brinkwood-item-tooltip__description {
+  margin-top: 0;
+}
+
+.brinkwood-item-tooltip > p {
   margin: 8px 0 0;
   padding-top: 7px;
   border-top: 1px solid rgba(247, 244, 237, 0.2);
