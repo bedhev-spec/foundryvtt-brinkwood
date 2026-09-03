@@ -25,6 +25,15 @@ test("the evolved character sheet is the only registered character sheet", async
   }
 });
 
+test("Character sheet delegates encumbrance policy to the shared calculation", async () => {
+  const controller = await read("module/blades-actor-sheet.js");
+
+  assert.match(controller, /from "\.\/encumbrance\.js"/);
+  assert.match(controller, /encumbranceLevelForLoadout\(loadout, hasMuleAbility\(context\.items\)\)/);
+  assert.doesNotMatch(controller, /const load_level\s*=/);
+  assert.doesNotMatch(controller, /\(C\) Mule/);
+});
+
 test("effect management is grouped and uses markup-independent controls", async () => {
   const [template, manager, sourceStyles, compiledStyles] = await Promise.all([
     read("templates/parts/active-effects.html"),

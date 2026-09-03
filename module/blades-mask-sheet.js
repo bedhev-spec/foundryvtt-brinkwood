@@ -2,6 +2,7 @@
 import { BladesSheet } from "./blades-sheet.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
 import { capitalize } from "./blades-helpers.js";
+import { encumbranceLevelForLoadout, hasMuleAbility } from "./encumbrance.js";
 
 export function getMaskTypePresentation(typeName, attributes) {
   const maskAttributes = attributes[typeName];
@@ -83,19 +84,6 @@ export class BladesMaskSheet extends BladesSheet {
     loadout = Math.max(0, Math.min(10, loadout));
     context.system.loadout = loadout;
 
-    // Encumbrance Levels
-    const load_level = [
-      "BITD.Light","BITD.Light","BITD.Light","BITD.Light",
-      "BITD.Normal","BITD.Normal","BITD.Heavy","BITD.Encumbered",
-      "BITD.Encumbered","BITD.Encumbered","BITD.OverMax",
-    ];
-    const mule_level = [
-      "BITD.Light","BITD.Light","BITD.Light","BITD.Light",
-      "BITD.Light","BITD.Light","BITD.Normal","BITD.Normal",
-      "BITD.Heavy","BITD.Encumbered","BITD.OverMax",
-    ];
-
-    let mule_present = 0;
     // Determine mask type from equipped mask item
     context.system.type = context.items.find(i => i.type === "mask")?.name.toLowerCase() ?? context.system.type;
     context.system.mask_attributes = [];
@@ -110,12 +98,7 @@ export class BladesMaskSheet extends BladesSheet {
         (presentation.xpKey ? game.i18n.localize(presentation.xpKey) : "");
     }
 
-    // Look for Mule ability
-    context.items.forEach(i => {
-      if (i.type === "ability" && i.name === "(C) Mule") mule_present = 1;
-    });
-
-    context.system.load_level  = mule_present ? mule_level[loadout] : load_level[loadout];
+    context.system.load_level = encumbranceLevelForLoadout(loadout, hasMuleAbility(context.items));
     context.system.load_levels = { "BITD.Light": "BITD.Light", "BITD.Normal": "BITD.Normal", "BITD.Heavy": "BITD.Heavy" };
 
     context.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(

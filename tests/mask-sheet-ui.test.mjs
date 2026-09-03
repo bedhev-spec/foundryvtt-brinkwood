@@ -33,6 +33,15 @@ test("Mask sheet uses compact, accessible, controller-compatible markup", async 
   assert.match(attributes, /class="attribute-skill-label roll-die-attribute rollable-text"/);
 });
 
+test("Mask sheet delegates encumbrance policy to the shared calculation", async () => {
+  const controller = await read("module/blades-mask-sheet.js");
+
+  assert.match(controller, /from "\.\/encumbrance\.js"/);
+  assert.match(controller, /encumbranceLevelForLoadout\(loadout, hasMuleAbility\(context\.items\)\)/);
+  assert.doesNotMatch(controller, /const load_level\s*=/);
+  assert.doesNotMatch(controller, /\(C\) Mule/);
+});
+
 test("Mask styles are scoped and adapt to the sheet container", async () => {
   const [entrypoint, source, compiled, sheet] = await Promise.all([
     read("scss/style.scss"),
