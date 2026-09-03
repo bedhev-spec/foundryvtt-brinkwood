@@ -32,7 +32,8 @@ test("character load-level control is a styled native menu with accessible overl
   assert.match(template, /class="bans-armor bw-section-frame"[\s\S]*?<thead class="bw-section-frame__header">/);
   assert.match(generalStyles, /\.bw-section-frame \{[\s\S]*?border: 1px solid var\(--bw-rule\);[\s\S]*?border-radius: 8px;[\s\S]*?overflow: hidden;/);
   assert.match(styles, /\.loadout__catalogue \{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);[\s\S]*?padding: 7px 8px;/);
-  assert.match(styles, /field-sizing: content;[\s\S]*?min-width: 82px;[\s\S]*?min-height: 22px;[\s\S]*?text-align: center; text-align-last: center;[\s\S]*?option \{ text-align: center; \}/);
+  assert.match(styles, /inline-size: 82px; min-width: 82px; max-width: 82px;[\s\S]*?height: 20px; min-height: 20px;[\s\S]*?text-align: center; text-align-last: center;[\s\S]*?option \{ text-align: center; \}/);
+  assert.doesNotMatch(styles, /field-sizing:\s*content/);
   assert.match(styles, /\.loadout-item-select \{ display: block; inline-size: 18px; block-size: 18px;[\s\S]*?opacity: 1;/);
   assert.match(styles, /\.loadout__item \{[\s\S]*?min-height: 32px;[\s\S]*?box-shadow: inset 3px 0 0 var\(--bw-accent\);[\s\S]*?&:focus-within \{ background: rgba\(141, 98, 93, 0\.16\); \}/);
   assert.match(styles, /\.loadout-item-open \{[\s\S]*?min-height: 30px;[\s\S]*?&:focus, &:focus-visible \{ outline: 0; box-shadow: none; \}/);

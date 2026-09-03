@@ -63,13 +63,14 @@ test("legacy item sheets share bounded headers and scrolling content", async () 
 });
 
 test("item sheets opt into compact active-effect cards without changing shared sheets", async () => {
-  const [partial, item, simple, trait, klass, styles] = await Promise.all([
+  const [partial, item, simple, trait, klass, styles, characterStyles] = await Promise.all([
     read("templates/parts/active-effects.html"),
     read("templates/items/item.html"),
     read("templates/items/simple.html"),
     read("templates/items/trait.html"),
     read("templates/items/class.html"),
     read("scss/import/general-styles.scss"),
+    read("scss/import/character-sheet.scss"),
   ]);
 
   const compactCard = renderEffectCardOpeningTag(partial, { compact: true }, {}, { disabled: false });
@@ -80,8 +81,13 @@ test("item sheets opt into compact active-effect cards without changing shared s
     assert.match(template, /active-effects\.html" compact=true/);
   }
   assert.match(styles, /\.effect-card--compact\s*\{[\s\S]*?\.effect-card__image\s*\{[\s\S]*?width:\s*28px/);
-  assert.match(styles, /\.effect-card--compact\s*\{[\s\S]*?button\.effect-control,[\s\S]*?height:\s*28px/);
+  assert.match(styles, /\.effect-card--compact\s*\{[\s\S]*?button\.effect-control,[\s\S]*?block-size:\s*28px !important/);
+  assert.match(styles, /\.effect-card--compact\s*\{[\s\S]*?inline-size:\s*fit-content[\s\S]*?justify-self:\s*end/);
+  assert.match(styles, /button\.effect-control,[\s\S]*?inline-size:\s*28px !important[\s\S]*?flex:\s*0 0 28px !important/);
   assert.match(styles, /@container \(max-width: 600px\)\s*\{[\s\S]*?\.effect-card--compact[\s\S]*?flex-wrap:\s*wrap/);
+  assert.match(characterStyles, /\.loadout__weight\s*\{[\s\S]*?margin-inline-end:\s*2px[\s\S]*?font-size:\s*calc\(1em \+ 2px\)/);
+  assert.match(characterStyles, /\.loadout__level\s*\{[\s\S]*?select\s*\{[\s\S]*?inline-size:\s*82px; min-width:\s*82px; max-width:\s*82px[\s\S]*?height:\s*20px/);
+  assert.match(characterStyles, /&:focus\s*\{[\s\S]*?box-shadow:\s*none !important[\s\S]*?&:focus-visible\s*\{[\s\S]*?outline:\s*2px solid var\(--bw-ink-soft\) !important/);
 });
 
 test("loadout items use v13 form editing and accessible active-effect controls", async () => {

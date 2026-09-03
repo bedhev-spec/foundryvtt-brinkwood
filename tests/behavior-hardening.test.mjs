@@ -384,10 +384,13 @@ test("item effect listener catches rejected mutations and ignores a rapid second
 
 test("item effect reconciliation restores scroll from the replacement render lifecycle", async () => {
   const originalManage = BladesActiveEffect.onManageActiveEffect;
+  const originalRequestAnimationFrame = globalThis.requestAnimationFrame;
+  const frames = [];
   BladesActiveEffect.onManageActiveEffect = async () => {};
+  globalThis.requestAnimationFrame = callback => { frames.push(callback); return frames.length; };
   game.user.isGM = true;
   const firstForm = { scrollTop: 214, scrollLeft: 9 };
-  const replacementForm = { scrollTop: 0, scrollLeft: 0 };
+  const replacementForm = { scrollTop: 0, scrollLeft: 0, addEventListener() {} };
   const itemRoot = form => ({
     isConnected: true,
     matches: () => false,
@@ -410,12 +413,59 @@ test("item effect reconciliation restores scroll from the replacement render lif
   });
   try {
     await sheet._onItemEffectControl({ currentTarget: control, preventDefault() {} });
+    // Foundry's deferred focus work can run after ApplicationV2's _onRender.
+    replacementForm.scrollTop = replacementForm.scrollLeft = 0;
+    assert.equal(frames.length, 1);
+    frames.shift()();
     assert.deepEqual(
       { scrollTop: replacementForm.scrollTop, scrollLeft: replacementForm.scrollLeft },
       { scrollTop: 214, scrollLeft: 9 },
     );
   } finally {
     BladesActiveEffect.onManageActiveEffect = originalManage;
+    if (originalRequestAnimationFrame) globalThis.requestAnimationFrame = originalRequestAnimationFrame;
+    else delete globalThis.requestAnimationFrame;
+  }
+});
+
+test("item sheets retain viewport state through later document-driven renders", async () => {
+  const originalRequestAnimationFrame = globalThis.requestAnimationFrame;
+  const frames = [];
+  globalThis.requestAnimationFrame = callback => { frames.push(callback); return frames.length; };
+  let firstScrollListener;
+  const firstForm = {
+    scrollTop: 214,
+    scrollLeft: 9,
+    addEventListener(type, listener) { if (type === "scroll") firstScrollListener = listener; },
+  };
+  const replacementForm = { scrollTop: 0, scrollLeft: 0, addEventListener() {} };
+  const root = form => ({
+    isConnected: true,
+    matches: () => false,
+    closest: () => null,
+    querySelector: selector => selector === "form" ? form : null,
+    querySelectorAll: () => [],
+  });
+  const sheet = Object.assign(Object.create(BladesItemSheet.prototype), {
+    element: root(firstForm),
+    _bindEffectDisclosureState() {},
+  });
+
+  try {
+    await sheet._onRender({ editable: false }, {});
+    firstScrollListener();
+    sheet.element = root(replacementForm);
+    await sheet._onRender({ editable: false }, {});
+    replacementForm.scrollTop = replacementForm.scrollLeft = 0;
+    assert.equal(frames.length, 1);
+    frames.shift()();
+    assert.deepEqual(
+      { scrollTop: replacementForm.scrollTop, scrollLeft: replacementForm.scrollLeft },
+      { scrollTop: 214, scrollLeft: 9 },
+    );
+  } finally {
+    if (originalRequestAnimationFrame) globalThis.requestAnimationFrame = originalRequestAnimationFrame;
+    else delete globalThis.requestAnimationFrame;
   }
 });
 

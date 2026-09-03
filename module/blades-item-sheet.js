@@ -4,7 +4,7 @@
  */
 import { BladesActiveEffect } from "./blades-active-effect.js";
 import { lockSheetFormControls } from "./blades-sheet.js";
-import { captureSheetViewState, restoreSheetViewState } from "./sheet-view-state.js";
+import { captureSheetViewState, getSheetScrollContainers, restoreSheetViewState } from "./sheet-view-state.js";
 
 /** Brinkwood item fields, including Load, remain GM-authored. */
 export function prepareItemSheetPermissions(doc, { isGM = game.user.isGM, sheetEditable = true } = {}) {
@@ -89,9 +89,20 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
     // queue their captured state immediately before that render; consume it
     // here, once the replacement root is available, rather than racing the
     // render lifecycle from the control handler.
-    const pendingViewState = this._pendingItemEffectViewState;
+    const pendingViewState = this._pendingItemEffectViewState ?? this._itemSheetViewState;
     this._pendingItemEffectViewState = null;
-    if (pendingViewState && html?.isConnected) restoreSheetViewState(html, pendingViewState);
+    if (pendingViewState && html?.isConnected) {
+      const renderController = this._itemSheetListenerController;
+      const restore = () => {
+        if (renderController.signal.aborted || !html.isConnected || this.element !== html) return;
+        restoreSheetViewState(html, pendingViewState);
+      };
+      if (typeof requestAnimationFrame === "function") requestAnimationFrame(restore);
+      else restore();
+    }
+    getSheetScrollContainers(html).forEach(([, container]) => container.addEventListener("scroll", () => {
+      this._itemSheetViewState = captureSheetViewState(html);
+    }, listenerOptions));
     this._bindEffectDisclosureState?.(html);
 
     if (!context.editable) {
@@ -120,8 +131,10 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
     if (!control || this._pendingItemEffectControls?.has(control)) return;
     const action = control.dataset?.effectAction;
     const reconcilesParent = ["create", "toggle", "delete"].includes(action);
-    const canReconcile = reconcilesParent && this.document?.isOwner && game.user.isGM;
-    const viewState = canReconcile ? captureSheetViewState(this.element) : null;
+    const canManage = this.document?.isOwner && game.user.isGM;
+    const canReconcile = reconcilesParent && canManage;
+    const viewState = canManage ? captureSheetViewState(this.element) : null;
+    if (viewState) this._itemSheetViewState = viewState;
     const listenerController = this._itemSheetListenerController;
     this._pendingItemEffectControls ??= new WeakSet();
     this._pendingItemEffectControls.add(control);
@@ -163,6 +176,13 @@ export class BladesItemSheet extends foundry.applications.api.HandlebarsApplicat
         event.currentTarget.setAttribute("aria-expanded", String(!details.hidden));
       }, { signal: this._itemSheetListenerController?.signal });
     });
+  }
+
+  async _onClose(options) {
+    this._itemSheetListenerController?.abort();
+    this._pendingItemEffectViewState = null;
+    this._itemSheetViewState = null;
+    return super._onClose(options);
   }
 
   /* -------------------------------------------- */

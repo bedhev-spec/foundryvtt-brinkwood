@@ -493,16 +493,16 @@ nav.tabs {
   .loadout__header { display: grid; grid-template-columns: minmax(0, 1fr) max-content minmax(72px, max-content); align-items: center; gap: 5px; min-height: 32px; margin: 0; padding: 4px 8px; }
   .loadout__heading, .loadout__weight { margin: 0; }
   .loadout__heading { color: var(--bw-inverse); font-size: 0.82rem; line-height: 1; text-align: left; }
-    .loadout__weight { color: var(--bw-inverse); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .loadout__weight { margin-inline-end: 2px; color: var(--bw-inverse); font-size: calc(1em + 2px); white-space: nowrap; font-variant-numeric: tabular-nums; }
   .loadout__weight.is-overloaded { color: #d97b76; }
     .loadout__level {
       min-width: 0;
       select {
-      // `field-sizing` follows localized option text where supported. The minimum
-      // remains large enough for the Normal tier on older Foundry shells.
-      field-sizing: content; min-width: 82px; max-width: 100%; min-height: 22px; padding: 1px 18px 1px 5px; border: 1px solid var(--bw-rule); border-radius: 2px; background: var(--bw-paper); color: var(--bw-ink); cursor: pointer; font-family: Georgia, "Bitstream Charter", "Times New Roman", serif; font-size: 0.68rem; font-weight: 700; line-height: 1; text-align: center; text-align-last: center; text-transform: uppercase;
+      // Keep all three load tiers the same width so the header does not shift.
+      box-sizing: border-box; inline-size: 82px; min-width: 82px; max-width: 82px; height: 20px; min-height: 20px; padding: 0 18px 0 5px; border: 1px solid var(--bw-rule); border-radius: 2px; background: var(--bw-paper); color: var(--bw-ink); cursor: pointer; font-family: Georgia, "Bitstream Charter", "Times New Roman", serif; font-size: 0.68rem; font-weight: 700; line-height: 1; text-align: center; text-align-last: center; text-transform: uppercase;
         option { text-align: center; }
-        &:focus-visible { outline: 3px solid var(--bw-focus); outline-offset: 2px; }
+        &:focus { outline: none !important; box-shadow: none !important; }
+        &:focus-visible { outline: 2px solid var(--bw-ink-soft) !important; outline-offset: 1px; box-shadow: none !important; }
         &:disabled { cursor: default; opacity: 0.65; }
       }
     }

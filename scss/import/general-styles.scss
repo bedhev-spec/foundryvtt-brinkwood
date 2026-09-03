@@ -912,16 +912,21 @@ button.effects-category__add {
   }
 
   .effect-card__actions {
+    box-sizing: border-box;
+    inline-size: fit-content;
+    max-inline-size: 100%;
+    justify-self: end;
     margin-right: 8px;
     padding: 1px;
 
     button.effect-control,
     .effect-card__disclosure {
-      width: 28px;
-      min-width: 28px;
-      height: 28px;
-      min-height: 28px;
-      flex-basis: 28px;
+      box-sizing: border-box;
+      inline-size: 28px !important;
+      min-inline-size: 28px !important;
+      block-size: 28px !important;
+      min-block-size: 28px !important;
+      flex: 0 0 28px !important;
     }
   }
 }
@@ -936,6 +941,7 @@ button.effects-category__add {
     .effect-card__actions {
       grid-column: auto;
       justify-content: flex-end;
+      justify-self: end;
       align-self: start;
       flex-wrap: wrap;
       margin: 0 8px 7px;
