@@ -278,6 +278,6 @@ test("legacy migration preserves effects and updates embedded items in place", a
 test("test manifest targets the 0.6.13 release", async () => {
   const manifest = JSON.parse(await read("system-test.json"));
   assert.equal(manifest.version, "0.6.13");
-  assert.match(manifest.manifest, /master\/system-test\.json$/);
+  assert.match(manifest.manifest, /integration\/v13-follow-up\/system-test\.json$/);
   assert.match(manifest.download, /refs\/tags\/v0\.6\.13\.zip$/);
 });

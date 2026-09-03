@@ -9,7 +9,7 @@
     "maximum": "13"
   },
   "url": "https://github.com/bedhev-spec/foundryvtt-brinkwood",
-  "manifest": "https://raw.githubusercontent.com/bedhev-spec/foundryvtt-brinkwood/master/system.json",
+  "manifest": "https://raw.githubusercontent.com/bedhev-spec/foundryvtt-brinkwood/integration/v13-follow-up/system.json",
   "download": "https://github.com/bedhev-spec/foundryvtt-brinkwood/archive/refs/tags/v0.6.13.zip",
   "authors": [
     {

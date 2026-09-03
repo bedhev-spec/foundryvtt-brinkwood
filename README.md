@@ -6,7 +6,7 @@ Version 0.6.13 supports Foundry VTT v13, verified through build 13.351.
 
 Install or update the system with this manifest URL:
 
-`https://raw.githubusercontent.com/bedhev-spec/foundryvtt-brinkwood/master/system.json`
+`https://raw.githubusercontent.com/bedhev-spec/foundryvtt-brinkwood/integration/v13-follow-up/system.json`
 
 ## v0.5 - first "public" release
 This a barebones implementation of Brinkwood its still heavily based on megastrukturs Blades in The Dark and has *waaay* too much leftover/unused logic.

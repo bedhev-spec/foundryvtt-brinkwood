@@ -7,6 +7,13 @@
 
 See `scss/README.md` for ownership and build details.
 
+## Branch parent and merge target
+
+- Never assume `master` is the merge or release target. Every working branch must use the explicit parent/Epic branch recorded when the branch is created or handed off.
+- Current mapping: `char-sheet-followup-update` was created from and must merge into `integration/v13-follow-up`.
+- If the parent mapping is absent or ambiguous, stop and ask before merging, changing manifest branch URLs, moving tags, or publishing a release.
+- Update this mapping whenever a new follow-up branch is created or the Epic branch is renamed.
+
 ## ApplicationV2 scroll ownership
 
 - Every `BladesItemSheet.PARTS` descriptor must declare `scrollable: [""]`. Each Item template renders one root `<form>`, and that root is the vertical scroll owner; in Foundry v13 a blank selector means the template-part root, while `"form"` would search only descendants.

@@ -13,9 +13,9 @@ test("release manifests target version 0.6.13", async () => {
 
   assert.equal(manifest.version, "0.6.13");
   assert.equal(testManifest.version, "0.6.13");
-  assert.match(manifest.manifest, /master\/system\.json$/);
+  assert.match(manifest.manifest, /integration\/v13-follow-up\/system\.json$/);
   assert.match(manifest.download, /refs\/tags\/v0\.6\.13\.zip$/);
-  assert.match(testManifest.manifest, /master\/system-test\.json$/);
+  assert.match(testManifest.manifest, /integration\/v13-follow-up\/system-test\.json$/);
   assert.match(testManifest.download, /refs\/tags\/v0\.6\.13\.zip$/);
   assert.deepEqual(testManifest.packs, manifest.packs);
 });
