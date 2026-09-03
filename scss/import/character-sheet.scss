@@ -1006,6 +1006,19 @@ nav.tabs {
       background: rgba(255, 255, 255, 0.35);
     }
 
+    .editor-content,
+    prose-mirror .ProseMirror {
+      box-sizing: border-box;
+      padding-inline: 5px;
+      color: var(--bw-ink);
+    }
+
+    // Rich text can carry pasted or toolbar-authored foreground colors.
+    // Character notes deliberately normalize those descendants to readable ink.
+    prose-mirror .ProseMirror * {
+      color: inherit !important;
+    }
+
     .editor-edit {
       display: inline-grid;
       place-items: center;
