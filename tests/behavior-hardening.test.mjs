@@ -1,8 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const tokenCalls = [];
-
 globalThis.Hooks = { on() {} };
 globalThis.foundry = {
   abstract: { TypeDataModel: class {} },
@@ -22,11 +20,6 @@ globalThis.foundry = {
   dice: { Roll: {} },
   documents: {
     ActiveEffect: class {},
-    TokenDocument: {
-      async updateDocuments(updates, options) {
-        tokenCalls.push({ updates, options });
-      }
-    }
   },
   utils: {
     mergeObject: (target, source) => ({ ...target, ...source }),
@@ -37,7 +30,6 @@ globalThis.CONST = { ACTIVE_EFFECT_MODES: { CUSTOM: 0 } };
 globalThis.game = { user: { isGM: false }, scenes: { current: null } };
 
 const { BladesActiveEffect } = await import("../module/blades-active-effect.js");
-const { BladesClockSheet } = await import("../module/blades-clock-sheet.js");
 const { BladesSheet } = await import("../module/blades-sheet.js");
 const { BladesActorSheet, prepareLoadoutCapacity } = await import("../module/blades-actor-sheet.js");
 const { BladesItemSheet, prepareItemSheetPermissions } = await import("../module/blades-item-sheet.js");
@@ -179,123 +171,6 @@ test("item-owned effects support create, edit, toggle, and delete without blocki
     { render: false },
     { render: false },
   ]);
-});
-
-test("clock updates preserve actor and token textures when active tokens exist", async () => {
-  tokenCalls.length = 0;
-  const actorUpdates = [];
-  const scene = { id: "scene-1" };
-  const actor = {
-    system: { type: 4, value: 0 },
-    getActiveTokens: (...args) => {
-      assert.deepEqual(args, [false, true]);
-      return [{ id: "token-1" }, { id: "token-2" }];
-    }
-  };
-  const sheet = { actor, document: { update: async update => actorUpdates.push(update) } };
-  game.scenes.current = scene;
-
-  await BladesClockSheet.prototype._updateClock.call(sheet, { "system.type": "6", "system.value": 4 });
-
-  const image = "systems/brinkwood/styles/assets/progressclocks-svg/Progress Clock 6-4.svg";
-  assert.deepEqual(actorUpdates, [{
-    "system.type": "6",
-    "system.value": 4,
-    img: image,
-    "prototypeToken.texture.src": image
-  }]);
-  assert.equal(tokenCalls.length, 1);
-  assert.equal(tokenCalls[0].options.parent, scene);
-  assert.deepEqual(tokenCalls[0].updates.map(update => update._id), ["token-1", "token-2"]);
-  assert.ok(tokenCalls[0].updates.every(update => update["texture.src"] === image));
-});
-
-test("clock updates still save actor state without active tokens or an active scene", async () => {
-  for (const [tokens, scene] of [[[], { id: "scene-1" }], [[{ id: "token-1" }], null]]) {
-    tokenCalls.length = 0;
-    const actorUpdates = [];
-    const actor = {
-      system: { type: 4, value: 0 },
-      getActiveTokens: () => tokens
-    };
-    game.scenes.current = scene;
-
-    await BladesClockSheet.prototype._updateClock.call(
-      { actor, document: { update: async update => actorUpdates.push(update) } },
-      { "system.type": 4, "system.value": 3 }
-    );
-
-    assert.equal(tokenCalls.length, 0);
-    assert.equal(actorUpdates.length, 1);
-    assert.match(actorUpdates[0].img, /Progress Clock 4-3\.svg$/);
-    assert.match(actorUpdates[0]["prototypeToken.texture.src"], /Progress Clock 4-3\.svg$/);
-  }
-});
-
-test("clock size changes suppress the stale document render and force one fresh sheet render", async () => {
-  tokenCalls.length = 0;
-  const updates = [];
-  const renders = [];
-  const actor = {
-    system: { type: 4, value: 1 },
-    getActiveTokens: () => []
-  };
-  game.scenes.current = { id: "scene-1" };
-
-  await BladesClockSheet.prototype._updateClock.call({
-    actor,
-    document: { update: async (data, options) => updates.push({ data, options }) },
-    render: async options => renders.push(options)
-  }, { "system.type": "8", "system.value": 1 });
-
-  const image = "systems/brinkwood/styles/assets/progressclocks-svg/Progress Clock 8-1.svg";
-  assert.deepEqual(updates, [{
-    data: {
-      "system.type": "8",
-      "system.value": 1,
-      img: image,
-      "prototypeToken.texture.src": image
-    },
-    options: { render: false }
-  }]);
-  assert.deepEqual(renders, [{ force: true }]);
-});
-
-test("clock size selection resets progress and owns the change event", async () => {
-  const clockUpdates = [];
-  const sheet = {
-    isEditable: true,
-    _updateClock: async data => clockUpdates.push(data)
-  };
-  const form = { id: "clock-form" };
-  const options = { render: false };
-
-  const sizeEvent = {
-    prevented: false,
-    stopped: false,
-    currentTarget: { value: "8" },
-    preventDefault() { this.prevented = true; },
-    stopPropagation() { this.stopped = true; }
-  };
-  await BladesClockSheet.prototype._onClockSizeChange.call(sheet, sizeEvent);
-  assert.equal(sizeEvent.prevented, true);
-  assert.equal(sizeEvent.stopped, true);
-  assert.deepEqual(clockUpdates, [{ "system.type": 8, "system.value": 0 }]);
-
-  const result = await BladesClockSheet.prototype._processSubmitData.call(
-    sheet,
-    { target: { name: "system.description" } },
-    form,
-    { "system.description": "Updated notes" },
-    options
-  );
-  assert.deepEqual(clockUpdates, [{ "system.type": 8, "system.value": 0 }]);
-  assert.deepEqual(result, {
-    event: { target: { name: "system.description" } },
-    form,
-    submitData: { "system.description": "Updated notes" },
-    options
-  });
 });
 
 test("read-only sheets disable every input type while retaining read-only text areas", async () => {

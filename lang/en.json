@@ -1,7 +1,6 @@
 {
   "TYPES": {
     "Actor": {
-      "🕛 clock": "Clock",
       "npc": "NPC",
       "character": "Character",
       "mask": "Mask",
@@ -595,10 +594,5 @@
   "BITD.SlyFriends": "Sly Friends",
   "BITD.ShrewdFriends": "Shrewd Friends",
   "BITD.DarkServants": "Dark Servants",
-  "BITD.StrangeFriends": "Strange Friends",
-  "Clock.Type": "Clock size",
-  "Clock.GMDescription": "GM description",
-  "Clock.ShowDescription": "Show description to players",
-  "Clock.Progress": "Progress"
-
+  "BITD.StrangeFriends": "Strange Friends"
 }

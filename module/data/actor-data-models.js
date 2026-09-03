@@ -177,25 +177,6 @@ export class MaskActorData extends TypeDataModel {
 }
 
 /* -------------------------------------------- */
-/*  Actor: 🕛 clock                             */
-/* -------------------------------------------- */
-
-export class ClockActorData extends TypeDataModel {
-
-  /** @override */
-  static defineSchema() {
-    return {
-      name:  new fields.StringField({ required: false, initial: "" }),
-      // Clock size (4, 6, 8 …); stored as a number in template.json
-      type:  new fields.NumberField({ required: false, nullable: false, initial: 4, integer: true }),
-      value: new fields.NumberField({ required: false, nullable: false, initial: 0, integer: true }),
-      description: new fields.HTMLField({ required: false, initial: "" }),
-      show_description: new fields.BooleanField({ required: false, initial: false })
-    };
-  }
-}
-
-/* -------------------------------------------- */
 /*  Actor: rebelion                             */
 /* -------------------------------------------- */
 

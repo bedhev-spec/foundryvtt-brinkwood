@@ -69,12 +69,14 @@ test("Legacy Effects use persistent accessible sub-tabs and hide empty suppressi
   // Load level is one native select, not a duplicated effect surface.
   assert.equal((actorTemplate.match(/name="system\.selected_load_level"/g) ?? []).length, 1);
   assert.doesNotMatch(actorTemplate, /id="character-\{\{_id\}\}-traits-tab"[\s\S]*?class="label-stripe"[\s\S]*?id="character-\{\{_id\}\}-traits-list"/);
-  assert.match(styles, /character-sheet__workspace > nav\.tabs \{[\s\S]*?grid-column: 1 \/ -1[\s\S]*?width: 100%[\s\S]*?box-sizing: border-box/);
+  assert.match(characterStyles, /character-sheet__workspace > nav\.tabs \{[\s\S]*?grid-column: 1 \/ -1[\s\S]*?width: 100%[\s\S]*?box-sizing: border-box/);
   assert.equal((actorTemplate.match(/templates\/parts\/attributes\.html/g) ?? []).length, 1);
   assert.match(actorTemplate, /class="character-attributes"[\s\S]*?templates\/parts\/attributes\.html/);
- assert.match(styles, /character-attributes > \.attributes \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)[\s\S]*?box-sizing: border-box/);
-  assert.match(styles, /character-attributes > \.attributes \.attributes-exp \{[\s\S]*?margin-top: 0/);
- assert.doesNotMatch(styles, /character-sheet__workspace \.tab\[data-tab=traits\].*attributes/); assert.match(styles, /@container \(max-width: 570px\) \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/); assert.match(styles, /@container \(max-width: 410px\) \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)/);
+  assert.match(characterStyles, /character-attributes > \.attributes \{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)[\s\S]*?box-sizing: border-box/);
+  assert.match(characterStyles, /character-attributes > \.attributes \.attributes-exp \{[\s\S]*?margin-top: 0/);
+  assert.doesNotMatch(styles, /character-sheet__workspace \.tab\[data-tab=traits\].*attributes/);
+  assert.match(characterStyles, /@container \(max-width: 570px\) \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(characterStyles, /@container \(max-width: 410px\) \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)/);
   assert.match(styles, /character-bans table tbody > tr:last-child > td,[\s\S]*?td\[rowspan\] \{[\s\S]*?border-bottom: 0/);
   assert.equal((actorTemplate.match(/item-delete identity-choice__remove/g) ?? []).length, 4);
   assert.equal((actorTemplate.match(/class="identity-choice__action"/g) ?? []).length, 4);
@@ -90,8 +92,8 @@ test("Legacy Effects use persistent accessible sub-tabs and hide empty suppressi
   assert.match(styles, /big-teeth-section \.big-teeth \{[\s\S]*?display: flex[\s\S]*?flex-wrap: nowrap[\s\S]*?height: 26px[\s\S]*?min-height: 26px[\s\S]*?max-height: 26px[\s\S]*?overflow: visible/);
   assert.match(styles, /legacy-tracker-segments \{[\s\S]*?flex: 0 0 auto[\s\S]*?gap: 1px[\s\S]*?justify-content: flex-start[\s\S]*?height: 26px[\s\S]*?width: auto[\s\S]*?overflow: visible/);
   assert.doesNotMatch(styles, /big-teeth-section \.big-teeth \{[^}]*overflow: hidden/);
-  assert.match(styles, /tab-content > \.tab\[data-tab\] \{[\s\S]*?margin-top: 0[\s\S]*?padding-top: 10px/);
-  assert.match(styles, /character-sheet__workspace \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)[\s\S]*?row-gap: 0/);
+  assert.match(characterStyles, /tab-content > \.tab\[data-tab\] \{[\s\S]*?margin-top: 0[\s\S]*?padding-top: 10px/);
+  assert.match(characterStyles, /character-sheet__workspace \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)[\s\S]*?row-gap: 0/);
   assert.match(actorTemplate, /class="flex-column character-identity-choices"/);
   assert.match(polishStyles, /character-identity-choices \{[\s\S]*?grid-template-rows: repeat\(4, minmax\(26px, auto\)\)[\s\S]*?row-gap: 0[\s\S]*?padding-right: 0/);
   assert.match(polishStyles, /character-identity-choices \.item-block \{[\s\S]*?height: auto[\s\S]*?max-height: none[\s\S]*?margin: 0[\s\S]*?padding: 0 0 1\.5px/);

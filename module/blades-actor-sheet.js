@@ -6,9 +6,12 @@ import {
   prepareLoadoutCapacity,
   prepareLoadoutCatalogue,
 } from "./character/loadout.js";
+import { encumbranceLevelForLoadout, hasMuleAbility } from "./encumbrance.js";
 import { BladesHelpers } from "./blades-helpers.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
 import { preloadClockImages } from "./clock-utils.js";
+import { escapeHTML } from "./html-utils.js";
+import { renderDescriptionTooltip } from "./item-tooltip.js";
 import { formControlUpdate } from "./sheet-dom.js";
 
 export { prepareLoadoutCapacity } from "./character/loadout.js";
@@ -85,6 +88,20 @@ position: { width: 700, height: 1170 },
 
     this.setAttrLabels(context.system.attributes);
 
+    const identityDescriptionRoots = {
+      upbringing: "Actor.Upbringings",
+      profession: "Actor.Professions",
+      class: "Actor.Classes",
+      pact: "Actor.Pacts",
+    };
+    for (const item of context.items) {
+      const descriptionRoot = identityDescriptionRoots[item.type];
+      if (!descriptionRoot) continue;
+      item.identityTooltipHtml = escapeHTML(
+        renderDescriptionTooltip(game.i18n.localize(`${descriptionRoot}.${item.name}`)),
+      );
+    }
+
     context.traits = context.items
       .filter(i => i.type === "trait")
       .map(trait => {
@@ -108,19 +125,7 @@ position: { width: 700, height: 1170 },
     context.system.loadout = loadout;
     Object.assign(context, prepareLoadoutCapacity(loadout, context.system.selected_load_level));
 
-    // Encumbrance Levels
-    const load_level = [
-      "BITD.Light","BITD.Light","BITD.Light","BITD.Light",
-      "BITD.Normal","BITD.Normal","BITD.Heavy","BITD.Encumbered",
-      "BITD.Encumbered","BITD.Encumbered","BITD.OverMax",
-    ];
-    const mule_level = [
-      "BITD.Light","BITD.Light","BITD.Light","BITD.Light",
-      "BITD.Light","BITD.Light","BITD.Normal","BITD.Normal",
-      "BITD.Heavy","BITD.Encumbered","BITD.OverMax",
-    ];
-    const mule_present = context.items.some(i => i.type === "ability" && i.name === "(C) Mule");
-    context.system.load_level  = mule_present ? mule_level[loadout] : load_level[loadout];
+    context.system.load_level = encumbranceLevelForLoadout(loadout, hasMuleAbility(context.items));
     context.system.load_levels = { "BITD.Light": "BITD.Light", "BITD.Normal": "BITD.Normal", "BITD.Heavy": "BITD.Heavy" };
 
     context.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(

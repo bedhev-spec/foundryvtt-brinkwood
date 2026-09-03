@@ -74,12 +74,11 @@ const schemaDefaults = Model => Object.fromEntries(
 
 test("typed actor models retain template defaults for new actors", async () => {
   const template = JSON.parse(await read("template.json"));
-  const { CharacterData, ClockActorData, MaskActorData, NpcData, RebelionData } = await import("../module/data/actor-data-models.js");
+  const { CharacterData, MaskActorData, NpcData, RebelionData } = await import("../module/data/actor-data-models.js");
 
   assert.deepEqual(schemaDefaults(CharacterData), template.Actor.character);
   assert.deepEqual(schemaDefaults(MaskActorData), template.Actor.mask);
   assert.deepEqual(schemaDefaults(NpcData), template.Actor.npc);
-  assert.deepEqual(schemaDefaults(ClockActorData), template.Actor["🕛 clock"]);
   assert.deepEqual(schemaDefaults(RebelionData), template.Actor.rebelion);
 });
 
@@ -142,28 +141,18 @@ test("character clocks can return from one segment to empty", async () => {
   assert.match(source, /selectedValue === 1 && currentValue === 1 \? 0 : selectedValue/);
 });
 
-test("clock-sheet segments fill and empty contiguous clock progress", async () => {
+test("shared clock utilities normalize values and preload character clock images", async () => {
   const {
     clockImagePath,
-    clockValueAfterClick,
     normalizeClockLabel,
     normalizeClockState,
     preloadClockImages
   } = await import("../module/clock-utils.js");
-  const source = await read("module/blades-clock-sheet.js");
-
-  assert.equal(clockValueAfterClick(3, 1, 4), 3);
-  assert.equal(clockValueAfterClick(3, 3, 4), 2);
-  assert.equal(clockValueAfterClick(1, 1, 4), 0);
-  assert.equal(clockValueAfterClick(2, 4, 4), 1);
-  assert.match(source, /input\[name="system\.value"\]/);
-  assert.match(source, /addEventListener\("click", this\._onClockSegmentClick\.bind\(this\)/);
 
   assert.equal(normalizeClockLabel({ hash: {} }), "");
   assert.equal(normalizeClockLabel("oath"), "oath");
   assert.deepEqual(normalizeClockState("4", 8), { type: "4", value: 4 });
   assert.deepEqual(normalizeClockState("8", -1), { type: "8", value: 0 });
-  assert.match(source, /submitData\["prototypeToken\.texture\.src"\] = image_path/);
   for (const type of [4, 6, 8]) {
     for (let value = 0; value <= type; value += 1) {
       const path = clockImagePath(type, value);
@@ -220,9 +209,9 @@ test("item-picker interpolations are escaped before entering HTML", async () => 
   const professionTooltip = renderItemTooltip({ type: "profession", name: "Bard" });
   const classTooltip = renderItemTooltip({ type: "class", name: "Commander" });
   const pactTooltip = renderItemTooltip({ type: "pact", name: "A Pact" });
-  assert.match(upbringingTooltip, /BITD\.UpbringingGrantSummary/);
-  assert.match(professionTooltip, /BITD\.ProfessionGrantSummary/);
-  assert.match(classTooltip, /BITD\.ClassGrantSummary/);
+  assert.doesNotMatch(upbringingTooltip, /GrantSummary/);
+  assert.doesNotMatch(professionTooltip, /GrantSummary/);
+  assert.doesNotMatch(classTooltip, /GrantSummary/);
   assert.doesNotMatch(pactTooltip, /GrantSummary/);
 });
 

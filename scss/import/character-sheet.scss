@@ -647,9 +647,60 @@ nav.tabs {
   box-sizing: border-box;
 }
 
+// The tab workspace and Attribute grid are character-sheet geometry. Keep
+// their wide-screen dimensions here rather than in the late Effects layer.
+& .character-sheet__workspace > .tab-content {
+  grid-column: 1;
+  width: 100%;
+  min-width: 0;
+}
+
+& .character-sheet__workspace > .tab-content > .tab[data-tab] {
+  margin-top: 0;
+  padding-top: 10px;
+}
+
 & .character-sheet__workspace > nav.tabs .item {
   flex: 1 1 0;
   min-width: 0;
+}
+
+& .character-attributes {
+  display: block;
+  align-self: stretch;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+& .character-attributes > .attributes {
+  display: grid;
+  // Match the Bans region: each Attribute family receives an equal column.
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  // Override the v11 fixed 200px flex basis still present on the element.
+  flex: 1 1 100%;
+  gap: 12px;
+}
+
+& .character-attributes > .attributes .attribute {
+  width: 100%;
+  min-width: 0;
+}
+
+& .character-attributes > .attributes .attribute > .flex-horizontal {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+& .character-attributes > .attributes .attributes-exp {
+  margin-top: 0;
 }
 
 // Character-sheet redesign layer: keep tokens local to the ApplicationV2 sheet
@@ -1065,5 +1116,17 @@ nav.tabs {
       width: 132px;
       @include clock(4, 64);
     }
+  }
+}
+
+@container (max-width: 570px) {
+  & .character-attributes > .attributes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (max-width: 410px) {
+  & .character-attributes > .attributes {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
