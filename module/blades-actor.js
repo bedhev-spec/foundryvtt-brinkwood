@@ -55,8 +55,8 @@ export class BladesActor extends foundry.documents.Actor {
 
     data.prototypeToken = data.prototypeToken || {};
 
-    // For Crew and Character set the Token to sync with charsheet.
-    if ( ['character', '🕛 clock'].includes(data.type) ) {
+    // Characters use linked tokens so their token and sheet stay in sync.
+    if (data.type === "character") {
       data.prototypeToken.actorLink = true;
     }
     return super.create(data, options);

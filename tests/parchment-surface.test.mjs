@@ -6,11 +6,10 @@ const root = new URL("../", import.meta.url);
 const read = file => readFile(new URL(file, root), "utf8");
 
 test("shared parchment uses an ivory wash over subdued grain", async () => {
-  const [tokens, general, character, clock, mask, npc, rebellion, polish, compiled] = await Promise.all([
+  const [tokens, general, character, mask, npc, rebellion, polish, compiled] = await Promise.all([
     read("scss/style.scss"),
     read("scss/import/general-styles.scss"),
     read("scss/import/character-sheet.scss"),
-    read("scss/import/clocks.scss"),
     read("scss/import/mask-sheet.scss"),
     read("scss/import/npc-sheet.scss"),
     read("scss/import/rebelion-sheet.scss"),
@@ -27,7 +26,6 @@ test("shared parchment uses an ivory wash over subdued grain", async () => {
   assert.match(general, /background-blend-mode:\s*normal, normal, normal/);
   assert.match(character, /\.window-content\s*\{[\s\S]*?background-color:\s*#eeeee8/);
   assert.match(character, /form\.actor-sheet\s*\{[\s\S]*?background-color:\s*transparent/);
-  assert.match(clock, /\.clock-sheet\s*\{[\s\S]*?background:\s*transparent/);
   assert.match(mask, /form\.mask-sheet[\s\S]*?background:\s*rgba\(247, 244, 237, 0\.28\)/);
   assert.match(npc, /\.npc-dossier\s*\{[\s\S]*?background:\s*transparent/);
   assert.match(rebellion, /\.rebelion-sheet__form\s*\{[^}]*background:\s*transparent/);

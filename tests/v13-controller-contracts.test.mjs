@@ -8,7 +8,6 @@ const read = file => readFile(new URL(file, root), "utf8");
 const lifecycleControllers = [
   "module/blades-sheet.js",
   "module/blades-actor-sheet.js",
-  "module/blades-clock-sheet.js",
   "module/blades-item-sheet.js",
   "module/blades-mask-sheet.js",
   "module/blades-rebelion-sheet.js",
@@ -31,7 +30,6 @@ test("each ApplicationV2 sheet awaits its own render lifecycle", async t => {
 const listenerControllers = [
   ["module/blades-sheet.js", "_brinkwoodListenerController"],
   ["module/blades-actor-sheet.js", "_characterSheetListenerController"],
-  ["module/blades-clock-sheet.js", "_clockSheetListenerController"],
   ["module/blades-item-sheet.js", "_itemSheetListenerController"],
   ["module/blades-mask-sheet.js", "_maskSheetListenerController"],
   ["module/blades-rebelion-sheet.js", "_rebelionSheetListenerController"],
@@ -90,7 +88,6 @@ test("each Actor HTML editor has its own enriched context and template target", 
     ["character", "module/blades-actor-sheet.js", "templates/actor-sheet.html", ["description"]],
     ["mask", "module/blades-mask-sheet.js", "templates/mask-sheet.html", ["description"]],
     ["NPC", "module/blades-npc-sheet.js", "templates/npc-sheet.html", ["description", "notes"]],
-    ["clock", "module/blades-clock-sheet.js", "templates/actors/clock-sheet.html", ["description"]],
   ];
 
   for (const [name, controllerPath, templatePath, fields] of contracts) {

@@ -30,16 +30,14 @@ test("sheet tabs and action surfaces expose keyboard semantics", async () => {
   assert.match(actorSheet, /\.item-body\[role="button"\]/);
 });
 
-test("NPC and Clock styles support their narrow and locked states", async () => {
-  const [npcStyles, clockStyles, locale] = await Promise.all([
+test("NPC styles support their narrow state", async () => {
+  const [npcStyles, locale] = await Promise.all([
     read("scss/import/npc-sheet.scss"),
-    read("scss/import/clocks.scss"),
     read("lang/en.json"),
   ]);
 
   assert.match(npcStyles, /min-width:\s*320px/);
   assert.match(npcStyles, /@container \(max-width: 430px\)/);
-  assert.match(clockStyles, /\.clock-sheet\.locked/);
   const translations = JSON.parse(locale);
   assert.equal(translations["BITD.Profile"], "Profile");
   assert.equal(translations["BITD.ShortDescription"], "Short description");

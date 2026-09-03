@@ -14,7 +14,6 @@ import { BladesItem } from "./blades-item.js";
 import { BladesItemSheet } from "./blades-item-sheet.js";
 import { BladesActorSheet } from "./blades-actor-sheet.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
-import { BladesClockSheet } from "./blades-clock-sheet.js";
 import { BladesNPCSheet } from "./blades-npc-sheet.js";
 import { BladesMaskSheet } from "./blades-mask-sheet.js";
 import { BladesRebelionSheet } from "./blades-rebelion-sheet.js";
@@ -25,7 +24,7 @@ import { syncOpenActorTrackers } from "./sheet-tracker-sync.js";
 
 import * as migrations from "./migration.js";
 import {
-  CharacterData, NpcData, MaskActorData, ClockActorData, RebelionData
+  CharacterData, NpcData, MaskActorData, RebelionData
 } from "./data/actor-data-models.js";
 import {
   ItemData, ClassData, TraitData, UpbringingData, ProfessionData,
@@ -42,10 +41,6 @@ Hooks.once("init", async function() {
     dice: bladesRoll,
     rollStatistics: showRollStatistics
   };
-  game.system.bladesClocks = {
-    sizes: [ 4, 6, 8 ]
-  };
-
   CONFIG.Item.documentClass = BladesItem;
   CONFIG.Actor.documentClass = BladesActor;
   CONFIG.ActiveEffect.documentClass = BladesActiveEffect;
@@ -57,7 +52,6 @@ Hooks.once("init", async function() {
     "character":  CharacterData,
     "npc":        NpcData,
     "mask":       MaskActorData,
-    "🕛 clock": ClockActorData,
     "rebelion":   RebelionData
   };
   CONFIG.Item.dataModels = {
@@ -84,7 +78,6 @@ Hooks.once("init", async function() {
     makeDefault: true,
     label: "Brinkwood Character Sheet",
   });
-  DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesClockSheet, { types: ["\uD83D\uDD5B clock"], makeDefault: true });
   DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesNPCSheet, { types: ["npc"], makeDefault: true });
   DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesMaskSheet, { types: ["mask"], makeDefault: true });
   DocumentSheetConfig.registerSheet(foundry.documents.Actor, "brinkwood", BladesRebelionSheet, { types: ["rebelion"], makeDefault: true });
