@@ -1,5 +1,5 @@
 <form class="{{cssClass}} actor-sheet mask-sheet" data-actor-uuid="{{actor.uuid}}" autocomplete="off">
-  <header class="mask-sheet__identity-block sheet-identity bw-section-frame">
+  <header class="mask-sheet__identity-block sheet-identity bw-section-frame{{#if maskItem}} mask-sheet__identity-block--with-attributes{{/if}}">
     {{> "systems/brinkwood/templates/parts/sheet-identity-portrait.html" img=img name=name editable=editable}}
 
     <section class="mask-sheet__identity sheet-identity__details" aria-label="{{localize 'BITD.Mask'}}">
@@ -41,15 +41,17 @@
       <section id="mask-{{_id}}-panel-traits" class="tab mask-sheet__panel {{#if (eq tabs.primary "traits")}}active{{/if}}" data-group="primary" data-tab="traits" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-traits">
         <div class="mask-sheet__traits-workspace">
       <div class="mask-sheet__trait-library">
-        <div class="mask-sheet__section-heading">
-          <h2>{{localize "BITD.Traits"}}</h2>
-          {{#if canAddMaskTraits}}<button type="button" class="item-add-popup" data-item-type="trait">{{localize "Add"}}</button>{{/if}}
-        </div>
-            <div class="mask-sheet__traits">
+        <div class="mask-sheet__traits">
+          {{#if canAddMaskTraits}}
+          <button type="button" class="mask-sheet__trait-add item-add-popup" data-item-type="trait">
+            <span class="mask-sheet__trait-add-content">
+                  <span class="mask-sheet__trait-add-icon" aria-hidden="true"></span>
+              <span class="mask-sheet__trait-add-label">{{localize "Add"}} {{localize "TYPES.Item.trait"}}</span>
+            </span>
+          </button>
+          {{/if}}
               {{#each traits as |trait|}}
               {{> "systems/brinkwood/templates/parts/actor/trait-card.html" itemId=trait._id title=trait.name description=trait.system.description purchased=trait.system.purchased editable=../editable canDelete=trait.canDelete}}
-              {{else}}
-              <p class="mask-sheet__empty">{{localize "BITD.Traits"}}</p>
               {{/each}}
             </div>
           </div>

@@ -26,7 +26,7 @@ test("shared parchment uses an ivory wash over subdued grain", async () => {
   assert.match(general, /background-blend-mode:\s*normal, normal, normal/);
   assert.match(character, /\.window-content\s*\{[\s\S]*?background-color:\s*#eeeee8/);
   assert.match(character, /form\.actor-sheet\s*\{[\s\S]*?background-color:\s*transparent/);
-  assert.match(mask, /form\.mask-sheet[\s\S]*?background:\s*rgba\(247, 244, 237, 0\.28\)/);
+  assert.doesNotMatch(mask, /form\.mask-sheet\s*\{[^}]*background:\s*rgba\(247, 244, 237, 0\.28\)/);
   assert.match(npc, /\.npc-dossier\s*\{[\s\S]*?background:\s*transparent/);
   assert.match(rebellion, /\.rebelion-sheet__form\s*\{[^}]*background:\s*transparent/);
   assert.doesNotMatch(

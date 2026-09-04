@@ -37,12 +37,17 @@ test("description-only identity tooltips retain readable paragraph structure", (
   assert.match(tooltip, /<p>First sentence\. Second sentence\.<\/p><p>Third sentence\. Fourth sentence\.<\/p>/);
 });
 
-test("the picker enriches once and delegates Mask tooltip policy", async () => {
-  const [sheet, maskSheet] = await Promise.all([read("module/blades-sheet.js"), read("module/blades-mask-sheet.js")]);
+test("the picker enriches once and delegates type-specific Mask tooltip policy", async () => {
+  const [sheet, picker, maskSheet] = await Promise.all([
+    read("module/blades-sheet.js"),
+    read("module/item-picker-dialog.js"),
+    read("module/blades-mask-sheet.js"),
+  ]);
   assert.match(sheet, /TextEditor\.implementation\.enrichHTML\([\s\S]*?String\(e\.system\.description \?\? ""\)[\s\S]*?this\.document[\s\S]*?this\.document\.isOwner/);
-  assert.match(sheet, /const itemTooltip = escapeHTML\(this\._renderItemPickerTooltip\(e, enrichedDescription\)\)/);
+  assert.match(sheet, /tooltipHtml:\s*this\._renderItemPickerTooltip\(e, enrichedDescription\)/);
+  assert.match(picker, /const tooltipHtml = escapeHTML\(row\.tooltipHtml\)/);
   assert.match(sheet, /_renderItemPickerTooltip\(item, enrichedDescription\)[\s\S]*?renderItemTooltip\([\s\S]*?\(\) => enrichedDescription/);
-  assert.match(maskSheet, /_renderItemPickerTooltip\(item, enrichedDescription\)[\s\S]*?renderMaskPickerTooltip\(item, enrichedDescription\)/);
+  assert.match(maskSheet, /_renderItemPickerTooltip\(item, enrichedDescription\)[\s\S]*?item\?\.type === "mask"[\s\S]*?renderMaskPickerTooltip\(item, enrichedDescription\)[\s\S]*?super\._renderItemPickerTooltip\(item, enrichedDescription\)/);
 });
 
 test("item-picker tooltip styles preserve paragraph spacing", async () => {

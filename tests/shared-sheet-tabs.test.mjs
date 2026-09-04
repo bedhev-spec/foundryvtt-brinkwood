@@ -54,7 +54,7 @@ test("shared tab component is the only primary tabbar visual and responsive owne
     "the primary tabbar must not rely on a character-only flex utility");
 
   assert.match(generalStyles, /@import 'sheet-tabs\.scss';/);
-  assert.match(component, /\.sheet-tabs\s*\{[\s\S]*?width:\s*100%[\s\S]*?border:\s*1px solid var\(--bw-rule\)[\s\S]*?gap:\s*4px[\s\S]*?padding:\s*4px[\s\S]*?background:\s*var\(--bw-paper-deep\)/);
+  assert.match(component, /\.sheet-tabs\s*\{[\s\S]*?--bw-tab-frame:\s*#e0d7c5[\s\S]*?--bw-tab-surface:\s*#e9e2d5[\s\S]*?--bw-tab-active:\s*#f0ece3[\s\S]*?width:\s*100%[\s\S]*?background:\s*var\(--bw-tab-frame\)/);
   assert.match(component, /\.sheet-tabs \.item\s*\{[\s\S]*?flex:\s*1 1 0[\s\S]*?min-height:\s*40px[\s\S]*?padding:\s*10px 12px[\s\S]*?text-align:\s*center/);
   assert.match(component, /\.sheet-tabs \.item[\s\S]*?&\.active\s*\{[\s\S]*?border-bottom-color:\s*var\(--bw-accent\)/);
   assert.match(component, /@container \(max-width: 480px\)\s*\{[\s\S]*?\.sheet-tabs\s*\{[\s\S]*?overflow-x:\s*auto[\s\S]*?\.sheet-tabs \.item\s*\{[\s\S]*?flex:\s*0 0 auto/);
@@ -64,6 +64,7 @@ test("shared tab component is the only primary tabbar visual and responsive owne
   // visuals, state, sizing, or their responsive behavior.
   assert.doesNotMatch(characterSheet, /(?:^|[\s,{])(?:\.character-sheet__workspace\s*>\s*)?nav\.tabs\b/);
   assert.doesNotMatch(maskSheet, /\.mask-sheet__tabs\b/);
+  assert.doesNotMatch(component, /\.sheet-panel,\s*[\s\S]*?&\.actor\.mask \.mask-sheet__panel/);
 
   // Mask has an active-panel-dependent intrinsic width. Its sheet geometry,
   // not the shared tab component, fixes the primary workspace to one flexible

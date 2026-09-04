@@ -16,7 +16,7 @@ test("Mask uses the shared identity contract rather than an inline header implem
     read("scss/import/sheet-identity.scss"),
   ]);
 
-  assert.match(sheet, /class="mask-sheet__identity-block sheet-identity bw-section-frame"/);
+  assert.match(sheet, /class="mask-sheet__identity-block sheet-identity bw-section-frame\{\{#if maskItem\}\} mask-sheet__identity-block--with-attributes\{\{\/if\}\}"/);
   assert.match(sheet, /parts\/sheet-identity-portrait\.html/);
   assert.match(sheet, /parts\/sheet-identity-name\.html/);
   assert.match(sheet, /parts\/sheet-identity-row\.html" row=row editable=\.\.\/editable/);
@@ -30,6 +30,7 @@ test("Mask uses the shared identity contract rather than an inline header implem
   assert.match(sharedStyles, /\.sheet-identity__portrait-frame[\s\S]*?width:\s*200px[\s\S]*?height:\s*200px/);
   assert.match(sharedStyles, /\.sheet-identity \.sheet-identity__rows\s*\{[\s\S]*?grid-auto-rows:\s*28px/);
   assert.match(styles, /\.mask-sheet__identity-block\s*\{[\s\S]*?grid-template-columns:\s*minmax\(150px, 200px\) minmax\(0, 1fr\)/);
+  assert.match(styles, /\.mask-sheet__identity-block--with-attributes\s*\{[\s\S]*?grid-template-columns:\s*minmax\(150px, 200px\) minmax\(230px, 1fr\) 212px/);
   assert.match(styles, /\.mask-sheet__identity\s*\{[^}]*display:\s*grid;[^}]*gap:\s*10px;[^}]*min-width:\s*0/);
   assert.doesNotMatch(styles, /\.mask-sheet__identity\s*\{[^}]*(?:sheet-identity__rows|identity-choice__value)/);
   assert.doesNotMatch(styles, /\.mask-sheet__(?:header|portrait|item-list|item-open)\b/);
@@ -80,8 +81,17 @@ test("Mask Trait CTA is gated by a configured Mask and uses the shared Trait Car
   ]);
 
   const traitsPanel = template.match(/data-tab="traits"[\s\S]*?<\/section>/)?.[0] ?? "";
-  assert.match(traitsPanel, /\{\{#if canAddMaskTraits\}\}[\s\S]*?item-add-popup[\s\S]*?data-item-type="trait"/);
+  assert.match(traitsPanel, /\{\{#if canAddMaskTraits\}\}[\s\S]*?class="mask-sheet__trait-add item-add-popup"[\s\S]*?data-item-type="trait"/);
   assert.match(traitsPanel, /parts\/actor\/trait-card\.html/);
+  assert.ok(traitsPanel.indexOf("mask-sheet__trait-add") < traitsPanel.indexOf("parts/actor/trait-card.html"));
+  assert.doesNotMatch(traitsPanel, /<h2>\{\{localize "BITD\.Traits"\}\}<\/h2>/);
+  assert.doesNotMatch(traitsPanel, /<p class="mask-sheet__empty">\{\{localize "BITD\.Traits"\}\}<\/p>/);
+  assert.match(traitsPanel, /class="mask-sheet__trait-add-content"[\s\S]*?class="mask-sheet__trait-add-icon"[\s\S]*?class="mask-sheet__trait-add-label"/);
+  assert.match(await read("scss/import/mask-sheet.scss"), /\.mask-sheet__trait-add\s*\{[\s\S]*?width:\s*100%;[\s\S]*?min-height:\s*40px;[\s\S]*?border:\s*1px dashed var\(--bw-rule\);[\s\S]*?border-left:\s*5px solid var\(--bw-accent\)/);
+  assert.match(await read("scss/import/mask-sheet.scss"), /\.mask-sheet__trait-add\s*\{[\s\S]*?display:\s*flex;[\s\S]*?align-items:\s*center;[\s\S]*?justify-content:\s*start/);
+  assert.match(await read("scss/import/mask-sheet.scss"), /\.mask-sheet__trait-add-content\s*\{[\s\S]*?display:\s*inline-flex;[\s\S]*?align-items:\s*center;[\s\S]*?height:\s*20px/);
+  assert.match(await read("scss/import/mask-sheet.scss"), /\.mask-sheet__trait-add-icon\s*\{[\s\S]*?&::before,[\s\S]*?&::after[\s\S]*?inset-block-start:\s*50%;[\s\S]*?inset-inline-start:\s*50%/);
+  assert.doesNotMatch(await read("scss/import/mask-sheet.scss"), /\.mask-sheet__trait-add-content\s*\{[\s\S]*?translateY/);
   assert.match(controller, /context\.maskItem = context\.items\.find\(item => item\.type === "mask"\) \?\? null;/);
   assert.match(controller, /context\.traits = getMaskTraitsForSource\(context\.items, context\.maskItem\)/);
   assert.match(controller, /context\.canAddMaskTraits = Boolean\(context\.maskItem\) && context\.editable;/);

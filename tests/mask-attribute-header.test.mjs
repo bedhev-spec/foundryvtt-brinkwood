@@ -30,9 +30,10 @@ test("Mask Attributes live in the identity header and share Character presentati
   assert.match(controller, /position:\s*\{\s*width:\s*MASK_SHEET_DEFAULT_WIDTH,\s*height:\s*840\s*\}/);
   assert.match(controller, /async _syncMaskAttributeAvailability\(hasMaskType\)[\s\S]*?const becameAvailable = available && !this\._maskAttributesAvailable;[\s\S]*?if \(becameAvailable\) await this\._expandForMaskAttributes\(\);[\s\S]*?else if \(!available && wasAvailable\) await this\._shrinkForMaskAttributes\(\);/);
   assert.match(controller, /await this\._syncMaskAttributeAvailability\(Boolean\(context\.maskItem\)\);/);
-  assert.match(maskStyles, /\.mask-sheet__identity-block\s*\{[\s\S]*?grid-template-columns:\s*minmax\(150px, 200px\) minmax\(230px, 1fr\) 212px;[\s\S]*?column-gap:\s*20px;/);
+  assert.match(maskStyles, /\.mask-sheet__identity-block\s*\{[\s\S]*?grid-template-columns:\s*minmax\(150px, 200px\) minmax\(0, 1fr\);[\s\S]*?column-gap:\s*20px;[\s\S]*?block-size:\s*222px;/);
+  assert.match(maskStyles, /\.mask-sheet__identity-block--with-attributes\s*\{[\s\S]*?grid-template-columns:\s*minmax\(150px, 200px\) minmax\(230px, 1fr\) 212px;/);
   assert.match(maskStyles, /\.mask-attributes\s*\{[\s\S]*?align-self:\s*start;[\s\S]*?margin-block-start:\s*20px;/);
-  assert.match(maskStyles, /@container \(max-width: 650px\)\s*\{[\s\S]*?\.mask-sheet__identity-block\s*\{[\s\S]*?grid-template-columns:\s*minmax\(150px, 200px\) minmax\(0, 1fr\)[\s\S]*?\.mask-attributes\s*\{[\s\S]*?grid-column:\s*1\s*\/\s*-1/);
+  assert.match(maskStyles, /@container \(max-width: 650px\)\s*\{[\s\S]*?\.mask-sheet__identity-block\s*\{[\s\S]*?grid-template-columns:\s*minmax\(150px, 200px\) minmax\(0, 1fr\)[\s\S]*?block-size:\s*auto;[\s\S]*?\.mask-attributes\s*\{[\s\S]*?grid-column:\s*1\s*\/\s*-1/);
   assert.match(maskStyles, /&\.mask-sheet--attribute-resizing\s*\{\s*transition:\s*width 180ms ease;/);
   assert.doesNotMatch(maskStyles, /color:\s*var\(--bw-ink\);\s*transition:/);
   assert.match(maskStyles, /@media \(prefers-reduced-motion: reduce\)\s*\{[\s\S]*?&\.mask-sheet--attribute-resizing\s*\{\s*transition:\s*none;/);

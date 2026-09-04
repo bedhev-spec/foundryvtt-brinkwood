@@ -177,18 +177,23 @@ test("shared clock utilities normalize values and preload character clock images
 });
 
 test("item-picker interpolations are escaped before entering HTML", async () => {
-  const source = await read("module/blades-sheet.js");
+  const [source, pickerSource] = await Promise.all([
+    read("module/blades-sheet.js"),
+    read("module/item-picker-dialog.js"),
+  ]);
   const { escapeHTML } = await import("../module/html-utils.js");
   const { renderItemTooltip } = await import("../module/item-tooltip.js");
   const payload = `&<>"'`;
 
   assert.equal(escapeHTML(payload), "&amp;&lt;&gt;&quot;&#39;");
-  assert.match(source, /const itemId = escapeHTML\(e\._id\)/);
-  assert.match(source, /const itemName = escapeHTML\(game\.i18n\.localize\(e\.name\)\)/);
-  assert.match(source, /const itemDetails = escapeHTML\(addition_price_load\)/);
-  assert.match(source, /data-tooltip-html="\$\{itemTooltip\}"/);
-  assert.match(source, /data-tooltip-class="brinkwood-item-tooltip-shell"/);
-  assert.match(source, /tabindex="0" aria-label="\$\{itemTooltipLabel\}"/);
+  assert.match(source, /promptItemPicker\(\{[\s\S]*?rows:\s*pickerRows/);
+  assert.match(pickerSource, /const id = escapeHTML\(row\.id\)/);
+  assert.match(pickerSource, /const name = escapeHTML\(row\.name\)/);
+  assert.match(pickerSource, /const details = escapeHTML\(row\.details\)/);
+  assert.match(pickerSource, /const tooltipHtml = escapeHTML\(row\.tooltipHtml\)/);
+  assert.match(pickerSource, /data-tooltip-html="\$\{tooltipHtml\}"/);
+  assert.match(pickerSource, /data-tooltip-class="brinkwood-item-tooltip-shell"/);
+  assert.match(pickerSource, /tabindex="0" aria-label="\$\{safeTooltipLabel\}"/);
 
   const tooltip = renderItemTooltip({
     name: "Shortbow",

@@ -6,6 +6,18 @@
     transition: width 180ms ease;
   }
 
+  // A newly rendered Attribute column must not participate in header layout
+  // until the ApplicationV2 frame has finished expanding to its target width.
+  &.mask-sheet--attributes-entering {
+    .mask-sheet__identity-block {
+      grid-template-columns: minmax(150px, 200px) minmax(0, 1fr);
+    }
+
+    .mask-attributes {
+      display: none;
+    }
+  }
+
   form.mask-sheet {
     // The fixed ApplicationV2 frame keeps identity and tabs stationary; only
     // the active shared tab panel scrolls.
@@ -19,7 +31,6 @@
     padding: 16px;
     container-type: inline-size;
     color: var(--bw-ink);
-    background: rgba(247, 244, 237, 0.28);
 
     input[type="text"], textarea {
       box-sizing: border-box;
@@ -39,10 +50,19 @@
   }
 
   .mask-sheet__identity-block {
+    // Unconfigured Masks have no third column to reserve while the frame
+    // contracts. Configuration opts into the Attribute track below.
+    grid-template-columns: minmax(150px, 200px) minmax(0, 1fr);
+    column-gap: 20px;
+    // Character identity frame: 200px portrait + 10px padding on each edge
+    // + the 1px frame border. Prevent shorter Mask content adding dead space.
+    block-size: 222px;
+  }
+
+  .mask-sheet__identity-block--with-attributes {
     // Match one Character Attribute column at the Character sheet's 700px
     // default: (700px - 40px padding - 24px grid gaps) / 3 = 212px.
     grid-template-columns: minmax(150px, 200px) minmax(230px, 1fr) 212px;
-    column-gap: 20px;
   }
 
   .mask-sheet__identity {
@@ -162,11 +182,73 @@
     min-width: 0;
   }
 
-  .mask-sheet__section-heading {
+  .mask-sheet__trait-add {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+    justify-content: start;
+    box-sizing: border-box;
+    width: 100%;
+    height: 40px;
+    min-height: 40px;
+    margin: 0;
+    padding: 0 12px;
+    border: 1px dashed var(--bw-rule);
+    border-left: 5px solid var(--bw-accent);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.18);
+    color: var(--bw-ink);
+    font-family: "Crimson Text", serif;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: rgba(141, 98, 93, 0.14);
+      color: var(--bw-ink);
+    }
+  }
+
+  .mask-sheet__trait-add-content {
+    display: inline-flex;
+    align-items: center;
+    column-gap: 8px;
+    min-width: 0;
+    height: 20px;
+  }
+
+  .mask-sheet__trait-add-icon {
+    position: relative;
+    display: block;
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      inset-block-start: 50%;
+      inset-inline-start: 50%;
+      width: 12px;
+      height: 1px;
+      background: currentColor;
+      transform: translate(-50%, -50%);
+    }
+
+    &::after {
+      transform: translate(-50%, -50%) rotate(90deg);
+    }
+  }
+
+  .mask-sheet__trait-add-label {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    height: 20px;
+    line-height: 20px;
   }
 
   .mask-sheet__traits {
@@ -230,13 +312,13 @@
     min-width: 0;
   }
 
-  // The query measures this form's content box, not the window frame. Keep
-  // the three columns through the 700px compact state so resizing never
-  // causes an intermediate row jump; stack before the 150px portrait track,
-  // 230px identity track, 212px Attributes, and two gaps become cramped.
+  // The query measures this form's content box, not the window frame.
+  // Configured sheets stack before the portrait, identity, Attribute, and
+  // two-gap tracks become cramped; unconfigured sheets already use two tracks.
   @container (max-width: 650px) {
     .mask-sheet__identity-block {
       grid-template-columns: minmax(150px, 200px) minmax(0, 1fr);
+      block-size: auto;
     }
 
     .mask-attributes {

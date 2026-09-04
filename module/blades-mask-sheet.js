@@ -19,6 +19,7 @@ export const MASK_SHEET_DEFAULT_WIDTH = 700;
 export const MASK_SHEET_ATTRIBUTES_WIDTH = 760;
 export const MASK_SHEET_VIEWPORT_GUTTER = 32;
 const MASK_SHEET_RESIZING_CLASS = "mask-sheet--attribute-resizing";
+const MASK_SHEET_ATTRIBUTES_ENTERING_CLASS = "mask-sheet--attributes-entering";
 const MASK_SHEET_RESIZE_DURATION = 180;
 
 const itemId = item => item?.id ?? item?._id;
@@ -34,7 +35,7 @@ export function getMaskTraitsForSource(items, maskItem) {
   );
 }
 
-/** Return ungranted compendium Traits associated with the selected Mask Type. */
+/** Return ungranted compendium Traits that can be linked to the selected Mask. */
 export function getEligibleMaskTraits(items, actorItems, maskItem) {
   const sourceItemId = itemId(maskItem);
   if (!sourceItemId) return [];
@@ -42,10 +43,8 @@ export function getEligibleMaskTraits(items, actorItems, maskItem) {
   const existingTraitSourceIds = new Set(existingTraits
     .map(item => item.flags?.brinkwood?.traitGrant?.traitSourceId)
     .filter(Boolean));
-  const maskType = normalizedTraitSourceName(maskItem.name);
   return Array.from(items ?? []).filter(item =>
     item.type === "trait"
-    && normalizedTraitSourceName(item.system?.class) === maskType
     && !existingTraitSourceIds.has(itemId(item))
     && !existingTraits.some(existing => traitHasCompendiumProvenance(existing, item))
     && Boolean(item.name?.trim())
@@ -213,17 +212,17 @@ export class BladesMaskSheet extends BladesSheet {
     const currentWidth = Number(this.position?.width) || MASK_SHEET_DEFAULT_WIDTH;
     const viewportWidth = globalThis.window?.innerWidth ?? globalThis.document?.documentElement?.clientWidth;
     const nextWidth = maskSheetWidthForAttributes(currentWidth, viewportWidth);
-    return this._resizeForMaskAttributes(nextWidth);
+    return this._resizeForMaskAttributes(nextWidth, { attributesEntering: true });
   }
 
   async _shrinkForMaskAttributes() {
     return this._resizeForMaskAttributes(MASK_SHEET_DEFAULT_WIDTH);
   }
 
-  async _resizeForMaskAttributes(nextWidth) {
+  async _resizeForMaskAttributes(nextWidth, { attributesEntering = false } = {}) {
     const currentWidth = Number(this.position?.width) || MASK_SHEET_DEFAULT_WIDTH;
     if (nextWidth === currentWidth || typeof this.setPosition !== "function") return;
-    const stopTransition = this._startMaskAttributeResizeTransition();
+    const stopTransition = this._startMaskAttributeResizeTransition({ attributesEntering });
     try {
       return await this.setPosition({ width: nextWidth });
     } catch (error) {
@@ -232,12 +231,13 @@ export class BladesMaskSheet extends BladesSheet {
     }
   }
 
-  _startMaskAttributeResizeTransition() {
+  _startMaskAttributeResizeTransition({ attributesEntering = false } = {}) {
     if (globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) return null;
     const frame = this.element?.closest?.(".brinkwood.actor.mask") ?? this.element;
     if (!frame?.classList) return null;
 
     frame.classList.add(MASK_SHEET_RESIZING_CLASS);
+    if (attributesEntering) frame.classList.add(MASK_SHEET_ATTRIBUTES_ENTERING_CLASS);
     // Commit the transient class before ApplicationV2 writes its inline width.
     void frame.offsetWidth;
 
@@ -246,6 +246,7 @@ export class BladesMaskSheet extends BladesSheet {
       globalThis.clearTimeout(timeout);
       frame.removeEventListener?.("transitionend", onTransitionEnd);
       frame.classList.remove(MASK_SHEET_RESIZING_CLASS);
+      frame.classList.remove(MASK_SHEET_ATTRIBUTES_ENTERING_CLASS);
     };
     const onTransitionEnd = event => {
       if (event.target === frame && event.propertyName === "width") stop();
@@ -365,7 +366,8 @@ export class BladesMaskSheet extends BladesSheet {
   }
 
   _renderItemPickerTooltip(item, enrichedDescription) {
-    return renderMaskPickerTooltip(item, enrichedDescription);
+    if (item?.type === "mask") return renderMaskPickerTooltip(item, enrichedDescription);
+    return super._renderItemPickerTooltip(item, enrichedDescription);
   }
 
   /** Limit the shared Trait picker to still-missing grants for this Mask Type. */

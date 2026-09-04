@@ -86,6 +86,7 @@ test("Mask Type availability resizes only on transitions and preserves manual si
   assert.equal(maskSheetWidthForAttributes(980, 880), 980);
 
   const positions = [];
+  const transitionOptions = [];
   const sheet = {
     position: { width: 700 },
     setPosition(position) {
@@ -95,14 +96,19 @@ test("Mask Type availability resizes only on transitions and preserves manual si
     _expandForMaskAttributes: BladesMaskSheet.prototype._expandForMaskAttributes,
     _shrinkForMaskAttributes: BladesMaskSheet.prototype._shrinkForMaskAttributes,
     _resizeForMaskAttributes: BladesMaskSheet.prototype._resizeForMaskAttributes,
-    _startMaskAttributeResizeTransition() { return null; },
+    _startMaskAttributeResizeTransition(options) {
+      transitionOptions.push(options);
+      return null;
+    },
   };
 
   await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, false);
   assert.deepEqual(positions, []);
+  assert.deepEqual(transitionOptions, []);
 
   await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, true);
   assert.deepEqual(positions, [{ width: 760 }]);
+  assert.deepEqual(transitionOptions, [{ attributesEntering: true }]);
 
   // A user can make the configured sheet narrower or wider. Re-renders must
   // preserve both instead of restoring the automatic target width.
@@ -116,6 +122,7 @@ test("Mask Type availability resizes only on transitions and preserves manual si
 
   await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, false);
   assert.deepEqual(positions, [{ width: 760 }, { width: 700 }]);
+  assert.deepEqual(transitionOptions.at(-1), { attributesEntering: false });
   assert.equal(sheet.position.width, 700);
 
   // A newly selected Mask Type may expand again after removal.
@@ -126,7 +133,7 @@ test("Mask Type availability resizes only on transitions and preserves manual si
   assert.deepEqual(positions, [{ width: 760 }, { width: 700 }, { width: 760 }, { width: 700 }]);
 });
 
-test("Mask Traits and picker candidates stay scoped to the selected Mask source", () => {
+test("Mask Traits stay scoped to their source while picker offers every missing Trait", () => {
   const mask = { id: "mask-judgement", type: "mask", name: "Judgement" };
   const matchingGrant = {
     id: "actor-trait-present",
@@ -169,7 +176,7 @@ test("Mask Traits and picker candidates stay scoped to the selected Mask source"
   ];
 
   assert.deepEqual(getMaskTraitsForSource(actorItems, mask), [matchingGrant]);
-  assert.deepEqual(getEligibleMaskTraits(candidates, actorItems, mask), [candidates[1]]);
+  assert.deepEqual(getEligibleMaskTraits(candidates, actorItems, mask), [candidates[1], candidates[2]]);
 });
 
 test("Mask Trait picker delegates selected source IDs to the actor repair command", async () => {
@@ -218,14 +225,25 @@ test("automatic Mask resize transition is transient and honors reduced motion", 
 
   try {
     globalThis.matchMedia = () => ({ matches: false });
-    BladesMaskSheet.prototype._startMaskAttributeResizeTransition.call(sheet);
+    BladesMaskSheet.prototype._startMaskAttributeResizeTransition.call(sheet, { attributesEntering: true });
     assert.equal(classes.has("mask-sheet--attribute-resizing"), true);
+    assert.equal(classes.has("mask-sheet--attributes-entering"), true);
     listeners.get("transitionend")({ target: frame, propertyName: "width" });
     assert.equal(classes.has("mask-sheet--attribute-resizing"), false);
+    assert.equal(classes.has("mask-sheet--attributes-entering"), false);
+
+    BladesMaskSheet.prototype._startMaskAttributeResizeTransition.call(sheet);
+    assert.equal(classes.has("mask-sheet--attribute-resizing"), true);
+    assert.equal(classes.has("mask-sheet--attributes-entering"), false);
+    listeners.get("transitionend")({ target: frame, propertyName: "width" });
 
     globalThis.matchMedia = () => ({ matches: true });
-    assert.equal(BladesMaskSheet.prototype._startMaskAttributeResizeTransition.call(sheet), null);
+    assert.equal(BladesMaskSheet.prototype._startMaskAttributeResizeTransition.call(
+      sheet,
+      { attributesEntering: true },
+    ), null);
     assert.equal(classes.has("mask-sheet--attribute-resizing"), false);
+    assert.equal(classes.has("mask-sheet--attributes-entering"), false);
   } finally {
     globalThis.matchMedia = previousMatchMedia;
   }
