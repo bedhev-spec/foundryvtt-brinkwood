@@ -3773,20 +3773,20 @@
   font-size: 0.82rem;
 }
 
-.tooltip[data-tooltip-html] {
+.tooltip[data-tooltip-html]:not(.tooltip-trigger--plain) {
   padding: 4px;
   border-radius: 50%;
   color: #51464a;
   cursor: help;
 }
 
-.tooltip[data-tooltip-html]:hover,
-.tooltip[data-tooltip-html]:focus-visible {
+.tooltip[data-tooltip-html]:not(.tooltip-trigger--plain):hover,
+.tooltip[data-tooltip-html]:not(.tooltip-trigger--plain):focus-visible {
   color: #8f2f35;
   filter: drop-shadow(0 0 0.18em rgba(143, 47, 53, 0.55));
 }
 
-.tooltip[data-tooltip-html]:focus-visible {
+.tooltip[data-tooltip-html]:not(.tooltip-trigger--plain):focus-visible {
   outline: 2px solid #9b5d14;
   outline-offset: 1px;
 }

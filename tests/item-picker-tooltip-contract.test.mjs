@@ -11,6 +11,7 @@ test("selected identity values use prepared shared HTML tooltips", async () => {
     read("templates/actor-sheet.html"), read("templates/parts/sheet-identity-row.html"), read("module/blades-actor-sheet.js"),
   ]);
   assert.equal((template.match(/parts\/sheet-identity-row\.html/g) ?? []).length, 1);
+  assert.match(identityRow, /tooltip tooltip-trigger--plain/);
   assert.match(identityRow, /data-tooltip-html="\{\{row\.item\.identityTooltipHtml\}\}"/);
   assert.match(identityRow, /data-tooltip-class="brinkwood-item-tooltip-shell"/);
   assert.match(controller, /identityDefinitions[\s\S]*?itemType: "upbringing"[\s\S]*?descriptionRoot: "Actor\.Upbringings"[\s\S]*?itemType: "profession"[\s\S]*?descriptionRoot: "Actor\.Professions"[\s\S]*?itemType: "class"[\s\S]*?descriptionRoot: "Actor\.Classes"[\s\S]*?itemType: "pact"[\s\S]*?descriptionRoot: "Actor\.Pacts"/);
@@ -46,6 +47,8 @@ test("the picker enriches once and delegates Mask tooltip policy", async () => {
 
 test("item-picker tooltip styles preserve paragraph spacing", async () => {
   const styles = await read("scss/import/tooltip.scss");
+  assert.match(styles, /\.tooltip\[data-tooltip-html\]:not\(\.tooltip-trigger--plain\)\s*\{[\s\S]*?padding:\s*4px/);
+  assert.doesNotMatch(styles, /\.tooltip\[data-tooltip-html\]\s*\{[\s\S]*?padding:\s*4px/);
   assert.match(styles, /brinkwood-item-tooltip-shell[\s\S]*?line-height:\s*1\.35/);
   assert.match(styles, /\.brinkwood-item-tooltip__description\s*\{[\s\S]*?margin-top:\s*8px/);
   assert.match(styles, /\.brinkwood-item-tooltip__description[\s\S]*?p\s*\{[\s\S]*?margin:\s*0 0 \.8em/);
