@@ -21,8 +21,9 @@ test("Character Name and Alias share exact field geometry while retaining distin
 });
 
 test("Character identity rows keep selected and empty values clear of separators", async () => {
-  const [character, row, characterStyles, sharedStyles, legacyEffects, legacyPolish] = await Promise.all([
+  const [character, mask, row, characterStyles, sharedStyles, legacyEffects, legacyPolish] = await Promise.all([
     read("templates/actor-sheet.html"),
+    read("templates/mask-sheet.html"),
     read("templates/parts/sheet-identity-row.html"),
     read("scss/import/character-sheet.scss"),
     read("scss/import/sheet-identity.scss"),
@@ -31,6 +32,7 @@ test("Character identity rows keep selected and empty values clear of separators
   ]);
 
   assert.match(character, /class="sheet-identity__rows sheet-identity__rows--separated"/);
+  assert.doesNotMatch(mask, /sheet-identity__rows--separated/);
   assert.match(row, /class="item identity-choice__slot identity-choice__value/);
   assert.match(row, /class="identity-choice__slot identity-choice__blank"/);
   assert.match(row, /class="item-add-popup identity-choice__text"/);
@@ -44,6 +46,7 @@ test("Character identity rows keep selected and empty values clear of separators
   assert.match(sharedStyles, /\.sheet-identity \.sheet-identity__rows--separated \.sheet-identity__row\s*\{[\s\S]*?height:\s*28px;[\s\S]*?min-height:\s*28px;[\s\S]*?border-block-end:\s*1px solid rgba\(141, 98, 93, 0\.3\);[\s\S]*?box-shadow:\s*none/);
   assert.match(characterStyles, /\.item-block:not\(\.sheet-identity__row\)\s*\{/);
   assert.match(characterStyles, /\.sheet-identity__details > \.sheet-identity__rows,\s*\.sheet-identity__trackers > \.big-teeth-section\s*\{[\s\S]*?transform:\s*translateY\(10px\)/);
+  assert.match(characterStyles, /\.sheet-identity__rows--separated \.item-class-label > \.identity-choice__text,\s*\.sheet-identity__rows--separated \.identity-choice__value > \.identity-choice__text\s*\{[\s\S]*?line-height:\s*1\.25/);
   assert.doesNotMatch(characterStyles, /\.sheet-identity__details > \.sheet-identity__rows,\s*\.sheet-identity__trackers > \.big-teeth-section\s*\{[^}]*(?:margin|padding|top|inset)[^}]*:/);
   assert.doesNotMatch(legacyEffects, /\.name-alias \.item-block \.item\s*\{/);
   assert.doesNotMatch(legacyPolish, /\.character-identity-choices \.item-name\s*\{[^}]*line-height\s*:/);

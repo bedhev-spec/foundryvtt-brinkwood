@@ -973,6 +973,10 @@
 .brinkwood.actor.pc.character .sheet-identity__trackers > .big-teeth-section {
   transform: translateY(10px);
 }
+.brinkwood.actor.pc.character .sheet-identity__rows--separated .item-class-label > .identity-choice__text,
+.brinkwood.actor.pc.character .sheet-identity__rows--separated .identity-choice__value > .identity-choice__text {
+  line-height: 1.25;
+}
 .brinkwood.actor.pc.character {
   /* The selected value owns an inner action track because its remove control
    * is nested inside the value rather than being a sibling of the outer row. */
