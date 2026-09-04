@@ -25,6 +25,25 @@ test("the evolved character sheet is the only registered character sheet", async
   }
 });
 
+test("Character prepares every shared identity row consumed by its template", async () => {
+  const [controller, template] = await Promise.all([
+    read("module/blades-actor-sheet.js"),
+    read("templates/actor-sheet.html"),
+  ]);
+
+  assert.match(template, /\{\{#each identityRows as \|row\|\}\}/);
+  for (const [itemType, label] of [
+    ["upbringing", "BITD.Upbringing"],
+    ["profession", "BITD.Profession"],
+    ["class", "BITD.Class"],
+    ["pact", "BITD.Pact"],
+  ]) {
+    assert.match(controller, new RegExp(`itemType: "${itemType}", label: "${label}"`));
+  }
+  assert.match(controller, /context\.identityRows = identityDefinitions\.map/);
+  assert.match(controller, /item: context\.items\.find\(item => item\.type === itemType\) \?\? null/);
+});
+
 test("Character sheet delegates encumbrance policy to the shared calculation", async () => {
   const controller = await read("module/blades-actor-sheet.js");
 

@@ -13,7 +13,7 @@ test("selected identity values use prepared shared HTML tooltips", async () => {
   assert.equal((template.match(/parts\/sheet-identity-row\.html/g) ?? []).length, 1);
   assert.match(identityRow, /data-tooltip-html="\{\{row\.item\.identityTooltipHtml\}\}"/);
   assert.match(identityRow, /data-tooltip-class="brinkwood-item-tooltip-shell"/);
-  assert.match(controller, /identityDescriptionRoots[\s\S]*?upbringing: "Actor\.Upbringings"[\s\S]*?profession: "Actor\.Professions"[\s\S]*?class: "Actor\.Classes"[\s\S]*?pact: "Actor\.Pacts"/);
+  assert.match(controller, /identityDefinitions[\s\S]*?itemType: "upbringing"[\s\S]*?descriptionRoot: "Actor\.Upbringings"[\s\S]*?itemType: "profession"[\s\S]*?descriptionRoot: "Actor\.Professions"[\s\S]*?itemType: "class"[\s\S]*?descriptionRoot: "Actor\.Classes"[\s\S]*?itemType: "pact"[\s\S]*?descriptionRoot: "Actor\.Pacts"/);
   assert.match(controller, /identityTooltipHtml = renderDescriptionTooltip\(/);
   assert.doesNotMatch(controller, /identityTooltipHtml = escapeHTML/);
 });

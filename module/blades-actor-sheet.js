@@ -87,19 +87,29 @@ position: { width: 700, height: 1170 },
 
     this.setAttrLabels(context.system.attributes);
 
-    const identityDescriptionRoots = {
-      upbringing: "Actor.Upbringings",
-      profession: "Actor.Professions",
-      class: "Actor.Classes",
-      pact: "Actor.Pacts",
-    };
+    const identityDefinitions = [
+      { itemType: "upbringing", label: "BITD.Upbringing", descriptionRoot: "Actor.Upbringings" },
+      { itemType: "profession", label: "BITD.Profession", descriptionRoot: "Actor.Professions" },
+      { itemType: "class", label: "BITD.Class", descriptionRoot: "Actor.Classes" },
+      { itemType: "pact", label: "BITD.Pact", descriptionRoot: "Actor.Pacts" },
+    ];
     for (const item of context.items) {
-      const descriptionRoot = identityDescriptionRoots[item.type];
+      const descriptionRoot = identityDefinitions.find(({ itemType }) => itemType === item.type)?.descriptionRoot;
       if (!descriptionRoot) continue;
       item.identityTooltipHtml = renderDescriptionTooltip(
         game.i18n.localize(`${descriptionRoot}.${item.name}`),
       );
     }
+
+    // The shared identity-row partial renders descriptors rather than scanning
+    // the Actor's entire item collection. Keep all four Character rows present
+    // even when their optional embedded Item has not been selected yet.
+    context.identityRows = identityDefinitions.map(({ itemType, label }) => ({
+      itemType,
+      label,
+      deleteLabel: "BITD.TitleDeleteItem",
+      item: context.items.find(item => item.type === itemType) ?? null,
+    }));
 
     context.traits = context.items
       .filter(i => i.type === "trait")
