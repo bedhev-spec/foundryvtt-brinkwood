@@ -10,7 +10,11 @@ import { formControlUpdate, handleActorNameEnter, persistActorNameChange, queueD
 export { handleActorNameEnter as handleMaskNameEnter };
 
 export const MASK_SHEET_DEFAULT_WIDTH = 700;
-export const MASK_SHEET_ATTRIBUTES_WIDTH = 900;
+// A Character sheet at its 700px default has a 212px Attribute column:
+// (700px - 40px form padding - 24px inter-column gaps) / 3.
+// Mask's 16px form padding leaves 688px at this target, enough to keep the
+// Attribute family beside the portrait and identity details.
+export const MASK_SHEET_ATTRIBUTES_WIDTH = 720;
 export const MASK_SHEET_VIEWPORT_GUTTER = 32;
 const MASK_SHEET_RESIZING_CLASS = "mask-sheet--attribute-resizing";
 const MASK_SHEET_RESIZE_DURATION = 180;

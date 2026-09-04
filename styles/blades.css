@@ -2317,7 +2317,7 @@
   outline-offset: 2px;
 }
 .brinkwood.actor.mask .mask-sheet__identity-block {
-  grid-template-columns: minmax(150px, 200px) minmax(230px, 1fr) minmax(260px, 0.9fr);
+  grid-template-columns: minmax(150px, 200px) minmax(230px, 1fr) 212px;
   column-gap: 20px;
 }
 .brinkwood.actor.mask .mask-sheet__identity {
@@ -2469,7 +2469,7 @@
   width: 100%;
   min-width: 0;
 }
-@container (max-width: 800px) {
+@container (max-width: 650px) {
   .brinkwood.actor.mask .mask-sheet__identity-block {
     grid-template-columns: minmax(150px, 200px) minmax(0, 1fr);
   }
@@ -3838,9 +3838,13 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   background: #211b1d;
   box-shadow: 0 8px 24px rgba(25, 18, 19, 0.35);
   font-family: "Crimson Text", serif;
-  font-size: var(--font-size-16);
+  font-size: 17px;
   line-height: 1.35;
   text-align: left !important;
+}
+
+.brinkwood-item-tooltip {
+  font-size: inherit;
 }
 
 .brinkwood-item-tooltip header {
@@ -3848,7 +3852,7 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   border-bottom: 1px solid rgba(247, 244, 237, 0.3);
   color: #f7f4ed;
   font-family: Kirsty, serif;
-  font-size: 1.15rem;
+  font-size: calc(1.15rem + 2px);
 }
 
 .brinkwood-item-tooltip__stats {

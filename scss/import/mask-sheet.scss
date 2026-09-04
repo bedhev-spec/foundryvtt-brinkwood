@@ -40,7 +40,9 @@
   }
 
   .mask-sheet__identity-block {
-    grid-template-columns: minmax(150px, 200px) minmax(230px, 1fr) minmax(260px, 0.9fr);
+    // Match one Character Attribute column at the Character sheet's 700px
+    // default: (700px - 40px padding - 24px grid gaps) / 3 = 212px.
+    grid-template-columns: minmax(150px, 200px) minmax(230px, 1fr) 212px;
     column-gap: 20px;
   }
 
@@ -228,7 +230,11 @@
     min-width: 0;
   }
 
-  @container (max-width: 800px) {
+  // The query measures this form's content box, not the window frame. Keep
+  // the three columns through the 700px compact state so resizing never
+  // causes an intermediate row jump; stack before the 150px portrait track,
+  // 230px identity track, 212px Attributes, and two gaps become cramped.
+  @container (max-width: 650px) {
     .mask-sheet__identity-block {
       grid-template-columns: minmax(150px, 200px) minmax(0, 1fr);
     }

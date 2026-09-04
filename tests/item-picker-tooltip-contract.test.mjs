@@ -49,7 +49,10 @@ test("item-picker tooltip styles preserve paragraph spacing", async () => {
   const styles = await read("scss/import/tooltip.scss");
   assert.match(styles, /\.tooltip\[data-tooltip-html\]:not\(\.tooltip-trigger--plain\)\s*\{[\s\S]*?padding:\s*4px/);
   assert.doesNotMatch(styles, /\.tooltip\[data-tooltip-html\]\s*\{[\s\S]*?padding:\s*4px/);
-  assert.match(styles, /brinkwood-item-tooltip-shell[\s\S]*?font-size:\s*var\(--font-size-16\)[\s\S]*?line-height:\s*1\.35/);
+  assert.match(styles, /brinkwood-item-tooltip-shell[\s\S]*?font-size:\s*17px[\s\S]*?line-height:\s*1\.35/);
+  assert.match(styles, /\.brinkwood-item-tooltip\s*\{\s*font-size:\s*inherit;/);
+  assert.match(styles, /\.brinkwood-item-tooltip header\s*\{[\s\S]*?font-size:\s*calc\(1\.15rem \+ 2px\)/);
+  assert.doesNotMatch(styles, /aside#tooltip\.brinkwood-tooltip\s*\{[^}]*font-size:\s*17px/);
   assert.match(styles, /\.brinkwood-item-tooltip__description\s*\{[\s\S]*?margin-top:\s*8px/);
   assert.match(styles, /\.brinkwood-item-tooltip__description[\s\S]*?p\s*\{[\s\S]*?margin:\s*0 0 \.8em/);
 });
