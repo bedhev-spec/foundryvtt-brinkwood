@@ -34,7 +34,7 @@ const { BladesSheet } = await import("../module/blades-sheet.js");
 const { BladesActorSheet, prepareLoadoutCapacity } = await import("../module/blades-actor-sheet.js");
 const { BladesItemSheet, prepareItemSheetPermissions } = await import("../module/blades-item-sheet.js");
 const { BladesMaskSheet, getMaskTypePresentation } = await import("../module/blades-mask-sheet.js");
-const { formControlUpdate } = await import("../module/sheet-dom.js");
+const { formControlUpdate, queueDocumentPathUpdate } = await import("../module/sheet-dom.js");
 const { syncOpenActorTrackers } = await import("../module/sheet-tracker-sync.js");
 const { BladesRebelionSheet } = await import("../module/blades-rebelion-sheet.js");
 
@@ -626,6 +626,93 @@ test("Mask trackers update without a sheet rerender and refresh their output", a
   assert.equal(dot["aria-pressed"], "true");
   assert.equal(output.textContent, "2 / 8");
   assert.match(tooth.src, /stresstooth-blue\.png$/);
+});
+
+test("Actor effect controls ignore a second activation while the first is pending", async () => {
+  const original = BladesActiveEffect.onManageActiveEffect;
+  let release;
+  const pending = new Promise(resolve => { release = resolve; });
+  let calls = 0;
+  let captures = 0;
+  let restores = 0;
+  const control = {};
+  const sheet = {
+    actor: {},
+    _captureSheetViewState() { captures += 1; },
+    _restoreSheetViewState() { restores += 1; },
+  };
+
+  BladesActiveEffect.onManageActiveEffect = async () => {
+    calls += 1;
+    await pending;
+  };
+
+  try {
+    const action = () => BladesActiveEffect.onManageActiveEffect();
+    const first = BladesSheet.prototype._onActorEffectControl.call(sheet, { currentTarget: control }, action);
+    const second = BladesSheet.prototype._onActorEffectControl.call(sheet, { currentTarget: control }, action);
+    await Promise.resolve();
+
+    assert.equal(calls, 1);
+    assert.equal(await second, false);
+    release();
+    assert.equal(await first, true);
+    assert.deepEqual({ captures, restores }, { captures: 1, restores: 1 });
+
+    BladesActiveEffect.onManageActiveEffect = async () => { throw new Error("expected failure"); };
+    assert.equal(await BladesSheet.prototype._onActorEffectControl.call(sheet, { currentTarget: control }, action), false);
+    BladesActiveEffect.onManageActiveEffect = async () => undefined;
+    assert.equal(await BladesSheet.prototype._onActorEffectControl.call(sheet, { currentTarget: control }, action), true);
+  } finally {
+    BladesActiveEffect.onManageActiveEffect = original;
+  }
+});
+
+test("Character tracker updates serialize by path and preserve click order", async () => {
+  let releaseFirst;
+  const firstPending = new Promise(resolve => { releaseFirst = resolve; });
+  const values = [];
+  const document = {
+    system: { experience: { value: 0 } },
+    async update(update) {
+      const value = update["system.experience.value"];
+      values.push(value);
+      if (values.length === 1) await firstPending;
+      this.system.experience.value = value;
+    },
+  };
+  const sheet = {
+    isEditable: true,
+    document,
+    _updateTrackerDisplay() {},
+  };
+  const event = () => ({
+    preventDefault() {},
+    currentTarget: {
+      dataset: { path: "system.experience.value", value: "1", max_value: "4" },
+      parentElement: null,
+    },
+  });
+
+  const first = BladesActorSheet.prototype._onDotChange.call(sheet, event());
+  const second = BladesActorSheet.prototype._onDotChange.call(sheet, event());
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.deepEqual(values, [1]);
+
+  releaseFirst();
+  await Promise.all([first, second]);
+  assert.deepEqual(values, [1, 0]);
+  assert.equal(document.system.experience.value, 0);
+});
+
+test("document-path queues recover after a rejected update", async () => {
+  const document = {};
+  await assert.rejects(queueDocumentPathUpdate(document, "system.value", async () => {
+    throw new Error("expected failure");
+  }));
+
+  assert.equal(await queueDocumentPathUpdate(document, "system.value", async () => 2), 2);
 });
 
 test("actor update synchronization refreshes every open tracker renderer", () => {

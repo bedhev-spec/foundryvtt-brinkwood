@@ -11,7 +11,7 @@ import { BladesHelpers } from "./blades-helpers.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
 import { preloadClockImages } from "./clock-utils.js";
 import { renderDescriptionTooltip } from "./item-tooltip.js";
-import { formControlUpdate, handleActorNameEnter, persistActorNameChange } from "./sheet-dom.js";
+import { formControlUpdate, handleActorNameEnter, persistActorNameChange, queueDocumentPathUpdate } from "./sheet-dom.js";
 
 export { prepareLoadoutCapacity } from "./character/loadout.js";
 
@@ -212,13 +212,12 @@ position: { width: 700, height: 1170 },
     );
 
     // Active effect controls - use data-effect-action to avoid AppV2 action dispatch
- html.querySelectorAll(".effect-control[data-effect-action]").forEach(el =>
- el.addEventListener("click", ev => {
-  this._captureSheetViewState();
-  const action = BladesActiveEffect.onManageActiveEffect(ev, this.actor, { gmOnly: true });
-  Promise.resolve(action).finally(() => this._restoreSheetViewState());
- }, listenerOptions)
- );
+    html.querySelectorAll(".effect-control[data-effect-action]").forEach(el =>
+      el.addEventListener("click", ev => this._onActorEffectControl(
+        ev,
+        () => BladesActiveEffect.onManageActiveEffect(ev, this.actor, { gmOnly: true }),
+      ), listenerOptions)
+    );
   }
 
   async _persistFormControl(event) {
@@ -243,13 +242,15 @@ position: { width: 700, height: 1170 },
 
     let new_value  = Number(dataset.value);
     const max_value = Number(dataset.max_value);
-    const old_value = foundry.utils.getProperty(this.document, dataset.path);
+    await queueDocumentPathUpdate(this.document, dataset.path, async () => {
+      const old_value = foundry.utils.getProperty(this.document, dataset.path);
+      let queuedValue = new_value;
+      if (queuedValue === old_value && queuedValue === 1) queuedValue = 0;
+      if (Number.isFinite(max_value) && queuedValue > max_value) queuedValue = max_value;
 
-    if (new_value === old_value && new_value === 1) new_value = 0;
-    if (Number.isFinite(max_value) && new_value > max_value) new_value = max_value;
-
-    await this.document.update({ [dataset.path]: new_value }, { render: false });
-    this._updateTrackerDisplay(element, new_value);
+      await this.document.update({ [dataset.path]: queuedValue }, { render: false });
+      this._updateTrackerDisplay(element, queuedValue);
+    });
   }
 
   _updateTrackerDisplay(element, value) {
@@ -263,9 +264,11 @@ position: { width: 700, height: 1170 },
 
     event.preventDefault();
     event.stopPropagation();
-    const currentValue = Number(foundry.utils.getProperty(this.document, name));
-    const clockValue = selectedValue === 1 && currentValue === 1 ? 0 : selectedValue;
-    await this.document.update({ [name]: Math.min(4, Math.max(0, clockValue)) });
+    await queueDocumentPathUpdate(this.document, name, async () => {
+      const currentValue = Number(foundry.utils.getProperty(this.document, name));
+      const clockValue = selectedValue === 1 && currentValue === 1 ? 0 : selectedValue;
+      await this.document.update({ [name]: Math.min(4, Math.max(0, clockValue)) });
+    });
   }
 
   /* -------------------------------------------- */

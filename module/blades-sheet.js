@@ -37,6 +37,26 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
     form: { submitOnChange: true },
   };
 
+  async _onActorEffectControl(event, action) {
+    const control = event.currentTarget;
+    if (!control || typeof action !== "function" || this._pendingActorEffectControls?.has(control)) return false;
+
+    this._pendingActorEffectControls ??= new WeakSet();
+    this._pendingActorEffectControls.add(control);
+    this._captureSheetViewState();
+
+    try {
+      await action();
+      return true;
+    } catch (error) {
+      ui.notifications?.error?.("Unable to update this Actor effect.");
+      return false;
+    } finally {
+      this._pendingActorEffectControls.delete(control);
+      this._restoreSheetViewState();
+    }
+  }
+
   /* -------------------------------------------- */
 
   /**

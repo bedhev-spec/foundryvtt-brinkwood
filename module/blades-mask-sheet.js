@@ -5,7 +5,7 @@ import { capitalize } from "./blades-helpers.js";
 import { encumbranceLevelForLoadout, hasMuleAbility } from "./encumbrance.js";
 import { renderMaskPickerTooltip } from "./mask-picker-tooltip.js";
 import { maskActorImage } from "./actor-images.js";
-import { formControlUpdate, handleActorNameEnter, persistActorNameChange } from "./sheet-dom.js";
+import { formControlUpdate, handleActorNameEnter, persistActorNameChange, queueDocumentPathUpdate } from "./sheet-dom.js";
 
 export { handleActorNameEnter as handleMaskNameEnter };
 
@@ -184,11 +184,10 @@ export class BladesMaskSheet extends BladesSheet {
 
     // Active effect controls
     html.querySelectorAll(".effect-control[data-effect-action]").forEach(el =>
-      el.addEventListener("click", ev => {
-        this._captureSheetViewState();
-        const action = BladesActiveEffect.onManageActiveEffect(ev, this.actor, { gmOnly: true });
-        Promise.resolve(action).finally(() => this._restoreSheetViewState());
-      }, listenerOptions)
+      el.addEventListener("click", ev => this._onActorEffectControl(
+        ev,
+        () => BladesActiveEffect.onManageActiveEffect(ev, this.actor, { gmOnly: true }),
+      ), listenerOptions)
     );
   }
 
@@ -214,13 +213,16 @@ export class BladesMaskSheet extends BladesSheet {
     let new_value   = parseInt(dataset.value);
     const max_value = parseInt(dataset.max_value);
     if (!dataset.path) return;
-    const old_value = foundry.utils.getProperty(this.actor.system, dataset.path);
+    const path = `system.${dataset.path}`;
+    await queueDocumentPathUpdate(this.actor, path, async () => {
+      const old_value = foundry.utils.getProperty(this.actor, path);
+      let queuedValue = new_value;
+      if (queuedValue === old_value && queuedValue === 1) queuedValue = 0;
+      if (queuedValue > max_value) queuedValue = max_value;
 
-    if (new_value === old_value && new_value === 1) new_value = 0;
-    if (new_value > max_value) new_value = max_value;
-
-    await this.actor.update({ [`system.${dataset.path}`]: new_value }, { render: false });
-    this._updateDotDisplay(element, new_value, max_value);
+      await this.actor.update({ [path]: queuedValue }, { render: false });
+      this._updateDotDisplay(element, queuedValue, max_value);
+    });
   }
 
   _updateDotDisplay(element, value, maxValue) {

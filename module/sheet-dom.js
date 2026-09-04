@@ -45,3 +45,27 @@ export async function persistActorNameChange(sheet, event) {
   await sheet.document.update({ name }, { render: true });
   return true;
 }
+
+
+const documentPathQueues = new WeakMap();
+
+/** Serialize read-modify-write interactions for one Document field path. */
+export function queueDocumentPathUpdate(document, path, action) {
+  if (!document || !path || typeof action !== "function") return Promise.resolve(false);
+
+  let pathQueues = documentPathQueues.get(document);
+  if (!pathQueues) {
+    pathQueues = new Map();
+    documentPathQueues.set(document, pathQueues);
+  }
+
+  const previous = pathQueues.get(path) ?? Promise.resolve();
+  const operation = previous.catch(() => undefined).then(action);
+  pathQueues.set(path, operation);
+
+  return operation.finally(() => {
+    if (pathQueues.get(path) !== operation) return;
+    pathQueues.delete(path);
+    if (pathQueues.size === 0) documentPathQueues.delete(document);
+  });
+}

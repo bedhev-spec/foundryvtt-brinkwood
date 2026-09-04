@@ -143,9 +143,18 @@ test("each Item portrait is keyboard-operable only while editable", async t => {
   assert.match(controller, /event\.currentTarget\.click\(\)/);
 });
 
-test("character effect controls enforce the GM-only template policy", async () => {
-  const source = await read("module/blades-actor-sheet.js");
-  assert.match(source, /onManageActiveEffect\(ev, this\.actor, \{ gmOnly: true \}\)/);
+test("Actor effect controls share a pending guard and enforce the GM-only policy", async () => {
+  const [base, character, mask] = await Promise.all([
+    read("module/blades-sheet.js"),
+    read("module/blades-actor-sheet.js"),
+    read("module/blades-mask-sheet.js"),
+  ]);
+  assert.match(base, /async _onActorEffectControl\(event, action\)/);
+  assert.match(base, /_pendingActorEffectControls\?\.has\(control\)/);
+  assert.match(character, /_onActorEffectControl\([\s\S]*?onManageActiveEffect\(ev, this\.actor, \{ gmOnly: true \}\)/);
+  assert.match(mask, /_onActorEffectControl\([\s\S]*?onManageActiveEffect\(ev, this\.actor, \{ gmOnly: true \}\)/);
+  assert.match(character, /queueDocumentPathUpdate\(this\.document, dataset\.path/);
+  assert.match(mask, /queueDocumentPathUpdate\(this\.actor, path/);
 });
 
 test("Simple Roll closes and cancels without submitting a roll", async () => {
