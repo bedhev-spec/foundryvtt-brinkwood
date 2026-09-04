@@ -2310,16 +2310,6 @@
   gap: 10px;
   min-width: 0;
 }
-.brinkwood.actor.mask .mask-sheet__identity .sheet-identity__rows {
-  grid-auto-rows: 28px;
-}
-.brinkwood.actor.mask .mask-sheet__identity .sheet-identity__row,
-.brinkwood.actor.mask .mask-sheet__identity .identity-choice__track,
-.brinkwood.actor.mask .mask-sheet__identity .identity-choice__value,
-.brinkwood.actor.mask .mask-sheet__identity .identity-choice__value .item-body {
-  height: 28px;
-  min-height: 28px;
-}
 .brinkwood.actor.mask .mask-sheet__trackers {
   display: flex;
   flex-direction: column;

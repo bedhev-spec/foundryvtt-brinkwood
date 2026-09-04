@@ -43,20 +43,6 @@
     display: grid;
     gap: 10px;
     min-width: 0;
-
-    // The Mask Type value is a button, whose 1.25 line-height needs slightly
-    // more room than the shared Character identity rows to retain descenders.
-    .sheet-identity__rows {
-      grid-auto-rows: 28px;
-    }
-
-    .sheet-identity__row,
-    .identity-choice__track,
-    .identity-choice__value,
-    .identity-choice__value .item-body {
-      height: 28px;
-      min-height: 28px;
-    }
   }
 
   .mask-sheet__trackers {

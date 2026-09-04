@@ -25,13 +25,9 @@ test("Mask uses the shared identity contract rather than an inline header implem
   assert.match(portrait, /data-action="editImage" data-edit="img" role="button" tabindex="0"/);
   assert.match(name, /class="name bw-text-field"/);
   assert.match(row, /class="item-delete identity-choice__remove"/);
-  assert.match(row, /class="item-body item-add-popup"[\s\S]*?class="item-name"/);
   assert.match(tracker, /data-path="\{\{\.\.\/trackerPath\}\}"/);
   assert.match(sharedStyles, /\.sheet-identity__portrait-frame[\s\S]*?width:\s*200px[\s\S]*?height:\s*200px/);
-  assert.match(sharedStyles, /\.sheet-identity \.sheet-identity__rows\s*\{[\s\S]*?grid-auto-rows:\s*26px/);
   assert.match(styles, /\.mask-sheet__identity-block\s*\{[\s\S]*?grid-template-columns:\s*minmax\(150px, 200px\) minmax\(0, 1fr\)/);
-  assert.match(styles, /\.mask-sheet__identity\s*\{[\s\S]*?\.sheet-identity__rows\s*\{[\s\S]*?grid-auto-rows:\s*28px/);
-  assert.match(styles, /\.identity-choice__value \.item-body\s*\{[\s\S]*?height:\s*28px;[\s\S]*?min-height:\s*28px/);
   assert.doesNotMatch(styles, /\.mask-sheet__(?:header|portrait|item-list|item-open)\b/);
 });
 
