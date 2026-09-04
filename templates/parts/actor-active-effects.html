@@ -1,8 +1,8 @@
 <div class="actor-effects">
-  <div class="effects-tabs" role="tablist" aria-label="Effect types">
+<div class="effects-tabs actor-effects__tabs" role="tablist" aria-label="Effect types">
     {{#each effects as |section sid|}}
       {{#if section.visible}}
-      <button type="button" class="effects-tab {{#if (eq section.type ../activeEffectTab)}}active{{/if}}"
+<button type="button" class="effects-tab actor-effects__tab {{#if (eq section.type ../activeEffectTab)}}active{{/if}}"
         id="effects-{{../_id}}-{{section.type}}-tab" role="tab"
         aria-controls="effects-{{../_id}}-{{section.type}}-panel"
         aria-selected="{{#if (eq section.type ../activeEffectTab)}}true{{else}}false{{/if}}"

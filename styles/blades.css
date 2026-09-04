@@ -1052,6 +1052,48 @@
   min-width: 0;
   container-type: inline-size;
 }
+.brinkwood .actor-effects__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 8px;
+  padding: 4px;
+  border: 1px solid var(--bw-rule);
+  background: var(--bw-paper-deep);
+}
+.brinkwood button.actor-effects__tab {
+  flex: 1 1 8rem;
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 34px;
+  margin: 0;
+  padding: 6px 9px;
+  border: 1px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--bw-ink-soft);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  text-align: center;
+  transition: color var(--bw-tab-transition), background-color var(--bw-tab-transition), border-color var(--bw-tab-transition);
+}
+.brinkwood button.actor-effects__tab:hover, .brinkwood button.actor-effects__tab:focus-visible, .brinkwood button.actor-effects__tab.active {
+  color: var(--bw-ink);
+  border-color: var(--bw-rule);
+  border-bottom-color: var(--bw-accent);
+}
+.brinkwood button.actor-effects__tab.active {
+  background: rgba(255, 255, 255, 0.42);
+}
+.brinkwood button.actor-effects__tab:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 1px;
+}
 .brinkwood .actor-effects__category {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -1305,6 +1347,16 @@
     gap: 3px;
   }
 }
+@container (max-width: 410px) {
+  .brinkwood button.actor-effects__tab {
+    flex-basis: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brinkwood button.actor-effects__tab {
+    transition-duration: 0.01ms;
+  }
+}
 .brinkwood {
   /* Shared tab and panel visual language. Geometry stays with each sheet. */
 }
@@ -1385,33 +1437,6 @@
   border: 0;
   font: inherit;
 }
-.brinkwood {
-  /* The legacy character sheet shares the same effect-tab state language. */
-}
-.brinkwood.actor.pc.character .effects-tabs {
-  border: 1px solid var(--bw-rule);
-  background: var(--bw-paper-deep);
-}
-.brinkwood.actor.pc.character .effects-tab {
-  color: var(--bw-ink-soft);
-  background: transparent;
-  cursor: pointer;
-  font: inherit;
-  font-weight: 700;
-  transition: color var(--bw-tab-transition), background-color var(--bw-tab-transition), border-color var(--bw-tab-transition);
-}
-.brinkwood.actor.pc.character .effects-tab:hover, .brinkwood.actor.pc.character .effects-tab:focus-visible, .brinkwood.actor.pc.character .effects-tab.active {
-  color: var(--bw-ink);
-  border-color: var(--bw-rule);
-  border-bottom-color: var(--bw-accent);
-}
-.brinkwood.actor.pc.character .effects-tab.active {
-  background: rgba(255, 255, 255, 0.42);
-}
-.brinkwood.actor.pc.character .effects-tab:focus-visible {
-  outline: 3px solid var(--bw-focus);
-  outline-offset: 1px;
-}
 .brinkwood .sheet-panel {
   background: rgba(255, 255, 255, 0.16);
   border: 1px solid rgba(141, 98, 93, 0.46);
@@ -1431,21 +1456,6 @@
   padding: 10px;
   background: rgba(255, 255, 255, 0.16);
 }
-.brinkwood.actor.mask .mask-sheet__panel .effects-tabs {
-  padding: 4px;
-  background: var(--bw-paper-deep);
-  border-bottom: 1px solid var(--bw-rule);
-}
-.brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab {
-  color: var(--bw-ink-soft);
-  background: transparent;
-  border-bottom: 2px solid transparent;
-  transition: color var(--bw-tab-transition), border-color var(--bw-tab-transition);
-}
-.brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab:hover, .brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab:focus-visible, .brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab.active {
-  color: var(--bw-ink);
-  border-bottom-color: var(--bw-accent);
-}
 .brinkwood.actor.mask .mask-sheet__panel .effects-category[data-effect-panel] {
   border: 0;
   border-radius: 0;
@@ -1458,7 +1468,7 @@
   background: var(--bw-ink);
 }
 @media (prefers-reduced-motion: reduce) {
-  .brinkwood .sheet-tabs .item, .brinkwood.actor.pc.character .effects-tab, .brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab {
+  .brinkwood .sheet-tabs .item {
     transition-duration: 0.01ms;
   }
 }
@@ -4499,25 +4509,7 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.48), 0 1px 2px rgba(33, 27, 29, 0.08);
 }
 
-/* Legacy character sheet only; V2 owns a separate Effects layout. */
-.brinkwood.actor.pc.character .effects-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: 8px;
-  padding: 4px;
-}
-
-.brinkwood.actor.pc.character .effects-tab {
-  flex: 1 1 8rem;
-  min-height: 34px;
-  margin: 0;
-  padding: 6px 9px;
-  border: 1px solid transparent;
-  border-bottom: 3px solid transparent;
-  border-radius: 3px;
-}
-
+/* Legacy character sheet compatibility outside the shared Actor Effect component. */
 .brinkwood.actor.pc.character .effects-category__add:focus-visible {
   outline: 3px solid var(--bw-focus);
   outline-offset: 1px;
@@ -4736,10 +4728,4 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   padding: 0;
   line-height: 1;
   place-items: center;
-}
-
-@container (max-width: 410px) {
-  .brinkwood.actor.pc.character .effects-tab {
-    flex-basis: 100%;
-  }
 }

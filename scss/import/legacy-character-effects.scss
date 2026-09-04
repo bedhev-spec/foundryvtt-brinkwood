@@ -1,21 +1,5 @@
 
-/* Legacy character sheet only; V2 owns a separate Effects layout. */
-.brinkwood.actor.pc.character .effects-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: 8px;
-  padding: 4px;
-}
-.brinkwood.actor.pc.character .effects-tab {
-  flex: 1 1 8rem;
-  min-height: 34px;
-  margin: 0;
-  padding: 6px 9px;
-  border: 1px solid transparent;
-  border-bottom: 3px solid transparent;
-  border-radius: 3px;
-}
+/* Legacy character sheet compatibility outside the shared Actor Effect component. */
 .brinkwood.actor.pc.character .effects-category__add:focus-visible {
   outline: 3px solid var(--bw-focus);
   outline-offset: 1px;
@@ -189,7 +173,4 @@
 .brinkwood.actor.pc.character .character-armor-uses { min-width: 96px; vertical-align: top; }
 .brinkwood.actor.pc.character button.effects-category__add {
   display: inline-grid; flex: 0 0 32px; width: 32px; min-width: 32px; height: 32px; min-height: 32px; margin: 0; padding: 0; line-height: 1; place-items: center;
-}
-@container (max-width: 410px) {
-  .brinkwood.actor.pc.character .effects-tab { flex-basis: 100%; }
 }
