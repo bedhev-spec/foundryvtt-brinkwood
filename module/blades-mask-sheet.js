@@ -66,6 +66,7 @@ export class BladesMaskSheet extends BladesSheet {
   /** @override */
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
+    this._ensureValidPrimaryTab(context);
 
     context.img = maskActorImage(context.img);
 
@@ -132,6 +133,15 @@ export class BladesMaskSheet extends BladesSheet {
     );
 
     return context;
+  }
+
+  /** Keep a remembered Mask tab when available; otherwise use its first tab. */
+  _ensureValidPrimaryTab(context) {
+    const validTabs = ["traits", "mask-notes"];
+    if (context.isGM) validTabs.push("effects");
+    if (validTabs.includes(this.tabGroups.primary)) return;
+    this.tabGroups.primary = "traits";
+    context.tabs.primary = "traits";
   }
 
   /* -------------------------------------------- */

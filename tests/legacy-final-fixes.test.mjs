@@ -17,7 +17,7 @@ test("Legacy XP updates and framing remain blue", async () => {
   assert.match(styles, /\.character-xp-section\s*\{[\s\S]*?border-color:\s*#315f82/);
 });
 
-test("Legacy tabs receive their final equal-width layout from the base stylesheet", async () => {
+test("Shared primary tabs receive their final equal-width layout from the base stylesheet", async () => {
   const [source, sharedTabs, compiled] = await Promise.all([
     read("scss/import/character-sheet.scss"),
     read("scss/import/sheet-tabs.scss"),
@@ -26,7 +26,7 @@ test("Legacy tabs receive their final equal-width layout from the base styleshee
 
   assert.match(source, /\.character-sheet__workspace[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
   for (const styles of [sharedTabs, compiled]) {
-    assert.match(styles, /character-sheet__workspace > nav\.tabs \.item,[\s\S]*?flex:\s*1 1 0[\s\S]*?min-width:\s*0/);
+    assert.match(styles, /\.sheet-tabs \.item\s*\{[\s\S]*?flex:\s*1 1 0[\s\S]*?min-width:\s*0/);
   }
 });
 

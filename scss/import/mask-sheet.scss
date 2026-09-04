@@ -87,12 +87,32 @@
 
   .mask-sheet__main {
     display: grid;
+    // The active tab panel must not determine the primary tabbar's inline
+    // size. An explicit flexible column keeps every primary tab state flush
+    // with the Mask workspace (Traits, Notes, and Effects alike).
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);
     box-sizing: border-box;
+    justify-self: stretch;
     min-width: 0;
     min-height: 0;
     width: 100%;
     height: 100%;
+  }
+
+  // Sheet-tabs owns the tabbar's appearance. Mask owns only the grid
+  // placement that makes the shared primitive span this sheet's workspace.
+  .mask-sheet__main > .sheet-tabs {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+
+  .mask-sheet__main > .sheet-tab-content {
+    grid-column: 1 / -1;
+    min-width: 0;
+    inline-size: 100%;
   }
 
   .mask-sheet__panel {
@@ -230,11 +250,5 @@
     form.mask-sheet { padding: 10px; }
     .mask-attributes__skills { grid-template-columns: 1fr; }
 
-    .mask-sheet__tabs {
-      overflow-x: auto;
-      justify-content: flex-start;
-    }
-
-    .mask-sheet__tabs .item { flex: 0 0 auto; }
   }
 }

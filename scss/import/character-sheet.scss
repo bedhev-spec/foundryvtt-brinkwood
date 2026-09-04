@@ -618,11 +618,6 @@
   row-gap: 0;
 }
 
-& .character-sheet__workspace > nav.tabs {
-  grid-column: 1 / -1;
-  width: 100%;
-  box-sizing: border-box;
-}
 
 // The tab workspace and Attribute grid are character-sheet geometry. Keep
 // their wide-screen dimensions here rather than in the late Effects layer.
@@ -725,10 +720,6 @@
     margin-block-end: -10px;
   }
 
-  .character-sheet__workspace > nav.tabs {
-    min-height: 0;
-  }
-
   .character-sheet__workspace > .tab-content {
     display: grid;
     grid-template-rows: minmax(0, 1fr);
@@ -787,7 +778,6 @@
 
   .big-teeth-section,
   .bans-armor,
-  nav.tabs,
   .label-stripe,
   .stripe {
     border-color: var(--bw-rule);
@@ -799,36 +789,6 @@
   .bans-armor th {
     background: var(--bw-ink);
     color: var(--bw-paper);
-  }
-
-  nav.tabs {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    display: flex;
-    gap: 4px;
-    padding: 4px;
-    background: var(--bw-paper-deep);
-
-    .item {
-      min-height: 40px;
-      padding: 10px 12px;
-      color: var(--bw-ink-soft);
-      border-bottom: 3px solid transparent;
-      text-align: center;
-
-      &:hover,
-      &:focus-visible,
-      &.active {
-        color: var(--bw-ink);
-        border-bottom-color: var(--bw-accent);
-      }
-
-      &:focus-visible {
-        outline: 3px solid var(--bw-focus);
-        outline-offset: -3px;
-      }
-    }
   }
 
   .locked {
@@ -878,16 +838,6 @@
 
     img.portrait {
       box-shadow: 3px 3px 0 var(--bw-paper-deep);
-    }
-
-    nav.tabs {
-      overflow-x: auto;
-      justify-content: start;
-
-      .item {
-        flex: 0 0 auto;
-        white-space: nowrap;
-      }
     }
 
     > .window-content > form.actor-sheet > .flex-horizontal:last-child {

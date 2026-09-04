@@ -834,7 +834,7 @@
   scrollbar-gutter: stable;
   scrollbar-width: thin;
 }
-.brinkwood .sheet-tabs, .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs, .brinkwood.actor.mask .mask-sheet__tabs {
+.brinkwood .sheet-tabs {
   --bw-tab-surface: rgba(255, 255, 255, 0.28);
   --bw-tab-active: rgba(255, 255, 255, 0.52);
   --bw-tab-transition: 120ms ease;
@@ -846,11 +846,15 @@
   overflow: hidden;
   border: 1px solid var(--bw-rule);
   border-radius: 3px;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bw-paper-deep);
 }
-.brinkwood .sheet-tabs .item, .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item, .brinkwood.actor.mask .mask-sheet__tabs .item {
+.brinkwood .sheet-tabs .item {
   flex: 1 1 0;
   min-width: 0;
-  padding: 7px 8px;
+  min-height: 40px;
+  padding: 10px 12px;
   color: var(--bw-ink-soft);
   background-color: var(--bw-tab-surface);
   border-bottom: 3px solid transparent;
@@ -859,19 +863,28 @@
   white-space: nowrap;
   transition: background-color var(--bw-tab-transition), border-color var(--bw-tab-transition), box-shadow var(--bw-tab-transition), color var(--bw-tab-transition);
 }
-.brinkwood .sheet-tabs .item:hover:not(.active), .brinkwood .sheet-tabs .item:focus-visible:not(.active), .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item:hover:not(.active), .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item:focus-visible:not(.active), .brinkwood.actor.mask .mask-sheet__tabs .item:hover:not(.active), .brinkwood.actor.mask .mask-sheet__tabs .item:focus-visible:not(.active) {
+.brinkwood .sheet-tabs .item:hover:not(.active), .brinkwood .sheet-tabs .item:focus-visible:not(.active) {
   color: var(--bw-ink);
   background-color: rgba(255, 255, 255, 0.44);
 }
-.brinkwood .sheet-tabs .item.active, .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item.active, .brinkwood.actor.mask .mask-sheet__tabs .item.active {
+.brinkwood .sheet-tabs .item.active {
   color: var(--bw-ink);
   background-color: var(--bw-tab-active);
   border-bottom-color: var(--bw-accent);
   box-shadow: inset 0 -3px 0 var(--bw-accent), 0 1px 3px rgba(33, 27, 29, 0.12);
 }
-.brinkwood .sheet-tabs .item:focus-visible, .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item:focus-visible, .brinkwood.actor.mask .mask-sheet__tabs .item:focus-visible {
+.brinkwood .sheet-tabs .item:focus-visible {
   outline: 3px solid var(--bw-focus);
   outline-offset: -3px;
+}
+@container (max-width: 480px) {
+  .brinkwood .sheet-tabs {
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+  .brinkwood .sheet-tabs .item {
+    flex: 0 0 auto;
+  }
 }
 .brinkwood .sheet-tabs button.item {
   border: 0;
@@ -950,7 +963,7 @@
   background: var(--bw-ink);
 }
 @media (prefers-reduced-motion: reduce) {
-  .brinkwood .sheet-tabs .item, .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item, .brinkwood.actor.pc.character .effects-tab, .brinkwood.actor.mask .mask-sheet__tabs .item, .brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab {
+  .brinkwood .sheet-tabs .item, .brinkwood.actor.pc.character .effects-tab, .brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab {
     transition-duration: 0.01ms;
   }
 }
@@ -1742,11 +1755,6 @@
   grid-template-columns: minmax(0, 1fr);
   row-gap: 0;
 }
-.brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs {
-  grid-column: 1/-1;
-  width: 100%;
-  box-sizing: border-box;
-}
 .brinkwood.actor.pc.character .character-sheet__workspace > .tab-content {
   grid-column: 1;
   width: 100%;
@@ -1828,9 +1836,6 @@
 .brinkwood.actor.pc.character form.actor-sheet > .character-attributes {
   margin-block-end: -10px;
 }
-.brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs {
-  min-height: 0;
-}
 .brinkwood.actor.pc.character .character-sheet__workspace > .tab-content {
   display: grid;
   grid-template-rows: minmax(0, 1fr);
@@ -1883,7 +1888,6 @@
 }
 .brinkwood.actor.pc.character .big-teeth-section,
 .brinkwood.actor.pc.character .bans-armor,
-.brinkwood.actor.pc.character nav.tabs,
 .brinkwood.actor.pc.character .label-stripe,
 .brinkwood.actor.pc.character .stripe {
   border-color: var(--bw-rule);
@@ -1894,30 +1898,6 @@
 .brinkwood.actor.pc.character .bans-armor th {
   background: var(--bw-ink);
   color: var(--bw-paper);
-}
-.brinkwood.actor.pc.character nav.tabs {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  display: flex;
-  gap: 4px;
-  padding: 4px;
-  background: var(--bw-paper-deep);
-}
-.brinkwood.actor.pc.character nav.tabs .item {
-  min-height: 40px;
-  padding: 10px 12px;
-  color: var(--bw-ink-soft);
-  border-bottom: 3px solid transparent;
-  text-align: center;
-}
-.brinkwood.actor.pc.character nav.tabs .item:hover, .brinkwood.actor.pc.character nav.tabs .item:focus-visible, .brinkwood.actor.pc.character nav.tabs .item.active {
-  color: var(--bw-ink);
-  border-bottom-color: var(--bw-accent);
-}
-.brinkwood.actor.pc.character nav.tabs .item:focus-visible {
-  outline: 3px solid var(--bw-focus);
-  outline-offset: -3px;
 }
 .brinkwood.actor.pc.character .locked input,
 .brinkwood.actor.pc.character .locked select,
@@ -1956,14 +1936,6 @@
   }
   .brinkwood.actor.pc.character img.portrait {
     box-shadow: 3px 3px 0 var(--bw-paper-deep);
-  }
-  .brinkwood.actor.pc.character nav.tabs {
-    overflow-x: auto;
-    justify-content: start;
-  }
-  .brinkwood.actor.pc.character nav.tabs .item {
-    flex: 0 0 auto;
-    white-space: nowrap;
   }
   .brinkwood.actor.pc.character > .window-content > form.actor-sheet > .flex-horizontal:last-child {
     flex-direction: column;
@@ -2350,12 +2322,25 @@
 }
 .brinkwood.actor.mask .mask-sheet__main {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr);
   box-sizing: border-box;
+  justify-self: stretch;
   min-width: 0;
   min-height: 0;
   width: 100%;
   height: 100%;
+}
+.brinkwood.actor.mask .mask-sheet__main > .sheet-tabs {
+  grid-column: 1/-1;
+  justify-self: stretch;
+  inline-size: 100%;
+  max-inline-size: 100%;
+}
+.brinkwood.actor.mask .mask-sheet__main > .sheet-tab-content {
+  grid-column: 1/-1;
+  min-width: 0;
+  inline-size: 100%;
 }
 .brinkwood.actor.mask .mask-sheet__panel {
   display: none;
@@ -2484,13 +2469,6 @@
   }
   .brinkwood.actor.mask .mask-attributes__skills {
     grid-template-columns: 1fr;
-  }
-  .brinkwood.actor.mask .mask-sheet__tabs {
-    overflow-x: auto;
-    justify-content: flex-start;
-  }
-  .brinkwood.actor.mask .mask-sheet__tabs .item {
-    flex: 0 0 auto;
   }
 }
 .brinkwood.actor.rebelion {

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 globalThis.Hooks = { on() {} };
@@ -37,6 +38,39 @@ const { BladesMaskSheet, getMaskTypePresentation } = await import("../module/bla
 const { formControlUpdate, queueDocumentPathUpdate } = await import("../module/sheet-dom.js");
 const { syncOpenActorTrackers } = await import("../module/sheet-tracker-sync.js");
 const { BladesRebelionSheet } = await import("../module/blades-rebelion-sheet.js");
+
+test("Mask context validates its primary tab immediately after the base context", async () => {
+  const source = await readFile(new URL("../module/blades-mask-sheet.js", import.meta.url), "utf8");
+  assert.match(source, /async _prepareContext\(options\)\s*\{\s*const context = await super\._prepareContext\(options\);\s*this\._ensureValidPrimaryTab\(context\);/);
+});
+
+test("Mask primary tabs default to Traits and preserve valid remembered selections", () => {
+  const sheet = { tabGroups: { primary: undefined } };
+  const initialContext = { isGM: false, tabs: { primary: undefined } };
+
+  BladesMaskSheet.prototype._ensureValidPrimaryTab.call(sheet, initialContext);
+  assert.equal(sheet.tabGroups.primary, "traits");
+  assert.equal(initialContext.tabs.primary, "traits");
+
+  // A normal tab switch survives the next context preparation.
+  sheet.tabGroups.primary = "mask-notes";
+  const notesContext = { isGM: false, tabs: { primary: "mask-notes" } };
+  BladesMaskSheet.prototype._ensureValidPrimaryTab.call(sheet, notesContext);
+  assert.equal(sheet.tabGroups.primary, "mask-notes");
+  assert.equal(notesContext.tabs.primary, "mask-notes");
+
+  // Effects is a remembered tab only while that tab is available to a GM.
+  sheet.tabGroups.primary = "effects";
+  const effectsContext = { isGM: true, tabs: { primary: "effects" } };
+  BladesMaskSheet.prototype._ensureValidPrimaryTab.call(sheet, effectsContext);
+  assert.equal(sheet.tabGroups.primary, "effects");
+  assert.equal(effectsContext.tabs.primary, "effects");
+
+  const unavailableEffectsContext = { isGM: false, tabs: { primary: "effects" } };
+  BladesMaskSheet.prototype._ensureValidPrimaryTab.call(sheet, unavailableEffectsContext);
+  assert.equal(sheet.tabGroups.primary, "traits");
+  assert.equal(unavailableEffectsContext.tabs.primary, "traits");
+});
 
 function effectEvent(action = "create", effectId = null, effectType = "passive") {
   return {

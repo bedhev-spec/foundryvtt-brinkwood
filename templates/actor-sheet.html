@@ -115,7 +115,7 @@
 <section class="character-sheet__workspace sheet-tab-workspace">
 
       {{!-- Nav menu --}}
-<nav class="tabs sheet-tabs flex-horizontal" data-group="primary" role="tablist" aria-label="{{localize "BITD.Traits"}}">
+<nav class="tabs sheet-tabs" data-group="primary" role="tablist" aria-label="{{localize "BITD.Traits"}}">
     <button type="button" class="item {{#if (eq tabs.primary "traits")}}active{{/if}}" id="character-{{_id}}-tab-traits" role="tab" tabindex="{{#if (eq tabs.primary "traits")}}0{{else}}-1{{/if}}" aria-controls="character-{{_id}}-traits-tab" aria-selected="{{#if (eq tabs.primary "traits")}}true{{else}}false{{/if}}" data-action="tab" data-group="primary" data-tab="traits">{{localize "BITD.Traits"}}</button>
     <button type="button" class="item {{#if (eq tabs.primary "loadout")}}active{{/if}}" id="character-{{_id}}-tab-loadout" role="tab" tabindex="{{#if (eq tabs.primary "loadout")}}0{{else}}-1{{/if}}" aria-controls="character-{{_id}}-loadout" aria-selected="{{#if (eq tabs.primary "loadout")}}true{{else}}false{{/if}}" data-action="tab" data-group="primary" data-tab="loadout">{{localize "BITD.Loadout"}}</button>
     <button type="button" class="item {{#if (eq tabs.primary "character-notes")}}active{{/if}}" id="character-{{_id}}-tab-notes" role="tab" tabindex="{{#if (eq tabs.primary "character-notes")}}0{{else}}-1{{/if}}" aria-controls="character-{{_id}}-notes" aria-selected="{{#if (eq tabs.primary "character-notes")}}true{{else}}false{{/if}}" data-action="tab" data-group="primary" data-tab="character-notes">{{localize "BITD.Notes"}}</button>

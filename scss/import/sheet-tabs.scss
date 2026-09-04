@@ -22,9 +22,7 @@
     scrollbar-width: thin;
   }
 }
-.sheet-tabs,
-&.actor.pc.character .character-sheet__workspace > nav.tabs,
-&.actor.mask .mask-sheet__tabs {
+.sheet-tabs {
   --bw-tab-surface: rgba(255, 255, 255, 0.28);
   --bw-tab-active: rgba(255, 255, 255, 0.52);
   --bw-tab-transition: 120ms ease;
@@ -36,14 +34,16 @@
   overflow: hidden;
   border: 1px solid var(--bw-rule);
   border-radius: 3px;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bw-paper-deep);
 }
 
-.sheet-tabs .item,
-&.actor.pc.character .character-sheet__workspace > nav.tabs .item,
-&.actor.mask .mask-sheet__tabs .item {
+.sheet-tabs .item {
   flex: 1 1 0;
   min-width: 0;
-  padding: 7px 8px;
+  min-height: 40px;
+  padding: 10px 12px;
   color: var(--bw-ink-soft);
   background-color: var(--bw-tab-surface);
   border-bottom: 3px solid transparent;
@@ -68,6 +68,17 @@
   &:focus-visible {
     outline: 3px solid var(--bw-focus);
     outline-offset: -3px;
+  }
+}
+
+@container (max-width: 480px) {
+  .sheet-tabs {
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+
+  .sheet-tabs .item {
+    flex: 0 0 auto;
   }
 }
 
@@ -168,9 +179,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .sheet-tabs .item,
-  &.actor.pc.character .character-sheet__workspace > nav.tabs .item,
   &.actor.pc.character .effects-tab,
-  &.actor.mask .mask-sheet__tabs .item,
   &.actor.mask .mask-sheet__panel .effects-tabs .effects-tab {
     transition-duration: 0.01ms;
   }
