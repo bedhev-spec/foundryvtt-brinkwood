@@ -230,6 +230,12 @@
   box-sizing: border-box;
   height: 26px;
   min-height: 26px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
   align-items: center;
   line-height: 1.25;
 }
@@ -241,7 +247,6 @@
   background: transparent;
   color: inherit;
   font: inherit;
-  line-height: inherit;
   cursor: pointer;
   &:hover { color: var(--bw-accent); text-shadow: 0 0 0.2em rgba(143, 47, 53, 0.4); }
   &:focus:not(:focus-visible) { outline: 0; box-shadow: none; }
