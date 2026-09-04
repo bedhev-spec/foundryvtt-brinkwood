@@ -8,7 +8,7 @@ const read = file => readFile(new URL(file, root), "utf8");
 test("active effect cards render prepared details permanently", async () => {
   const [template, controller, sheetController, styles, lateStyles, actorSheet, maskSheet, itemSheet, locale] = await Promise.all([
     read("templates/parts/active-effects.html"), read("module/blades-active-effect.js"), read("module/blades-sheet.js"),
-    read("scss/import/general-styles.scss"), read("scss/import/sheet-tabs.scss"),
+    read("scss/import/general-styles.scss"), read("scss/import/legacy-character-effects.scss"),
     read("module/blades-actor-sheet.js"), read("module/blades-mask-sheet.js"), read("module/blades-item-sheet.js"), read("lang/en.json")
   ]);
 

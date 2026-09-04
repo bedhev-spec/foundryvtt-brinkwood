@@ -7,44 +7,6 @@
   overflow: hidden;
 }
 
-// Character effect panels belong with their tab state. Their grid prevents
-// category headers and lists from overflowing the active panel.
-&.actor.pc.character .effects-category[data-effect-panel][hidden] {
-  display: none;
-}
-
-&.actor.pc.character .effects-category[data-effect-panel] {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto auto;
-  width: 100%;
-  min-width: 0;
-  height: auto;
-
-  > .effects-category__header,
-  > .effects-category__list {
-    grid-column: 1;
-    width: 100%;
-    min-width: 0;
-  }
-}
-
-&.actor.pc.character .effects-category__list {
-  grid-template-columns: minmax(0, 1fr);
-  align-content: start;
-}
-
-&.actor.pc.character .effects-category__add:focus-visible {
-  outline: 3px solid var(--bw-focus);
-  outline-offset: 1px;
-}
-
-@container (max-width: 410px) {
-  &.actor.pc.character .effects-tab {
-    flex-basis: 100%;
-  }
-}
-
 .sheet-tab-content {
   min-height: 0;
   overflow: hidden;
@@ -118,21 +80,9 @@
 &.actor.pc.character .effects-tabs {
   border: 1px solid var(--bw-rule);
   background: var(--bw-paper-deep);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: 8px;
-  padding: 4px;
 }
 
 &.actor.pc.character .effects-tab {
-  flex: 1 1 8rem;
-  min-height: 34px;
-  margin: 0;
-  padding: 6px 9px;
-  border: 1px solid transparent;
-  border-bottom: 3px solid transparent;
-  border-radius: 3px;
   color: var(--bw-ink-soft);
   background: transparent;
   cursor: pointer;

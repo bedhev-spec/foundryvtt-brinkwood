@@ -8,7 +8,7 @@ test("Legacy XP updates and framing remain blue", async () => {
   const [controller, template, styles] = await Promise.all([
     read("module/blades-actor-sheet.js"),
     read("templates/actor-sheet.html"),
-    read("scss/import/sheet-identity.scss")
+    read("scss/import/legacy-character-effects.scss")
   ]);
 
   assert.match(controller, /closest\?\.\("\.character-xp, \.character-stress"\)/);

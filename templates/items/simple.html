@@ -1,4 +1,4 @@
-<form class="{{cssClass}} bw-item-sheet" autocomplete="off">
+<form class="{{cssClass}} legacy-item-sheet" autocomplete="off">
   <header class="sheet-header">
     <img src="{{img}}" title="{{name}}" alt="{{name}}"{{#if editable}} data-action="editImage" data-edit="img" role="button" tabindex="0" aria-label="{{localize 'BITD.Name'}}: {{name}}"{{/if}}/>
       <div class="header-fields">
@@ -7,8 +7,8 @@
   </header>
 
   {{!-- Sheet Body --}}
-  <section class="sheet-body bw-item-sheet__body">
-    <div class="bw-item-sheet__primary">
+  <section class="sheet-body legacy-item-sheet__body">
+    <div class="legacy-item-sheet__primary">
     <label class="label-stripe">{{localize "BITD.Description"}}</label>
     {{#if editable}}
       <prose-mirror name="system.description" value="{{system.description}}" data-document-uuid="{{item.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
@@ -17,11 +17,11 @@
     {{/if}}
     </div>
     {{#if isGM}}
-      <aside class="bw-item-sheet__secondary">
+      <aside class="legacy-item-sheet__secondary">
       <div class="label-stripe">{{localize "BITD.Logic"}}</div>
       <textarea name="system.logic">{{{system.logic}}}</textarea>
       </aside>
-      <section class="bw-item-sheet__effects">
+      <section class="legacy-item-sheet__effects">
       <div class="label-stripe">{{localize "BITD.Effects"}}</div>
       <div id="effects">{{> "systems/brinkwood/templates/parts/active-effects.html" compact=true}}</div>
       </section>

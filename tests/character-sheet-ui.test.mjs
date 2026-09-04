@@ -101,7 +101,7 @@ test("Bans level two has stable neutral emphasis without row focus coloring", as
 
 test("Character text inputs retain the Mask-style black focus cue over compatibility polish", async () => {
   const [polish, compiled] = await Promise.all([
-    read("scss/import/character-sheet.scss"),
+    read("scss/import/legacy-character-sheet-polish.scss"),
     read("styles/blades.css"),
   ]);
 
@@ -166,7 +166,7 @@ test("Character sheet commits generic controls once and completes tab-panel cont
 test("Character sheet owns Attribute-grid geometry and breakpoints", async () => {
   const [styles, legacyStyles] = await Promise.all([
     read("scss/import/character-sheet.scss"),
-    read("scss/import/sheet-identity.scss"),
+    read("scss/import/legacy-character-effects.scss"),
   ]);
 
  assert.match(styles, /\.character-attributes > \.attributes\s*\{[\s\S]*?grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)[\s\S]*?width:\s*100%[\s\S]*?max-width:\s*100%[\s\S]*?box-sizing:\s*border-box[\s\S]*?flex:\s*1 1 100%/);

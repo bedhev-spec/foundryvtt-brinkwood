@@ -47,19 +47,19 @@ test("legacy item sheets share bounded headers and scrolling content", async () 
   ]);
 
   for (const template of [simple, trait, itemClass, moot]) {
-    assert.match(template, /class="\{\{cssClass\}\} bw-item-sheet"/);
+    assert.match(template, /class="\{\{cssClass\}\} legacy-item-sheet"/);
   }
-  assert.match(source, /\.window-content > \.bw-item-sheet\s*\{[\s\S]*?overflow-y:\s*auto/);
+  assert.match(source, /\.window-content > \.legacy-item-sheet\s*\{[\s\S]*?overflow-y:\s*auto/);
   assert.match(source, /\.sheet-header\s*\{[\s\S]*?grid-template-columns:\s*88px minmax\(0, 1fr\)/);
-  assert.match(simple, /class="sheet-body bw-item-sheet__body"/);
-  assert.match(simple, /class="bw-item-sheet__primary"/);
-  assert.match(simple, /class="bw-item-sheet__secondary"/);
-  assert.match(simple, /class="bw-item-sheet__effects"/);
-  assert.match(source, /\.bw-item-sheet__body\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1\.4fr\) minmax\(180px, 0\.8fr\)/);
-  assert.match(source, /\.bw-item-sheet__effects\s*\{[\s\S]*?grid-column:\s*1 \/ -1/);
-  assert.match(source, /\.bw-item-sheet__primary:only-child\s*\{[\s\S]*?grid-column:\s*1 \/ -1/);
-  assert.match(source, /@container \(max-width: 440px\)[\s\S]*?bw-item-sheet__body/);
-  assert.match(compiled, /\.brinkwood\.item\.sheet \.window-content > \.bw-item-sheet\s*\{[\s\S]*?overflow-y: auto/);
+  assert.match(simple, /class="sheet-body legacy-item-sheet__body"/);
+  assert.match(simple, /class="legacy-item-sheet__primary"/);
+  assert.match(simple, /class="legacy-item-sheet__secondary"/);
+  assert.match(simple, /class="legacy-item-sheet__effects"/);
+  assert.match(source, /\.legacy-item-sheet__body\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1\.4fr\) minmax\(180px, 0\.8fr\)/);
+  assert.match(source, /\.legacy-item-sheet__effects\s*\{[\s\S]*?grid-column:\s*1 \/ -1/);
+  assert.match(source, /\.legacy-item-sheet__primary:only-child\s*\{[\s\S]*?grid-column:\s*1 \/ -1/);
+  assert.match(source, /@container \(max-width: 440px\)[\s\S]*?legacy-item-sheet__body/);
+  assert.match(compiled, /\.brinkwood\.item\.sheet \.window-content > \.legacy-item-sheet\s*\{[\s\S]*?overflow-y: auto/);
 });
 
 test("item sheets opt into compact active-effect cards without changing shared sheets", async () => {

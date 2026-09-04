@@ -8,8 +8,8 @@ test("shared tab component owns character and Mask strip geometry and states", a
   const [component, generalStyles, legacyEffects, legacyPolish] = await Promise.all([
     read("scss/import/sheet-tabs.scss"),
     read("scss/import/general-styles.scss"),
-    read("scss/import/character-sheet.scss"),
-    read("scss/import/sheet-identity.scss"),
+    read("scss/import/legacy-character-effects.scss"),
+    read("scss/import/legacy-character-sheet-polish.scss"),
   ]);
 
   assert.match(generalStyles, /@import 'sheet-tabs\.scss';/);
@@ -24,7 +24,7 @@ test("shared tab component owns character and Mask strip geometry and states", a
   assert.match(component, /\.effects-tab[\s\S]*?&\.active\s*\{[\s\S]*?background:/);
   assert.match(component, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(component, /\.effects-category\[data-effect-panel\]/);
-  assert.match(component, /\.effects-category\[data-effect-panel\][\s\S]*?grid-template-columns/);
+  assert.doesNotMatch(component, /grid-template-columns/);
   assert.doesNotMatch(legacyEffects, /\.effects-tab(?::hover|:focus-visible|\.active)/);
   assert.doesNotMatch(legacyPolish, /character-sheet__workspace > nav\.tabs \.item\.active/);
 });
