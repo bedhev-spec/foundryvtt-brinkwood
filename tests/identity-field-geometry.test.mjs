@@ -47,6 +47,7 @@ test("Character identity rows keep selected and empty values clear of separators
   assert.match(characterStyles, /\.item-block:not\(\.sheet-identity__row\)\s*\{/);
   assert.match(characterStyles, /\.sheet-identity__details > \.sheet-identity__rows,\s*\.sheet-identity__trackers > \.big-teeth-section\s*\{[\s\S]*?transform:\s*translateY\(10px\)/);
   assert.match(characterStyles, /\.sheet-identity__rows--separated \.item-class-label > \.identity-choice__text,\s*\.sheet-identity__rows--separated \.identity-choice__value > \.identity-choice__text\s*\{[\s\S]*?line-height:\s*1\.25/);
+  assert.match(characterStyles, /\.sheet-identity__rows--separated\s*\.identity-choice__value > \.identity-choice__text > \.item-name\s*\{[\s\S]*?transform:\s*translateY\(-4px\)/);
   assert.doesNotMatch(characterStyles, /\.sheet-identity__details > \.sheet-identity__rows,\s*\.sheet-identity__trackers > \.big-teeth-section\s*\{[^}]*(?:margin|padding|top|inset)[^}]*:/);
   assert.doesNotMatch(legacyEffects, /\.name-alias \.item-block \.item\s*\{/);
   assert.doesNotMatch(legacyPolish, /\.character-identity-choices \.item-name\s*\{[^}]*line-height\s*:/);

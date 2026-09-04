@@ -30,6 +30,14 @@
     line-height: 1.25;
   }
 
+  // The Character value uses a plain flex item while its picker label uses a
+  // button. Lift only the text glyphs to match their optical baselines; the
+  // fixed row, separator, value box, and remove action remain stationary.
+  .sheet-identity__rows--separated
+    .identity-choice__value > .identity-choice__text > .item-name {
+    transform: translateY(-4px);
+  }
+
   /* The selected value owns an inner action track because its remove control
    * is nested inside the value rather than being a sibling of the outer row. */
   .character-identity-choices .item-block {

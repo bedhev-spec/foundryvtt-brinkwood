@@ -977,6 +977,9 @@
 .brinkwood.actor.pc.character .sheet-identity__rows--separated .identity-choice__value > .identity-choice__text {
   line-height: 1.25;
 }
+.brinkwood.actor.pc.character .sheet-identity__rows--separated .identity-choice__value > .identity-choice__text > .item-name {
+  transform: translateY(-4px);
+}
 .brinkwood.actor.pc.character {
   /* The selected value owns an inner action track because its remove control
    * is nested inside the value rather than being a sibling of the outer row. */
