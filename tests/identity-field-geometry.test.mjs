@@ -21,12 +21,13 @@ test("Character Name and Alias share exact field geometry while retaining distin
 });
 
 test("Character identity rows keep selected and empty values clear of separators", async () => {
-  const [character, row, characterStyles, sharedStyles, legacyEffects] = await Promise.all([
+  const [character, row, characterStyles, sharedStyles, legacyEffects, legacyPolish] = await Promise.all([
     read("templates/actor-sheet.html"),
     read("templates/parts/sheet-identity-row.html"),
     read("scss/import/character-sheet.scss"),
     read("scss/import/sheet-identity.scss"),
     read("scss/import/legacy-character-effects.scss"),
+    read("scss/import/legacy-character-sheet-polish.scss"),
   ]);
 
   assert.match(character, /class="sheet-identity__rows sheet-identity__rows--separated"/);
@@ -44,4 +45,5 @@ test("Character identity rows keep selected and empty values clear of separators
   assert.match(characterStyles, /\.sheet-identity__details > \.sheet-identity__rows,\s*\.sheet-identity__trackers > \.big-teeth-section\s*\{[\s\S]*?transform:\s*translateY\(10px\)/);
   assert.doesNotMatch(characterStyles, /\.sheet-identity__details > \.sheet-identity__rows,\s*\.sheet-identity__trackers > \.big-teeth-section\s*\{[^}]*(?:margin|padding|top|inset)[^}]*:/);
   assert.doesNotMatch(legacyEffects, /\.name-alias \.item-block \.item\s*\{/);
+  assert.doesNotMatch(legacyPolish, /\.character-identity-choices \.item-name\s*\{[^}]*line-height\s*:/);
 });
