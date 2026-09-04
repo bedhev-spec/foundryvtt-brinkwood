@@ -43,6 +43,7 @@ test("Character identity rows keep selected and empty values clear of separators
   assert.match(sharedStyles, /\.sheet-identity \.identity-choice__slot\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) 18px;[\s\S]*?column-gap:\s*4px;[\s\S]*?height:\s*28px;[\s\S]*?margin:\s*0;[\s\S]*?padding:\s*0/);
   assert.match(sharedStyles, /\.sheet-identity \.identity-choice__text\s*\{[\s\S]*?display:\s*grid;[\s\S]*?box-sizing:\s*border-box;[\s\S]*?height:\s*28px;[\s\S]*?min-height:\s*28px;[\s\S]*?margin:\s*0;[\s\S]*?padding:\s*0;[\s\S]*?border:\s*0;[\s\S]*?font:\s*inherit;[\s\S]*?align-items:\s*center;[\s\S]*?justify-items:\s*start;[\s\S]*?line-height:\s*normal/);
   assert.match(sharedStyles, /\.sheet-identity \.identity-choice__content\s*\{[\s\S]*?display:\s*block;[\s\S]*?line-height:\s*1\.2/);
+  assert.match(sharedStyles, /\.sheet-identity \.identity-choice__value \.item-body\s*\{[\s\S]*?display:\s*grid;[\s\S]*?justify-content:\s*end;[\s\S]*?justify-items:\s*end/);
   assert.match(sharedStyles, /\.sheet-identity \.identity-choice__value \.item-name\s*\{[\s\S]*?display:\s*block;[\s\S]*?height:\s*auto;[\s\S]*?line-height:\s*1\.2/);
   assert.match(sharedStyles, /\.sheet-identity \.identity-choice__remove\s*\{[\s\S]*?height:\s*28px;[\s\S]*?min-height:\s*28px;[\s\S]*?line-height:\s*normal/);
   assert.match(sharedStyles, /\.sheet-identity \.sheet-identity__rows\s*\{[\s\S]*?grid-auto-rows:\s*28px/);
@@ -52,6 +53,7 @@ test("Character identity rows keep selected and empty values clear of separators
   assert.match(characterStyles, /\.sheet-identity__details > \.sheet-identity__rows,\s*\.sheet-identity__trackers > \.big-teeth-section\s*\{[\s\S]*?transform:\s*translateY\(10px\)/);
   assert.doesNotMatch(characterStyles, /\.sheet-identity__rows--separated\s*\.identity-choice__value > \.identity-choice__text > \.item-name\s*\{/);
   assert.doesNotMatch(characterStyles, /\.sheet-identity__rows--separated\s*\.identity-choice__value > \.identity-choice__remove\s*\{/);
+  assert.doesNotMatch(sharedStyles, /\.item-body\.item-add-popup\s*\{[^}]*justify-content\s*:/);
   assert.doesNotMatch(characterStyles, /\.sheet-identity__details > \.sheet-identity__rows,\s*\.sheet-identity__trackers > \.big-teeth-section\s*\{[^}]*(?:margin|padding|top|inset)[^}]*:/);
   assert.doesNotMatch(legacyEffects, /\.name-alias \.item-block \.item\s*\{/);
   assert.doesNotMatch(legacyPolish, /\.character-identity-choices \.item-name\s*\{[^}]*line-height\s*:/);

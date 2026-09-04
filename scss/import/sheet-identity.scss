@@ -288,6 +288,7 @@
 .sheet-identity .identity-choice__value .item-body {
   grid-column: 1;
   display: grid;
+  justify-content: end;
   justify-items: end;
   min-width: 0;
   width: 100%;
@@ -321,7 +322,6 @@
 // A Mask selection reopens the shared picker. This rule owns only picker
 // behavior/chrome; all geometry remains on the shared identity primitive.
 .sheet-identity .identity-choice__value .item-body.item-add-popup {
-  justify-content: flex-end;
   cursor: pointer;
   border-radius: 0;
   clip-path: none;
