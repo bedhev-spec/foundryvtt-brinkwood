@@ -10,7 +10,7 @@ test("character sheet has one bounded frame and an internally scrolling tab view
     read("module/blades-actor-sheet.js"),
     read("scss/import/character-sheet.scss"),
     read("scss/import/sheet-tabs.scss"),
-    read("scss/import/legacy-character-effects.scss"),
+    read("scss/import/sheet-identity.scss"),
     read("styles/blades.css"),
   ]);
 

@@ -9,7 +9,7 @@ test("character load-level control is a styled native menu with accessible overl
   const [template, styles, polishStyles, generalStyles] = await Promise.all([
     read("templates/actor-sheet.html"),
     read("scss/import/character-sheet.scss"),
-    read("scss/import/legacy-character-sheet-polish.scss"),
+    read("scss/import/sheet-identity.scss"),
     read("scss/import/general-styles.scss"),
   ]);
 
@@ -49,7 +49,7 @@ test("character load-level control is a styled native menu with accessible overl
 test("character identity removal stays at the reserved row endpoint", async () => {
   const [styles, polishStyles] = await Promise.all([
     read("scss/import/character-sheet.scss"),
-    read("scss/import/legacy-character-sheet-polish.scss"),
+    read("scss/import/sheet-identity.scss"),
   ]);
 
   assert.match(styles, /character-identity-choices \.item-block \{[\s\S]*?grid-template-columns: max-content minmax\(0, 1fr\);/);

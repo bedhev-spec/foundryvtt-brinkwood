@@ -7,6 +7,146 @@
  */
 
 & {
+  // Character-only finishing geometry formerly emitted from a late
+  // compatibility layer. Shared identity controls remain in sheet-identity.
+  .name-alias > .grow-two:last-child,
+  .big-teeth-section,
+  .big-teeth-section .big-teeth {
+    min-width: 0;
+  }
+
+  // Kept sheet-scoped so every Character text entry has the same focused
+  // black cue as the shared identity controls.
+  @at-root .brinkwood.actor.pc.character form.actor-sheet input[type="text"]:focus {
+    border-color: #191813;
+    outline: 0;
+    box-shadow: 0 0 0 1px rgba(25, 24, 19, 0.25);
+  }
+
+  // Character parchment and armor finishes. These are intentionally scoped to
+  // the PC form: Mask shares the identity primitive but not this geometry.
+  @at-root .brinkwood.actor.pc.character form.actor-sheet {
+    background:
+      radial-gradient(circle at 16% 0%, rgba(255, 255, 255, 0.48), transparent 38%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(224, 215, 197, 0.14));
+  }
+
+  @at-root .brinkwood.actor.pc.character form.actor-sheet > .name-alias {
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid rgba(141, 98, 93, 0.62);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.58), 0 2px 6px rgba(33, 27, 29, 0.08);
+  }
+
+  @at-root .brinkwood.actor.pc.character form.actor-sheet > .name-alias .portrait {
+    border-color: rgba(33, 27, 29, 0.72);
+    background: rgba(224, 215, 197, 0.42);
+    box-shadow: 5px 5px 0 rgba(141, 98, 93, 0.2);
+  }
+
+  @at-root .brinkwood.actor.pc.character form.actor-sheet .name-alias input[type="text"],
+    .brinkwood.actor.pc.character form.actor-sheet > .bans-armor input[type="text"] {
+    box-sizing: border-box;
+    border: 1px solid rgba(33, 27, 29, 0.42);
+    border-radius: 2px;
+    background: #fffdf7;
+    color: var(--bw-ink);
+    box-shadow: inset 0 1px 2px rgba(33, 27, 29, 0.13);
+  }
+
+  @at-root .brinkwood.actor.pc.character .character-armor-uses input[type="checkbox"] {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    accent-color: auto;
+    box-sizing: border-box;
+    width: 18px;
+    min-width: 18px;
+    max-width: 18px;
+    height: 18px;
+    min-height: 18px;
+    max-height: 18px;
+    margin: 0;
+    border: 1px solid var(--bw-ink-soft);
+    border-radius: 2px;
+    background: #fff;
+
+    &:checked {
+      border-color: var(--bw-ink-soft);
+      background-color: #fff;
+      background-image:
+        linear-gradient(45deg, transparent 45%, var(--bw-ink) 46%, var(--bw-ink) 54%, transparent 55%),
+        linear-gradient(-45deg, transparent 45%, var(--bw-ink) 46%, var(--bw-ink) 54%, transparent 55%);
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--bw-focus);
+      outline-offset: 2px;
+    }
+  }
+
+  .character-identity-choices {
+    grid-template-rows: repeat(4, minmax(26px, auto));
+    row-gap: 0;
+  }
+
+  .character-identity-choices .item-name {
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+  }
+
+  .attributes .attributes-container {
+    grid-template-columns: repeat(4, 28px) minmax(0, 1fr);
+    align-items: center;
+    min-height: 28px;
+
+    button.dot-value {
+      align-self: center;
+      transform: translateY(-2px);
+      line-height: 1;
+
+      &:focus,
+      &:active {
+        outline: 0;
+        box-shadow: none;
+      }
+
+      &:focus-visible::before {
+        outline: 3px solid var(--bw-focus);
+        outline-offset: 3px;
+      }
+    }
+
+    .attribute-skill-label {
+      display: inline-flex;
+      align-items: center;
+      min-width: 0;
+      min-height: 28px;
+      margin-top: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 1.2;
+    }
+  }
+
+  .character-scars-clock,
+  .character-oath-clock {
+    .clock-zero-label {
+      display: contents;
+
+      > .nullifier {
+        display: none;
+      }
+    }
+  }
+
   // Keep the preferred Notes footprint on desktop while allowing Foundry's
   // application frame to fit entirely inside smaller viewports.
   max-height: calc(100vh - 32px);
