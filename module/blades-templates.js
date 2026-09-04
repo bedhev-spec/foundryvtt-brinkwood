@@ -16,6 +16,7 @@ export const preloadHandlebarsTemplates = async function() {
     "systems/brinkwood/templates/parts/sheet-identity-row.html",
     "systems/brinkwood/templates/parts/sheet-identity-tracker.html",
     "systems/brinkwood/templates/parts/active-effects.html",
+    "systems/brinkwood/templates/parts/actor-active-effects.html",
 		"systems/brinkwood/templates/chat/roll-calculation.html",
     "systems/brinkwood/templates/parts/actor/downtime.html",
     "systems/brinkwood/templates/parts/actor/trait-card.html",

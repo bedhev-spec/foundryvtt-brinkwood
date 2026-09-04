@@ -21,11 +21,13 @@
       <header class="effects-category__header">
         <h3{{#unless ../isEffectTabbed}} id="effects-{{../_id}}-{{section.type}}"{{/unless}}>{{localize section.label}}</h3>
         {{#if section.canCreate}}
+          {{#unless (eq section.type "inactive")}}
           {{#if ../editable}}
-          <button type="button" class="effect-control effects-category__add" data-effect-action="create" title="Create effect" aria-label="Create effect">
-            <i class="fas fa-plus" aria-hidden="true"></i>
-          </button>
+            <button type="button" class="effect-control effects-category__add" data-effect-action="create" title="Create effect" aria-label="Create effect">
+              <i class="fas fa-plus" aria-hidden="true"></i>
+            </button>
           {{/if}}
+          {{/unless}}
         {{/if}}
       </header>
 
