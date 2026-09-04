@@ -21,14 +21,20 @@ test("Character Name and Alias share exact field geometry while retaining distin
 });
 
 test("Character identity rows keep selected and empty values clear of separators", async () => {
-  const [character, sharedStyles, legacyEffects] = await Promise.all([
+  const [character, row, characterStyles, sharedStyles, legacyEffects] = await Promise.all([
     read("templates/actor-sheet.html"),
+    read("templates/parts/sheet-identity-row.html"),
+    read("scss/import/character-sheet.scss"),
     read("scss/import/sheet-identity.scss"),
     read("scss/import/legacy-character-effects.scss"),
   ]);
 
   assert.match(character, /class="sheet-identity__rows sheet-identity__rows--separated"/);
+  assert.match(row, /class="item identity-choice__slot identity-choice__value/);
+  assert.match(row, /class="identity-choice__slot identity-choice__blank"/);
+  assert.match(sharedStyles, /\.sheet-identity \.identity-choice__slot\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) 18px;[\s\S]*?column-gap:\s*4px;[\s\S]*?height:\s*26px;[\s\S]*?margin:\s*0;[\s\S]*?padding:\s*0/);
   assert.match(sharedStyles, /\.sheet-identity \.sheet-identity__rows--separated\s*\{[\s\S]*?grid-auto-rows:\s*28px/);
   assert.match(sharedStyles, /\.sheet-identity \.sheet-identity__rows--separated \.sheet-identity__row\s*\{[\s\S]*?height:\s*28px;[\s\S]*?min-height:\s*28px;[\s\S]*?border-block-end:\s*1px solid rgba\(141, 98, 93, 0\.3\);[\s\S]*?box-shadow:\s*none/);
+  assert.match(characterStyles, /\.item-block:not\(\.sheet-identity__row\)\s*\{/);
   assert.doesNotMatch(legacyEffects, /\.name-alias \.item-block \.item\s*\{/);
 });
