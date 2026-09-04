@@ -256,6 +256,37 @@ test("selected Mask Trait repairs retain actor-owned provenance and idempotency"
   });
 });
 
+test("explicit cross-class Mask Trait is linked to the Mask and removed with it", async () => {
+  const mask = { id: "mask-terror", type: "mask", name: "Terror", system: { logic: "" } };
+  const selected = compendiumTrait("trait-judgment", "Pronounce Sentence", "Judgment");
+  const manual = { id: "manual-trait", type: "trait", name: "Unlinked", flags: {} };
+  game.packs.set("brinkwood.trait", { getDocuments: async () => [selected] });
+
+  const actor = new BladesActor([mask, manual]);
+  actor.createEmbeddedDocuments = async (_type, entries) => {
+    const created = entries.map((entry, index) => ({ ...entry, id: `created-${index}` }));
+    actor.items.push(...created);
+    return created;
+  };
+  actor._modActionPoints = async () => {};
+
+  await actor._addTraits(mask, null, false, [selected.id]);
+
+  const grant = actor.items.find(item => item.id === "created-0");
+  assert.deepEqual(grant.flags.brinkwood.traitGrant, {
+    sourceItemId: mask.id,
+    sourceItemType: "mask",
+    traitSourceId: selected.id,
+  });
+
+  await actor.clearMaskConfiguration();
+
+  assert.deepEqual(actor.databaseDeletes.map(([, ids]) => ids), [
+    [mask.id, grant.id],
+  ]);
+  assert.deepEqual(actor.items.map(item => item.id), [manual.id]);
+});
+
 test("selected Mask Trait repair forwards only requested trait sources through the actor command", async () => {
   const source = { id: "mask-terror", type: "mask", name: "Terror" };
   const calls = [];

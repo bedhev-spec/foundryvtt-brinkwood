@@ -334,8 +334,9 @@ export class BladesActor extends foundry.documents.Actor {
     const requestedTraitSourceIds = traitSourceIds ? new Set(traitSourceIds) : null;
     const traits = (compendiumTraits ?? await traitPack.getDocuments())
       .filter(trait => trait.type === "trait"
-        && normalizedTraitSourceName(trait.system.class) === normalizedTraitSourceName(data.name)
-        && (!requestedTraitSourceIds || requestedTraitSourceIds.has(trait.id ?? trait._id)));
+        && (requestedTraitSourceIds
+          ? requestedTraitSourceIds.has(trait.id ?? trait._id)
+          : normalizedTraitSourceName(trait.system.class) === normalizedTraitSourceName(data.name)));
     const alreadyGranted = new Set(this.items
       .filter(item => item.type === "trait" && item.flags?.brinkwood?.traitGrant?.sourceItemId === sourceItemId)
       .map(item => item.flags.brinkwood.traitGrant.traitSourceId));
