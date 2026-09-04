@@ -2,34 +2,15 @@ import { bladesRoll } from "./blades-roll.js";
 import { readRollDialogValues } from "./roll-resolution.js";
 import { BladesHelpers } from "./blades-helpers.js";
 import { maskActorImage, npcActorImage } from "./actor-images.js";
+import {
+  compendiumSourceMetadata,
+  normalizedTraitSourceName,
+  traitHasCompendiumProvenance,
+} from "./trait-grant-matching.js";
 
 const TRAIT_SOURCE_TYPES = new Set(["upbringing", "profession", "mask"]);
 const ACTION_POINT_SOURCE_TYPES = new Set([...TRAIT_SOURCE_TYPES, "class"]);
 const isTraitSource = item => TRAIT_SOURCE_TYPES.has(item?.type);
-
-// The published Mask is named “Judgement”, while its trait compendium class
-// uses the American spelling. Preserve both as one source for grant lookup.
-const normalizedTraitSourceName = value => String(value ?? "")
-  .trim()
-  .toLocaleLowerCase()
-  .replace(/^judgement$/, "judgment");
-
-function compendiumSourceMetadata(item) {
-  return [
-    item.uuid,
-    item.flags?.core?.sourceId,
-    item._stats?.compendiumSource,
-    item.getFlag?.("core", "sourceId")
-  ].filter(value => typeof value === "string" && value.length);
-}
-
-function traitHasCompendiumProvenance(embeddedTrait, compendiumTrait) {
-  const compendiumId = compendiumTrait.id ?? compendiumTrait._id;
-  const expectedSources = new Set(compendiumSourceMetadata(compendiumTrait));
-  if (compendiumId) expectedSources.add(compendiumId);
-  return compendiumSourceMetadata(embeddedTrait).some(source =>
-    expectedSources.has(source) || (compendiumId && source.endsWith(`.${compendiumId}`)));
-}
 
 // Multiple document callbacks can request the same grant before the first
 // embedded-document create has synchronized back to this actor. Serialize that
@@ -340,7 +321,7 @@ export class BladesActor extends foundry.documents.Actor {
 		await this.update(system);
 	}
 
-  async _addTraits(data, compendiumTraits = null, adoptLegacyTraits = false) {
+  async _addTraits(data, compendiumTraits = null, adoptLegacyTraits = false, traitSourceIds = null) {
     const traitPack = game.packs.get("brinkwood.trait");
     if (!traitPack) return;
 
@@ -350,9 +331,11 @@ export class BladesActor extends foundry.documents.Actor {
 
     // Compendium queries are indexed-field dependent in v13. Hydrate then
     // filter so every mapped automatic trait source works consistently.
+    const requestedTraitSourceIds = traitSourceIds ? new Set(traitSourceIds) : null;
     const traits = (compendiumTraits ?? await traitPack.getDocuments())
       .filter(trait => trait.type === "trait"
-        && normalizedTraitSourceName(trait.system.class) === normalizedTraitSourceName(data.name));
+        && normalizedTraitSourceName(trait.system.class) === normalizedTraitSourceName(data.name)
+        && (!requestedTraitSourceIds || requestedTraitSourceIds.has(trait.id ?? trait._id)));
     const alreadyGranted = new Set(this.items
       .filter(item => item.type === "trait" && item.flags?.brinkwood?.traitGrant?.sourceItemId === sourceItemId)
       .map(item => item.flags.brinkwood.traitGrant.traitSourceId));
@@ -419,25 +402,25 @@ export class BladesActor extends foundry.documents.Actor {
   }
 
   /** Synchronize traits for newly embedded source choices through the actor. */
-  async syncTraitGrantsForSources(sources, adoptLegacyTraits = false) {
+  async syncTraitGrantsForSources(sources, adoptLegacyTraits = false, traitSourceIds = null) {
     const traitSources = Array.from(sources ?? []).filter(isTraitSource);
     if (!traitSources.length) return;
     const traitPack = game.packs.get("brinkwood.trait");
     if (!traitPack) return;
     const compendiumTraits = await traitPack.getDocuments();
     for (const source of traitSources) {
-      await this._addTraits(source, compendiumTraits, adoptLegacyTraits);
+      await this._addTraits(source, compendiumTraits, adoptLegacyTraits, traitSourceIds);
     }
   }
 
   /** Retry trait synchronization for source documents already saved on this actor. */
-  async repairTraitGrantsForSourceIds(sourceIds, adoptLegacyTraits = false) {
+  async repairTraitGrantsForSourceIds(sourceIds, adoptLegacyTraits = false, traitSourceIds = null) {
     const requestedIds = new Set(
       (Array.isArray(sourceIds) ? sourceIds : [sourceIds]).filter(Boolean)
     );
     const sources = this.items.filter(item =>
       requestedIds.has(item.id ?? item._id) && isTraitSource(item));
-    return this.syncTraitGrantsForSources(sources, adoptLegacyTraits);
+    return this.syncTraitGrantsForSources(sources, adoptLegacyTraits, traitSourceIds);
   }
 
   /**

@@ -71,3 +71,21 @@ test("Mask styles retain shared-tab scroll geometry without old-header compatibi
   assert.match(compiled, /\.sheet-identity__portrait-frame\s*\{[\s\S]*?width:\s*200px/);
   assert.doesNotMatch(compiled, /\.brinkwood\.actor\.mask \.mask-sheet__header/);
 });
+
+test("Mask Trait CTA is gated by a configured Mask and uses the shared Trait Card", async () => {
+  const [template, controller, sharedSheet] = await Promise.all([
+    read("templates/mask-sheet.html"),
+    read("module/blades-mask-sheet.js"),
+    read("module/blades-sheet.js"),
+  ]);
+
+  const traitsPanel = template.match(/data-tab="traits"[\s\S]*?<\/section>/)?.[0] ?? "";
+  assert.match(traitsPanel, /\{\{#if canAddMaskTraits\}\}[\s\S]*?item-add-popup[\s\S]*?data-item-type="trait"/);
+  assert.match(traitsPanel, /parts\/actor\/trait-card\.html/);
+  assert.match(controller, /context\.maskItem = context\.items\.find\(item => item\.type === "mask"\) \?\? null;/);
+  assert.match(controller, /context\.traits = getMaskTraitsForSource\(context\.items, context\.maskItem\)/);
+  assert.match(controller, /context\.canAddMaskTraits = Boolean\(context\.maskItem\) && context\.editable;/);
+  assert.match(controller, /async _getItemPickerItems\(itemType\)[\s\S]*?getEligibleMaskTraits\(items, this\.actor\.items, maskItem\)/);
+  assert.match(controller, /repairTraitGrantsForSourceIds\(\[itemId\(maskItem\)\], false, traitSourceIds\)/);
+  assert.match(sharedSheet, /async _getItemPickerItems\(itemType\)[\s\S]*?BladesHelpers\.getAllItemsByType\(itemType, game\)/);
+});

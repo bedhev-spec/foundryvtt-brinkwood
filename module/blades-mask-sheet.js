@@ -6,18 +6,54 @@ import { encumbranceLevelForLoadout, hasMuleAbility } from "./encumbrance.js";
 import { renderMaskPickerTooltip } from "./mask-picker-tooltip.js";
 import { maskActorImage } from "./actor-images.js";
 import { formControlUpdate, handleActorNameEnter, persistActorNameChange, queueDocumentPathUpdate } from "./sheet-dom.js";
+import { normalizedTraitSourceName, traitHasCompendiumProvenance } from "./trait-grant-matching.js";
 
 export { handleActorNameEnter as handleMaskNameEnter };
 
 export const MASK_SHEET_DEFAULT_WIDTH = 700;
 // A Character sheet at its 700px default has a 212px Attribute column:
 // (700px - 40px form padding - 24px inter-column gaps) / 3.
-// Mask's 16px form padding leaves 688px at this target, enough to keep the
-// Attribute family beside the portrait and identity details.
-export const MASK_SHEET_ATTRIBUTES_WIDTH = 720;
+// Foundry's ApplicationV2 inner frame also consumes horizontal space, so the
+// configured target includes enough clearance for the 200px portrait, identity
+// details, the Character-sized Attribute family, and both 20px gaps.
+export const MASK_SHEET_ATTRIBUTES_WIDTH = 760;
 export const MASK_SHEET_VIEWPORT_GUTTER = 32;
 const MASK_SHEET_RESIZING_CLASS = "mask-sheet--attribute-resizing";
 const MASK_SHEET_RESIZE_DURATION = 180;
+
+const itemId = item => item?.id ?? item?._id;
+
+/** Return only source-tagged traits belonging to the currently selected Mask. */
+export function getMaskTraitsForSource(items, maskItem) {
+  const sourceItemId = itemId(maskItem);
+  if (!sourceItemId) return [];
+  return Array.from(items ?? []).filter(item =>
+    item.type === "trait"
+    && item.flags?.brinkwood?.traitGrant?.sourceItemType === "mask"
+    && item.flags?.brinkwood?.traitGrant?.sourceItemId === sourceItemId
+  );
+}
+
+/** Return ungranted compendium Traits associated with the selected Mask Type. */
+export function getEligibleMaskTraits(items, actorItems, maskItem) {
+  const sourceItemId = itemId(maskItem);
+  if (!sourceItemId) return [];
+  const existingTraits = Array.from(actorItems ?? []).filter(item => item.type === "trait");
+  const existingTraitSourceIds = new Set(existingTraits
+    .map(item => item.flags?.brinkwood?.traitGrant?.traitSourceId)
+    .filter(Boolean));
+  const maskType = normalizedTraitSourceName(maskItem.name);
+  return Array.from(items ?? []).filter(item =>
+    item.type === "trait"
+    && normalizedTraitSourceName(item.system?.class) === maskType
+    && !existingTraitSourceIds.has(itemId(item))
+    && !existingTraits.some(existing => traitHasCompendiumProvenance(existing, item))
+    && Boolean(item.name?.trim())
+    && !existingTraits.some(existing =>
+      existing.name === item.name
+      && normalizedTraitSourceName(existing.system?.class) === normalizedTraitSourceName(item.system?.class))
+  );
+}
 
 /**
  * Return the width used when a configured Mask adds its Attribute column.
@@ -107,8 +143,10 @@ export class BladesMaskSheet extends BladesSheet {
 
     context.system.oath = game.user.character?.system?.oath || 0;
 
-    context.traits = context.items
-      .filter(i => i.type === "trait")
+    // Mask Traits are the automatic, source-tagged grants of the selected
+    // Mask Type. Other actor traits remain untouched but do not belong here.
+    context.maskItem = context.items.find(item => item.type === "mask") ?? null;
+    context.traits = getMaskTraitsForSource(context.items, context.maskItem)
       .map(trait => ({
         ...trait,
         canDelete: context.isGM && !trait.flags?.brinkwood?.traitGrant,
@@ -126,7 +164,7 @@ export class BladesMaskSheet extends BladesSheet {
     // Mask configuration is actor-owned and enforces a single embedded source.
     // Keep a dedicated presentation object so templates never infer it from an
     // arbitrary item loop.
-    context.maskItem = context.items.find(item => item.type === "mask") ?? null;
+    context.canAddMaskTraits = Boolean(context.maskItem) && context.editable;
     context.maskTypeLabel = context.maskItem?.name ?? "";
     context.identityRows = [{
       itemType: "mask",
@@ -330,8 +368,22 @@ export class BladesMaskSheet extends BladesSheet {
     return renderMaskPickerTooltip(item, enrichedDescription);
   }
 
-  /** Route the shared picker selection through the actor-owned Mask command. */
-  async _createPickedItems(items, { itemType } = {}) {
+  /** Limit the shared Trait picker to still-missing grants for this Mask Type. */
+  async _getItemPickerItems(itemType) {
+    const items = await super._getItemPickerItems(itemType);
+    if (itemType !== "trait") return items;
+    const maskItem = this.actor.items.find(item => item.type === "mask");
+    return getEligibleMaskTraits(items, this.actor.items, maskItem);
+  }
+
+  /** Route Mask picker selections through the actor-owned grant commands. */
+  async _createPickedItems(items, { itemType, selectedItems = [] } = {}) {
+    if (itemType === "trait") {
+      const maskItem = this.actor.items.find(item => item.type === "mask");
+      const traitSourceIds = selectedItems.map(itemId).filter(Boolean);
+      if (!this.isEditable || !maskItem || !traitSourceIds.length) return [];
+      return this.actor.repairTraitGrantsForSourceIds([itemId(maskItem)], false, traitSourceIds);
+    }
     if (itemType !== "mask") return super._createPickedItems(items, { itemType });
     const [mask] = items;
     return mask ? this.actor.configureMask(mask) : [];

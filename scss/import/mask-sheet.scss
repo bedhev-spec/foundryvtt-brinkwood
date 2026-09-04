@@ -29,9 +29,8 @@
       color: var(--bw-ink);
     }
 
-    button, a[role="tab"] {
-      font: inherit;
-
+    button,
+    a[role="tab"] {
       &:focus-visible {
         outline: 3px solid var(--bw-focus);
         outline-offset: 2px;
@@ -192,6 +191,7 @@
   .mask-attributes {
     align-self: start;
     min-width: 0;
+    margin-block-start: 20px;
   }
 
   .mask-attributes .attribute {

@@ -23,14 +23,15 @@ test("Mask Attributes live in the identity header and share Character presentati
   assert.match(maskAttributes, /class="attributes-exp"[\s\S]*?class="stripe"[\s\S]*?class="attribute-label"/);
   assert.match(maskAttributes, /class="attributes-container mask-skill"[\s\S]*?dot-value--empty[\s\S]*?dot-value--filled[\s\S]*?class="attribute-skill-label roll-die-attribute/);
   assert.match(characterSheet, /class="character-attributes sheet-attribute-presentation"/);
-  assert.match(sharedStyles, /\.sheet-attribute-presentation\s*\{[\s\S]*?\.stripe\s*\{[\s\S]*?background:\s*\$almost_black[\s\S]*?\.attribute-skill-label\s*\{[\s\S]*?min-height:\s*28px[\s\S]*?\.attributes-container\s*\{[\s\S]*?grid-template-columns:\s*repeat\(4, 28px\) minmax\(0, 1fr\)[\s\S]*?transform:\s*translateY\(7px\)[\s\S]*?\.dot-value--filled::before/);
+  assert.match(sharedStyles, /\.sheet-attribute-presentation\s*\{[\s\S]*?--bw-attribute-header-height:\s*34px;[\s\S]*?--bw-attribute-header-font-family:\s*"Crimson Text", serif;[\s\S]*?--bw-attribute-row-height:\s*28px;[\s\S]*?--bw-attribute-dot-track:\s*26px;[\s\S]*?\.stripe\s*\{[\s\S]*?display:\s*flex;[\s\S]*?align-items:\s*center;[\s\S]*?min-height:\s*var\(--bw-attribute-header-height\);[\s\S]*?\.attribute-skill-label\s*\{[\s\S]*?font-family:\s*var\(--bw-attribute-row-font-family\);[\s\S]*?\.attributes-container\s*\{[\s\S]*?grid-template-columns:\s*repeat\(4, var\(--bw-attribute-dot-track\)\) minmax\(0, 1fr\)[\s\S]*?button\.dot-value\s*\{[\s\S]*?font-size:\s*var\(--bw-attribute-row-font-size\);[\s\S]*?transform:\s*translateY\(7px\)[\s\S]*?\.dot-value--filled::before/);
 
   assert.match(controller, /MASK_SHEET_DEFAULT_WIDTH\s*=\s*700/);
-  assert.match(controller, /MASK_SHEET_ATTRIBUTES_WIDTH\s*=\s*720/);
+  assert.match(controller, /MASK_SHEET_ATTRIBUTES_WIDTH\s*=\s*760/);
   assert.match(controller, /position:\s*\{\s*width:\s*MASK_SHEET_DEFAULT_WIDTH,\s*height:\s*840\s*\}/);
   assert.match(controller, /async _syncMaskAttributeAvailability\(hasMaskType\)[\s\S]*?const becameAvailable = available && !this\._maskAttributesAvailable;[\s\S]*?if \(becameAvailable\) await this\._expandForMaskAttributes\(\);[\s\S]*?else if \(!available && wasAvailable\) await this\._shrinkForMaskAttributes\(\);/);
   assert.match(controller, /await this\._syncMaskAttributeAvailability\(Boolean\(context\.maskItem\)\);/);
   assert.match(maskStyles, /\.mask-sheet__identity-block\s*\{[\s\S]*?grid-template-columns:\s*minmax\(150px, 200px\) minmax\(230px, 1fr\) 212px;[\s\S]*?column-gap:\s*20px;/);
+  assert.match(maskStyles, /\.mask-attributes\s*\{[\s\S]*?align-self:\s*start;[\s\S]*?margin-block-start:\s*20px;/);
   assert.match(maskStyles, /@container \(max-width: 650px\)\s*\{[\s\S]*?\.mask-sheet__identity-block\s*\{[\s\S]*?grid-template-columns:\s*minmax\(150px, 200px\) minmax\(0, 1fr\)[\s\S]*?\.mask-attributes\s*\{[\s\S]*?grid-column:\s*1\s*\/\s*-1/);
   assert.match(maskStyles, /&\.mask-sheet--attribute-resizing\s*\{\s*transition:\s*width 180ms ease;/);
   assert.doesNotMatch(maskStyles, /color:\s*var\(--bw-ink\);\s*transition:/);
@@ -50,7 +51,7 @@ test("Mask Attribute parity has one shared visual owner and preserves its respon
   assert.match(maskAttributes, /data-path="attributes\.\{\{\.\.\/\.\.\/system\.type\}\}\.skills\.\{\{skill_name\}\}\.value"/);
   assert.match(maskAttributes, /\{\{#unless \.\.\/\.\.\/editable\}\} disabled\{\{\/unless\}\}/);
 
-  assert.match(sharedStyles, /h2\.attribute-label\s*\{[\s\S]*?font-family:\s*inherit;[\s\S]*?font-size:\s*inherit;[\s\S]*?font-weight:\s*bold;/);
+  assert.match(sharedStyles, /h2\.attribute-label\s*\{[\s\S]*?display:\s*inline-flex;[\s\S]*?align-items:\s*center;[\s\S]*?min-height:\s*var\(--bw-attribute-header-height\);[\s\S]*?font-family:\s*var\(--bw-attribute-header-font-family\);[\s\S]*?font-size:\s*var\(--bw-attribute-header-font-size\);[\s\S]*?line-height:\s*var\(--bw-attribute-header-line-height\);/);
   assert.match(sharedStyles, /&:focus,\s*&:active\s*\{[\s\S]*?box-shadow:\s*none;/);
   assert.match(sharedStyles, /&:focus-visible::before\s*\{[\s\S]*?outline-offset:\s*3px;/);
   assert.doesNotMatch(legacyEffects, /\.attributes-container button\.dot-value/);
@@ -61,7 +62,7 @@ test("Mask Attribute parity has one shared visual owner and preserves its respon
   assert.match(maskStyles, /\.mask-sheet__trait-library\s*\{[\s\S]*?grid-column:\s*1\s*\/\s*-1;[\s\S]*?inline-size:\s*100%;/);
   assert.match(maskStyles, /@container \(max-width: 480px\)\s*\{[\s\S]*?\.mask-sheet__identity-block\s*\{[\s\S]*?grid-template-columns:\s*96px minmax\(0, 1fr\);[\s\S]*?\.sheet-identity__portrait\s*\{[\s\S]*?grid-row:\s*span 3;[\s\S]*?\.sheet-identity__portrait-frame\s*\{[\s\S]*?width:\s*96px;[\s\S]*?height:\s*96px;/);
 
-  assert.match(compiledStyles, /\.brinkwood \.sheet-attribute-presentation h2\.attribute-label\s*\{[\s\S]*?font-size:\s*inherit;/);
+  assert.match(compiledStyles, /\.brinkwood \.sheet-attribute-presentation h2\.attribute-label\s*\{[\s\S]*?min-height:\s*var\(--bw-attribute-header-height\);[\s\S]*?font-size:\s*var\(--bw-attribute-header-font-size\);/);
   assert.match(compiledStyles, /\.brinkwood\.actor\.mask\.mask-sheet--attribute-resizing\s*\{\s*transition:\s*width 180ms ease;/);
   assert.doesNotMatch(compiledStyles, /\.brinkwood\.actor\.mask\s*\{[^}]*transition:\s*width/);
   assert.match(compiledStyles, /@media \(prefers-reduced-motion: reduce\)\s*\{[\s\S]*?\.brinkwood\.actor\.mask\.mask-sheet--attribute-resizing\s*\{\s*transition:\s*none;/);
@@ -75,12 +76,12 @@ test("configured Mask Attribute column matches one default Character Attribute c
     read("scss/import/mask-sheet.scss"),
   ]);
   const characterColumnWidth = (700 - (20 * 2) - (12 * 2)) / 3;
-  const configuredMaskContentWidth = 720 - (16 * 2);
+  const configuredMaskContentWidth = 760 - (16 * 2);
   const compactMaskContentWidth = 700 - (16 * 2);
   const maskHeaderMinimumWidth = 150 + 230 + characterColumnWidth + (20 * 2);
 
   assert.equal(characterColumnWidth, 212);
-  assert.equal(configuredMaskContentWidth, 688);
+  assert.equal(configuredMaskContentWidth, 728);
   assert.equal(compactMaskContentWidth, 668);
   assert.equal(maskHeaderMinimumWidth, 632);
   assert.ok(configuredMaskContentWidth > maskHeaderMinimumWidth);
@@ -89,4 +90,21 @@ test("configured Mask Attribute column matches one default Character Attribute c
   assert.match(characterStyles, /character-attributes > \.attributes\s*\{[\s\S]*?grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)[\s\S]*?gap:\s*12px;/);
   assert.match(maskStyles, /grid-template-columns:\s*minmax\(150px, 200px\) minmax\(230px, 1fr\) 212px;/);
   assert.match(maskStyles, /@container \(max-width: 650px\)/);
+});
+
+test("Attribute typography and centering have one shared cascade owner", async () => {
+  const [sharedStyles, characterStyles, maskStyles, compiledStyles] = await Promise.all([
+    read("scss/import/general-styles.scss"),
+    read("scss/import/character-sheet.scss"),
+    read("scss/import/mask-sheet.scss"),
+    read("styles/blades.css"),
+  ]);
+
+  assert.match(sharedStyles, /\.sheet-attribute-presentation\s*\{[\s\S]*?\.stripe\s*\{[\s\S]*?display:\s*flex;[\s\S]*?align-items:\s*center;[\s\S]*?justify-content:\s*center;[\s\S]*?min-height:\s*var\(--bw-attribute-header-height\);[\s\S]*?font-family:\s*var\(--bw-attribute-header-font-family\);[\s\S]*?font-size:\s*var\(--bw-attribute-header-font-size\);[\s\S]*?line-height:\s*var\(--bw-attribute-header-line-height\);/);
+  assert.match(sharedStyles, /\.attribute-label\s*\{[\s\S]*?justify-content:\s*center;[\s\S]*?width:\s*100%;[\s\S]*?text-align:\s*center;/);
+  assert.match(sharedStyles, /\.attributes-container\s*\{[\s\S]*?font-family:\s*var\(--bw-attribute-row-font-family\);[\s\S]*?font-size:\s*var\(--bw-attribute-row-font-size\);[\s\S]*?button\.dot-value\s*\{[\s\S]*?width:\s*var\(--bw-attribute-dot-track\);[\s\S]*?height:\s*var\(--bw-attribute-row-height\);/);
+  assert.doesNotMatch(characterStyles, /character-attributes[\s\S]*?attribute-(?:label|skill-label)[\s\S]*?font-(?:family|size)/);
+  assert.doesNotMatch(maskStyles, /mask-attributes[\s\S]*?attribute-(?:label|skill-label)[\s\S]*?font-(?:family|size)/);
+  assert.doesNotMatch(maskStyles, /font:\s*inherit/);
+  assert.match(compiledStyles, /\.brinkwood \.sheet-attribute-presentation \.stripe\s*\{[\s\S]*?min-height:\s*var\(--bw-attribute-header-height\);[\s\S]*?align-items:\s*center;/);
 });

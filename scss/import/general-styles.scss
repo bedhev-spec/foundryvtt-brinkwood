@@ -252,6 +252,18 @@ section {
 // each family uses this same stripe, rating-dot, and skill-label language.
 // Sheet styles retain only their placement and column geometry.
 .sheet-attribute-presentation {
+  // Character and Mask Attribute families share this visual contract. Sheet
+  // styles may place the family, but never alter its header or row metrics.
+  --bw-attribute-header-height: 34px;
+  --bw-attribute-header-font-family: "Crimson Text", serif;
+  --bw-attribute-header-font-size: 17px;
+  --bw-attribute-header-line-height: 1.2;
+  --bw-attribute-row-height: 28px;
+  --bw-attribute-dot-track: 26px;
+  --bw-attribute-row-font-family: "Crimson Text", serif;
+  --bw-attribute-row-font-size: 1rem;
+  --bw-attribute-row-line-height: 1.2;
+
   color: $almost_black;
 
   .attribute {
@@ -260,18 +272,37 @@ section {
   }
 
   .stripe {
-    padding-left: 5px;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--bw-attribute-header-height);
+    padding-inline: 5px;
     background: $almost_black;
     color: $almost_white;
-    font-size: 17px;
+    font-family: var(--bw-attribute-header-font-family);
+    font-size: var(--bw-attribute-header-font-size);
+    line-height: var(--bw-attribute-header-line-height);
   }
 
   .attribute-label,
   .attribute-skill-label {
     color: inherit;
+    font-family: var(--bw-attribute-header-font-family);
     font-weight: bold;
     text-shadow: none;
     text-transform: uppercase;
+  }
+
+  .attribute-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: var(--bw-attribute-header-height);
+    font-size: var(--bw-attribute-header-font-size);
+    line-height: var(--bw-attribute-header-line-height);
+    text-align: center;
   }
 
   button.attribute-label,
@@ -279,9 +310,9 @@ section {
     border: 0;
     background: transparent;
     cursor: pointer;
-    font-family: inherit;
-    font-size: inherit;
-    line-height: inherit;
+    font-family: var(--bw-attribute-header-font-family);
+    font-size: var(--bw-attribute-header-font-size);
+    line-height: var(--bw-attribute-header-line-height);
 
     &:focus-visible {
       outline: 3px solid var(--bw-focus);
@@ -289,24 +320,35 @@ section {
     }
   }
 
+  button.attribute-skill-label {
+    font-family: var(--bw-attribute-row-font-family);
+    font-size: var(--bw-attribute-row-font-size);
+    line-height: var(--bw-attribute-row-line-height);
+  }
+
   h2.attribute-label {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--bw-attribute-header-height);
     margin: 0;
-    font-family: inherit;
-    font-size: inherit;
+    font-family: var(--bw-attribute-header-font-family);
+    font-size: var(--bw-attribute-header-font-size);
     font-weight: bold;
-    line-height: inherit;
+    line-height: var(--bw-attribute-header-line-height);
   }
 
   .attribute-skill-label {
     display: inline-flex;
     align-items: center;
     min-width: 0;
-    min-height: 28px;
+    min-height: var(--bw-attribute-row-height);
     margin-top: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    line-height: 1.2;
+    font-family: var(--bw-attribute-row-font-family);
+    font-size: var(--bw-attribute-row-font-size);
+    line-height: var(--bw-attribute-row-line-height);
   }
 
   .attributes-exp {
@@ -316,19 +358,21 @@ section {
 
   .attributes-container {
     display: grid;
-    grid-template-columns: repeat(4, 28px) minmax(0, 1fr);
+    grid-template-columns: repeat(4, var(--bw-attribute-dot-track)) minmax(0, 1fr);
     align-items: center;
     width: 100%;
     min-width: 0;
-    min-height: 28px;
+    min-height: var(--bw-attribute-row-height);
     margin: 3px 0;
-    line-height: 1;
+    font-family: var(--bw-attribute-row-font-family);
+    font-size: var(--bw-attribute-row-font-size);
+    line-height: var(--bw-attribute-row-line-height);
 
     button.dot-value {
       display: inline-grid;
       align-self: center;
-      width: 28px;
-      height: 28px;
+      width: var(--bw-attribute-dot-track);
+      height: var(--bw-attribute-row-height);
       margin: 0;
       padding: 0;
       border: 0;
@@ -336,6 +380,8 @@ section {
       background: transparent;
       color: transparent;
       cursor: pointer;
+      font-family: var(--bw-attribute-row-font-family);
+      font-size: var(--bw-attribute-row-font-size);
       line-height: 1;
       place-items: center;
 

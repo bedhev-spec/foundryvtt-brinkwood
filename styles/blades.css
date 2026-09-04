@@ -310,6 +310,15 @@
   color: var(--bw-inverse);
 }
 .brinkwood .sheet-attribute-presentation {
+  --bw-attribute-header-height: 34px;
+  --bw-attribute-header-font-family: "Crimson Text", serif;
+  --bw-attribute-header-font-size: 17px;
+  --bw-attribute-header-line-height: 1.2;
+  --bw-attribute-row-height: 28px;
+  --bw-attribute-dot-track: 26px;
+  --bw-attribute-row-font-family: "Crimson Text", serif;
+  --bw-attribute-row-font-size: 1rem;
+  --bw-attribute-row-line-height: 1.2;
   color: #191813;
 }
 .brinkwood .sheet-attribute-presentation .attribute {
@@ -317,49 +326,77 @@
   margin-bottom: 10px;
 }
 .brinkwood .sheet-attribute-presentation .stripe {
-  padding-left: 5px;
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--bw-attribute-header-height);
+  padding-inline: 5px;
   background: #191813;
   color: #EEEFFF;
-  font-size: 17px;
+  font-family: var(--bw-attribute-header-font-family);
+  font-size: var(--bw-attribute-header-font-size);
+  line-height: var(--bw-attribute-header-line-height);
 }
 .brinkwood .sheet-attribute-presentation .attribute-label,
 .brinkwood .sheet-attribute-presentation .attribute-skill-label {
   color: inherit;
+  font-family: var(--bw-attribute-header-font-family);
   font-weight: bold;
   text-shadow: none;
   text-transform: uppercase;
+}
+.brinkwood .sheet-attribute-presentation .attribute-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--bw-attribute-header-height);
+  font-size: var(--bw-attribute-header-font-size);
+  line-height: var(--bw-attribute-header-line-height);
+  text-align: center;
 }
 .brinkwood .sheet-attribute-presentation button.attribute-label,
 .brinkwood .sheet-attribute-presentation button.attribute-skill-label {
   border: 0;
   background: transparent;
   cursor: pointer;
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
+  font-family: var(--bw-attribute-header-font-family);
+  font-size: var(--bw-attribute-header-font-size);
+  line-height: var(--bw-attribute-header-line-height);
 }
 .brinkwood .sheet-attribute-presentation button.attribute-label:focus-visible,
 .brinkwood .sheet-attribute-presentation button.attribute-skill-label:focus-visible {
   outline: 3px solid var(--bw-focus);
   outline-offset: 2px;
 }
+.brinkwood .sheet-attribute-presentation button.attribute-skill-label {
+  font-family: var(--bw-attribute-row-font-family);
+  font-size: var(--bw-attribute-row-font-size);
+  line-height: var(--bw-attribute-row-line-height);
+}
 .brinkwood .sheet-attribute-presentation h2.attribute-label {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--bw-attribute-header-height);
   margin: 0;
-  font-family: inherit;
-  font-size: inherit;
+  font-family: var(--bw-attribute-header-font-family);
+  font-size: var(--bw-attribute-header-font-size);
   font-weight: bold;
-  line-height: inherit;
+  line-height: var(--bw-attribute-header-line-height);
 }
 .brinkwood .sheet-attribute-presentation .attribute-skill-label {
   display: inline-flex;
   align-items: center;
   min-width: 0;
-  min-height: 28px;
+  min-height: var(--bw-attribute-row-height);
   margin-top: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  line-height: 1.2;
+  font-family: var(--bw-attribute-row-font-family);
+  font-size: var(--bw-attribute-row-font-size);
+  line-height: var(--bw-attribute-row-line-height);
 }
 .brinkwood .sheet-attribute-presentation .attributes-exp {
   position: relative;
@@ -367,19 +404,21 @@
 }
 .brinkwood .sheet-attribute-presentation .attributes-container {
   display: grid;
-  grid-template-columns: repeat(4, 28px) minmax(0, 1fr);
+  grid-template-columns: repeat(4, var(--bw-attribute-dot-track)) minmax(0, 1fr);
   align-items: center;
   width: 100%;
   min-width: 0;
-  min-height: 28px;
+  min-height: var(--bw-attribute-row-height);
   margin: 3px 0;
-  line-height: 1;
+  font-family: var(--bw-attribute-row-font-family);
+  font-size: var(--bw-attribute-row-font-size);
+  line-height: var(--bw-attribute-row-line-height);
 }
 .brinkwood .sheet-attribute-presentation .attributes-container button.dot-value {
   display: inline-grid;
   align-self: center;
-  width: 28px;
-  height: 28px;
+  width: var(--bw-attribute-dot-track);
+  height: var(--bw-attribute-row-height);
   margin: 0;
   padding: 0;
   border: 0;
@@ -387,6 +426,8 @@
   background: transparent;
   color: transparent;
   cursor: pointer;
+  font-family: var(--bw-attribute-row-font-family);
+  font-size: var(--bw-attribute-row-font-size);
   line-height: 1;
   place-items: center;
 }
@@ -2309,10 +2350,8 @@
   background: rgba(255, 255, 255, 0.6);
   color: var(--bw-ink);
 }
-.brinkwood.actor.mask form.mask-sheet button, .brinkwood.actor.mask form.mask-sheet a[role=tab] {
-  font: inherit;
-}
-.brinkwood.actor.mask form.mask-sheet button:focus-visible, .brinkwood.actor.mask form.mask-sheet a[role=tab]:focus-visible {
+.brinkwood.actor.mask form.mask-sheet button:focus-visible,
+.brinkwood.actor.mask form.mask-sheet a[role=tab]:focus-visible {
   outline: 3px solid var(--bw-focus);
   outline-offset: 2px;
 }
@@ -2438,6 +2477,7 @@
 .brinkwood.actor.mask .mask-attributes {
   align-self: start;
   min-width: 0;
+  margin-block-start: 20px;
 }
 .brinkwood.actor.mask .mask-attributes .attribute {
   margin-bottom: 0;

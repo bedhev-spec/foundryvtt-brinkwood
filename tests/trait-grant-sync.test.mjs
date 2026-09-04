@@ -226,3 +226,50 @@ test("Judgement Mask resolves the rulebook spelling to Judgment compendium trait
     traitSourceId: "trait-judgment",
   });
 });
+
+test("selected Mask Trait repairs retain actor-owned provenance and idempotency", async () => {
+  const selected = compendiumTrait("trait-terror", "Fear Your Slaves", "Terror");
+  const unselected = compendiumTrait("trait-terror-other", "Silenced Fears", "Terror");
+  game.packs.set("brinkwood.trait", { getDocuments: async () => [selected, unselected] });
+  const creates = [];
+  const actor = {
+    items: [],
+    createEmbeddedDocuments: async (type, data) => {
+      creates.push({ type, data });
+      actor.items.push(...data.map(entry => ({
+        ...entry,
+        id: `actor-${entry.flags.brinkwood.traitGrant.traitSourceId}`,
+      })));
+    },
+  };
+  const source = { id: "mask-terror", type: "mask", name: "Terror" };
+
+  await BladesActor.prototype._addTraits.call(actor, source, null, false, [selected.id]);
+  await BladesActor.prototype._addTraits.call(actor, source, null, false, [selected.id]);
+
+  assert.equal(creates.length, 1);
+  assert.deepEqual(creates[0].data.map(entry => entry.name), ["Fear Your Slaves"]);
+  assert.deepEqual(creates[0].data[0].flags.brinkwood.traitGrant, {
+    sourceItemId: "mask-terror",
+    sourceItemType: "mask",
+    traitSourceId: "trait-terror",
+  });
+});
+
+test("selected Mask Trait repair forwards only requested trait sources through the actor command", async () => {
+  const source = { id: "mask-terror", type: "mask", name: "Terror" };
+  const calls = [];
+  const actor = {
+    items: [source],
+    syncTraitGrantsForSources(...args) { calls.push(args); },
+  };
+
+  await BladesActor.prototype.repairTraitGrantsForSourceIds.call(
+    actor,
+    [source.id],
+    false,
+    ["trait-terror"],
+  );
+
+  assert.deepEqual(calls, [[[source], false, ["trait-terror"]]]);
+});

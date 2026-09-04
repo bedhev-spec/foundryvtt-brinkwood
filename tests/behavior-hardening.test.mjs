@@ -34,7 +34,14 @@ const { BladesActiveEffect } = await import("../module/blades-active-effect.js")
 const { BladesSheet } = await import("../module/blades-sheet.js");
 const { BladesActorSheet, prepareLoadoutCapacity } = await import("../module/blades-actor-sheet.js");
 const { BladesItemSheet, prepareItemSheetPermissions } = await import("../module/blades-item-sheet.js");
-const { BladesMaskSheet, getMaskTypePresentation, MASK_SHEET_DEFAULT_WIDTH, maskSheetWidthForAttributes } = await import("../module/blades-mask-sheet.js");
+const {
+  BladesMaskSheet,
+  getEligibleMaskTraits,
+  getMaskTraitsForSource,
+  getMaskTypePresentation,
+  MASK_SHEET_DEFAULT_WIDTH,
+  maskSheetWidthForAttributes,
+} = await import("../module/blades-mask-sheet.js");
 const { formControlUpdate, queueDocumentPathUpdate } = await import("../module/sheet-dom.js");
 const { syncOpenActorTrackers } = await import("../module/sheet-tracker-sync.js");
 const { BladesRebelionSheet } = await import("../module/blades-rebelion-sheet.js");
@@ -74,8 +81,8 @@ test("Mask primary tabs default to Traits and preserve valid remembered selectio
 
 test("Mask Type availability resizes only on transitions and preserves manual sizing during configured rerenders", async () => {
   assert.equal(MASK_SHEET_DEFAULT_WIDTH, 700);
-  assert.equal(maskSheetWidthForAttributes(700, undefined), 720);
-  assert.equal(maskSheetWidthForAttributes(700, 880), 720);
+  assert.equal(maskSheetWidthForAttributes(700, undefined), 760);
+  assert.equal(maskSheetWidthForAttributes(700, 880), 760);
   assert.equal(maskSheetWidthForAttributes(980, 880), 980);
 
   const positions = [];
@@ -95,28 +102,103 @@ test("Mask Type availability resizes only on transitions and preserves manual si
   assert.deepEqual(positions, []);
 
   await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, true);
-  assert.deepEqual(positions, [{ width: 720 }]);
+  assert.deepEqual(positions, [{ width: 760 }]);
 
   // A user can make the configured sheet narrower or wider. Re-renders must
   // preserve both instead of restoring the automatic target width.
   sheet.position.width = 760;
   await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, true);
-  assert.deepEqual(positions, [{ width: 720 }]);
+  assert.deepEqual(positions, [{ width: 760 }]);
 
   sheet.position.width = 980;
   await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, true);
-  assert.deepEqual(positions, [{ width: 720 }]);
+  assert.deepEqual(positions, [{ width: 760 }]);
 
   await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, false);
-  assert.deepEqual(positions, [{ width: 720 }, { width: 700 }]);
+  assert.deepEqual(positions, [{ width: 760 }, { width: 700 }]);
   assert.equal(sheet.position.width, 700);
 
   // A newly selected Mask Type may expand again after removal.
   await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, true);
-  assert.deepEqual(positions, [{ width: 720 }, { width: 700 }, { width: 720 }]);
+  assert.deepEqual(positions, [{ width: 760 }, { width: 700 }, { width: 760 }]);
 
   await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, false);
-  assert.deepEqual(positions, [{ width: 720 }, { width: 700 }, { width: 720 }, { width: 700 }]);
+  assert.deepEqual(positions, [{ width: 760 }, { width: 700 }, { width: 760 }, { width: 700 }]);
+});
+
+test("Mask Traits and picker candidates stay scoped to the selected Mask source", () => {
+  const mask = { id: "mask-judgement", type: "mask", name: "Judgement" };
+  const matchingGrant = {
+    id: "actor-trait-present",
+    type: "trait",
+    name: "Present",
+    system: { class: "Judgment" },
+    flags: { brinkwood: { traitGrant: { sourceItemId: mask.id, sourceItemType: "mask", traitSourceId: "trait-present" } } },
+  };
+  const otherMaskGrant = {
+    id: "actor-trait-other-mask",
+    type: "trait",
+    name: "Other Mask Grant",
+    system: { class: "Judgment" },
+    flags: { brinkwood: { traitGrant: { sourceItemId: "mask-violence", sourceItemType: "mask", traitSourceId: "trait-other-source" } } },
+  };
+  const sameIdNonMaskGrant = {
+    id: "actor-trait-same-id-non-mask",
+    type: "trait",
+    name: "Wrong Source Type",
+    system: { class: "Judgment" },
+    flags: { brinkwood: { traitGrant: { sourceItemId: mask.id, sourceItemType: "upbringing", traitSourceId: "trait-wrong-source-type" } } },
+  };
+  const manualTrait = { id: "actor-trait-manual", type: "trait", name: "Manual Existing", system: { class: "Judgment" }, flags: {} };
+  const provenanceTrait = {
+    id: "actor-trait-provenance",
+    type: "trait",
+    name: "Provenance Existing",
+    system: { class: "Judgment" },
+    flags: { core: { sourceId: "Compendium.brinkwood.trait.trait-provenance" } },
+  };
+  const actorItems = [mask, matchingGrant, otherMaskGrant, sameIdNonMaskGrant, manualTrait, provenanceTrait];
+  const candidates = [
+    { _id: "trait-present", type: "trait", name: "Present", system: { class: "Judgment" } },
+    { _id: "trait-missing", type: "trait", name: "Missing", system: { class: "Judgment" } },
+    { _id: "trait-wrong-mask", type: "trait", name: "Wrong Mask", system: { class: "Violence" } },
+    { _id: "trait-manual", type: "trait", name: "Manual Existing", system: { class: "Judgment" } },
+    { _id: "trait-provenance", type: "trait", name: "Provenance Existing", system: { class: "Judgment" } },
+    { _id: "trait-other-source", type: "trait", name: "Other Mask Grant", system: { class: "Judgment" } },
+    { _id: "trait-wrong-source-type", type: "trait", name: "Wrong Source Type", system: { class: "Judgment" } },
+  ];
+
+  assert.deepEqual(getMaskTraitsForSource(actorItems, mask), [matchingGrant]);
+  assert.deepEqual(getEligibleMaskTraits(candidates, actorItems, mask), [candidates[1]]);
+});
+
+test("Mask Trait picker delegates selected source IDs to the actor repair command", async () => {
+  const mask = { id: "mask-terror", type: "mask", name: "Terror" };
+  const selected = [{ _id: "trait-fear", type: "trait" }, { _id: "trait-silenced", type: "trait" }];
+  const calls = [];
+  const sheet = {
+    isEditable: true,
+    actor: {
+      items: [mask],
+      repairTraitGrantsForSourceIds(...args) { calls.push(args); return "repaired"; },
+    },
+  };
+
+  const result = await BladesMaskSheet.prototype._createPickedItems.call(
+    sheet,
+    [],
+    { itemType: "trait", selectedItems: selected },
+  );
+  assert.equal(result, "repaired");
+  assert.deepEqual(calls, [[[mask.id], false, ["trait-fear", "trait-silenced"]]]);
+
+  sheet.isEditable = false;
+  await BladesMaskSheet.prototype._createPickedItems.call(
+    sheet,
+    [],
+    { itemType: "trait", selectedItems: selected },
+  );
+  assert.equal(calls.length, 1);
 });
 
 test("automatic Mask resize transition is transient and honors reduced motion", () => {

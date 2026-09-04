@@ -43,7 +43,7 @@
       <div class="mask-sheet__trait-library">
         <div class="mask-sheet__section-heading">
           <h2>{{localize "BITD.Traits"}}</h2>
-          {{#if editable}}<button type="button" class="item-add-popup" data-item-type="trait">{{localize "Add"}}</button>{{/if}}
+          {{#if canAddMaskTraits}}<button type="button" class="item-add-popup" data-item-type="trait">{{localize "Add"}}</button>{{/if}}
         </div>
             <div class="mask-sheet__traits">
               {{#each traits as |trait|}}

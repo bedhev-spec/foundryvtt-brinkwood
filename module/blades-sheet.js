@@ -214,7 +214,7 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
     const distinct  = el.dataset.distinct;
     const input_type = distinct !== undefined ? "radio" : "checkbox";
 
-    const items = await BladesHelpers.getAllItemsByType(item_type, game);
+    const items = await this._getItemPickerItems(item_type);
 
     let htmlContent = `<form><div class="items-to-add">`;
     for (const e of items) {
@@ -257,14 +257,20 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
     });
 
     if (!selectedIds?.length) return;
-    const itemsToAdd = items
-      .filter(item => selectedIds.includes(item._id))
+    const selectedItems = items
+      .filter(item => selectedIds.includes(item._id));
+    const itemsToAdd = selectedItems
       .map(item => {
         const data = foundry.utils.deepClone(item);
         delete data._id;
         return data;
       });
-    await this._createPickedItems(itemsToAdd, { itemType: item_type });
+    await this._createPickedItems(itemsToAdd, { itemType: item_type, selectedItems });
+  }
+
+  /** Allow sheets to narrow a shared picker without duplicating its DialogV2 UI. */
+  async _getItemPickerItems(itemType) {
+    return BladesHelpers.getAllItemsByType(itemType, game);
   }
 
   /** Allow sheets to specialize picker help without duplicating dialog assembly. */
