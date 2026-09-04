@@ -27,6 +27,8 @@ export function updateMaskDotDisplay(element, value, maxValue) {
   group?.querySelectorAll(".dot-value").forEach(dot => {
     const filled = Number(dot.dataset.value) <= value;
     dot.setAttribute("aria-pressed", filled ? "true" : "false");
+    dot.classList?.toggle("dot-value--filled", filled);
+    dot.classList?.toggle("dot-value--empty", !filled);
     const tooth = dot.querySelector("img");
     if (tooth) {
       tooth.src = `systems/brinkwood/styles/assets/teeth/stresstooth-${filled ? color : "halfgrey"}.png`;
@@ -51,7 +53,9 @@ export class BladesMaskSheet extends BladesSheet {
 
   static DEFAULT_OPTIONS = {
     classes: ["brinkwood", "sheet", "actor", "pc", "mask"],
-    position: { width: 700, height: 840 },
+    // The header now carries the selected Mask's Attribute family beside the
+    // identity details; this keeps all three columns readable at first open.
+    position: { width: 900, height: 840 },
     // Explicit change handlers below are the only Mask persistence path.
     form: { submitOnChange: false },
     tabGroups: { primary: "traits" },

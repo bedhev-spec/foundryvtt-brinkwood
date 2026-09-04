@@ -309,6 +309,117 @@
   background: var(--bw-ink);
   color: var(--bw-inverse);
 }
+.brinkwood .sheet-attribute-presentation {
+  color: #191813;
+}
+.brinkwood .sheet-attribute-presentation .attribute {
+  min-width: 0;
+  margin-bottom: 10px;
+}
+.brinkwood .sheet-attribute-presentation .stripe {
+  padding-left: 5px;
+  background: #191813;
+  color: #EEEFFF;
+  font-size: 17px;
+}
+.brinkwood .sheet-attribute-presentation .attribute-label,
+.brinkwood .sheet-attribute-presentation .attribute-skill-label {
+  color: inherit;
+  font-weight: bold;
+  text-shadow: none;
+  text-transform: uppercase;
+}
+.brinkwood .sheet-attribute-presentation button.attribute-label,
+.brinkwood .sheet-attribute-presentation button.attribute-skill-label {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+.brinkwood .sheet-attribute-presentation button.attribute-label:focus-visible,
+.brinkwood .sheet-attribute-presentation button.attribute-skill-label:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 2px;
+}
+.brinkwood .sheet-attribute-presentation h2.attribute-label {
+  margin: 0;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: bold;
+  line-height: inherit;
+}
+.brinkwood .sheet-attribute-presentation .attribute-skill-label {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 28px;
+  margin-top: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+.brinkwood .sheet-attribute-presentation .attributes-exp {
+  position: relative;
+  margin-top: 0;
+}
+.brinkwood .sheet-attribute-presentation .attributes-container {
+  display: grid;
+  grid-template-columns: repeat(4, 28px) minmax(0, 1fr);
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 28px;
+  margin: 3px 0;
+  line-height: 1;
+}
+.brinkwood .sheet-attribute-presentation .attributes-container button.dot-value {
+  display: inline-grid;
+  align-self: center;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: transparent;
+  cursor: pointer;
+  line-height: 1;
+  place-items: center;
+}
+.brinkwood .sheet-attribute-presentation .attributes-container button.dot-value::before {
+  width: 13px;
+  height: 13px;
+  border: 2px solid var(--bw-ink-soft);
+  border-radius: 50%;
+  content: "";
+  transform: translateY(7px);
+}
+.brinkwood .sheet-attribute-presentation .attributes-container button.dot-value.dot-value--filled::before {
+  border-color: var(--bw-ink);
+  background: var(--bw-ink);
+}
+.brinkwood .sheet-attribute-presentation .attributes-container button.dot-value:hover:not(:disabled)::before {
+  border-color: var(--bw-accent);
+}
+.brinkwood .sheet-attribute-presentation .attributes-container button.dot-value:focus, .brinkwood .sheet-attribute-presentation .attributes-container button.dot-value:active {
+  outline: 0;
+  box-shadow: none;
+}
+.brinkwood .sheet-attribute-presentation .attributes-container button.dot-value:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 1px;
+}
+.brinkwood .sheet-attribute-presentation .attributes-container button.dot-value:focus-visible::before {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 3px;
+}
+.brinkwood .sheet-attribute-presentation .attributes-container button.dot-value:disabled {
+  cursor: default;
+}
 .brinkwood .editor,
 .brinkwood .editor-content,
 .brinkwood prose-mirror {
@@ -1329,18 +1440,6 @@
   width: 100%;
   min-width: 0;
 }
-.brinkwood.actor.pc.character .attribute-label,
-.brinkwood.actor.pc.character .attribute-skill-label {
-  border: 0;
-  background: transparent;
-  font: inherit;
-  cursor: pointer;
-}
-.brinkwood.actor.pc.character .attribute-label:focus-visible,
-.brinkwood.actor.pc.character .attribute-skill-label:focus-visible {
-  outline: 3px solid var(--bw-focus);
-  outline-offset: 2px;
-}
 .brinkwood.actor.pc.character .tab[data-tab] {
   display: none;
   min-height: 0;
@@ -1352,70 +1451,6 @@
 .brinkwood.actor.pc.character .attributes {
   width: 200px;
   flex: 0 0 200px;
-  color: #191813;
-}
-.brinkwood.actor.pc.character .attributes .attribute {
-  margin-bottom: 10px;
-}
-.brinkwood.actor.pc.character .attributes .stripe {
-  padding-left: 5px;
-  background: #191813;
-  color: #EEEFFF;
-  font-size: 17px;
-}
-.brinkwood.actor.pc.character .attributes .attribute-label,
-.brinkwood.actor.pc.character .attributes .attribute-skill-label {
-  color: inherit;
-  font-weight: bold;
-  text-transform: uppercase;
-  text-shadow: none;
-}
-.brinkwood.actor.pc.character .attributes .attribute-skill-label {
-  margin-top: 0.3em;
-}
-.brinkwood.actor.pc.character .attributes .attributes-exp {
-  position: relative;
-  margin-top: 1em;
-}
-.brinkwood.actor.pc.character .attributes .attributes-container {
-  display: flex;
-  align-items: center;
-  margin: 3px 0;
-}
-.brinkwood.actor.pc.character .attributes .attributes-container button.dot-value {
-  display: inline-grid;
-  width: 28px;
-  height: 28px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: transparent;
-  cursor: pointer;
-  line-height: 1;
-  place-items: center;
-}
-.brinkwood.actor.pc.character .attributes .attributes-container button.dot-value::before {
-  width: 13px;
-  height: 13px;
-  border: 2px solid var(--bw-ink-soft);
-  border-radius: 50%;
-  content: "";
-}
-.brinkwood.actor.pc.character .attributes .attributes-container button.dot-value.dot-value--filled::before {
-  border-color: var(--bw-ink);
-  background: var(--bw-ink);
-}
-.brinkwood.actor.pc.character .attributes .attributes-container button.dot-value:hover:not(:disabled)::before {
-  border-color: var(--bw-accent);
-}
-.brinkwood.actor.pc.character .attributes .attributes-container button.dot-value:focus-visible {
-  outline: 3px solid var(--bw-focus);
-  outline-offset: 1px;
-}
-.brinkwood.actor.pc.character .attributes .attributes-container button.dot-value:disabled {
-  cursor: default;
 }
 .brinkwood.actor.pc.character .traits .label-stripe p:first-child,
 .brinkwood.actor.pc.character .loadout .label-stripe p:first-child {
@@ -2279,7 +2314,7 @@
   outline-offset: 2px;
 }
 .brinkwood.actor.mask .mask-sheet__identity-block {
-  grid-template-columns: minmax(150px, 200px) minmax(0, 1fr);
+  grid-template-columns: minmax(150px, 200px) minmax(230px, 1fr) minmax(260px, 0.9fr);
 }
 .brinkwood.actor.mask .mask-sheet__identity {
   display: grid;
@@ -2357,7 +2392,7 @@
   width: 100%;
   min-width: 0;
 }
-.brinkwood.actor.mask .mask-sheet__panel > h2, .brinkwood.actor.mask .mask-sheet__panel .mask-attributes > h2 {
+.brinkwood.actor.mask .mask-sheet__panel > h2 {
   margin: 0 0 10px;
   color: var(--bw-ink);
   font-size: 1rem;
@@ -2366,13 +2401,15 @@
 }
 .brinkwood.actor.mask .mask-sheet__traits-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(190px, 0.42fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   align-items: start;
   width: 100%;
   min-width: 0;
 }
 .brinkwood.actor.mask .mask-sheet__trait-library {
+  grid-column: 1/-1;
+  inline-size: 100%;
   min-width: 0;
 }
 .brinkwood.actor.mask .mask-sheet__section-heading {
@@ -2395,44 +2432,20 @@
   background: rgba(255, 255, 255, 0.3);
 }
 .brinkwood.actor.mask .mask-attributes {
+  align-self: start;
   min-width: 0;
 }
-.brinkwood.actor.mask .mask-attributes {
-  padding: 10px;
-  border: 1px solid var(--bw-rule);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.25);
+.brinkwood.actor.mask .mask-attributes .attribute {
+  margin-bottom: 0;
+}
+.brinkwood.actor.mask .mask-attributes .flex-horizontal {
+  display: block;
+  width: 100%;
+  min-width: 0;
 }
 .brinkwood.actor.mask .mask-attributes__skills {
   display: grid;
-  gap: 8px;
-}
-.brinkwood.actor.mask .mask-skill {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  min-width: 0;
-}
-.brinkwood.actor.mask .mask-skill__controls {
-  display: flex;
-  flex: 0 0 auto;
-}
-.brinkwood.actor.mask .mask-skill__controls .dot-value {
-  min-width: 22px;
-  padding: 2px 4px;
-  border: 0;
-  background: transparent;
-  color: var(--bw-accent);
-  font-size: 1rem;
-  line-height: 1;
-}
-.brinkwood.actor.mask .attribute-skill-label {
-  min-width: 0;
-  color: var(--bw-ink);
-  font-size: 0.9rem;
-  font-weight: 700;
-  text-align: right;
+  gap: 0;
 }
 .brinkwood.actor.mask .mask-sheet__empty, .brinkwood.actor.mask .mask-attributes__empty {
   margin: 10px 0;
@@ -2452,23 +2465,36 @@
   width: 100%;
   min-width: 0;
 }
+@container (max-width: 800px) {
+  .brinkwood.actor.mask .mask-sheet__identity-block {
+    grid-template-columns: minmax(150px, 200px) minmax(0, 1fr);
+  }
+  .brinkwood.actor.mask .mask-attributes {
+    grid-column: 1/-1;
+  }
+}
 @container (max-width: 620px) {
   .brinkwood.actor.mask .mask-sheet__trackers {
     grid-column: 1/-1;
   }
-  .brinkwood.actor.mask .mask-sheet__traits-workspace {
-    grid-template-columns: minmax(0, 1fr);
+}
+@container (max-width: 480px) {
+  .brinkwood.actor.mask .mask-sheet__identity-block {
+    grid-template-columns: 96px minmax(0, 1fr);
   }
-  .brinkwood.actor.mask .mask-attributes__skills {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .brinkwood.actor.mask .mask-sheet__identity-block .sheet-identity__portrait {
+    grid-row: span 3;
+  }
+  .brinkwood.actor.mask .mask-sheet__identity-block .sheet-identity__portrait-frame {
+    width: 96px;
+    height: 96px;
+    max-width: 96px;
+    max-height: 96px;
   }
 }
 @container (max-width: 410px) {
   .brinkwood.actor.mask form.mask-sheet {
     padding: 10px;
-  }
-  .brinkwood.actor.mask .mask-attributes__skills {
-    grid-template-columns: 1fr;
   }
 }
 .brinkwood.actor.rebelion {
@@ -3928,29 +3954,6 @@ aside#tooltip.brinkwood-item-tooltip-shell {
 
 /* The value ends beside the fixed × column; width remains available for
  * multi-line identities rather than being shortened by the action. */
-/* Stable action rows: labels stay fixed while only the circle artwork is optically aligned. */
-.brinkwood.actor.pc.character .attributes .attributes-container {
-  display: grid;
-  grid-template-columns: repeat(4, 28px) minmax(0, 1fr);
-  align-items: center;
-  min-height: 28px;
-}
-
-.brinkwood.actor.pc.character .attributes .attributes-container button.dot-value {
-  align-self: center;
-  transform: none;
-}
-
-.brinkwood.actor.pc.character .attributes .attributes-container button.dot-value::before {
-  transform: translateY(7px);
-}
-
-.brinkwood.actor.pc.character .attributes .attribute-skill-label {
-  align-self: center;
-  min-height: 28px;
-  margin-top: 0;
-}
-
 /* Hide the zero/nullifier glyph while retaining the clock and progress text. */
 .brinkwood.actor.pc.character .character-scars-clock .clock-zero-label,
 .brinkwood.actor.pc.character .character-oath-clock .clock-zero-label {
@@ -4310,47 +4313,6 @@ aside#tooltip.brinkwood-item-tooltip-shell {
 .brinkwood.actor.pc.character .character-armor-uses {
   min-width: 96px;
   vertical-align: top;
-}
-
-.brinkwood.actor.pc.character .attributes-container button.dot-value:focus,
-.brinkwood.actor.pc.character .attributes-container button.dot-value:active {
-  outline: 0;
-  box-shadow: none;
-}
-
-.brinkwood.actor.pc.character .attributes .attributes-container {
-  /* Every action row fills its family column. The legacy flex wrapper had an
-   * intrinsic width, which made all three columns collapse into the left edge. */
-  display: grid;
-  grid-template-columns: repeat(4, 28px) minmax(0, 1fr);
-  align-items: center;
-  width: 100%;
-  min-width: 0;
-  min-height: 28px;
-  line-height: 1;
-}
-
-.brinkwood.actor.pc.character .attributes .attributes-container button.dot-value {
-  align-self: center;
-  line-height: 1;
-  transform: translateY(-2px);
-}
-
-.brinkwood.actor.pc.character .attributes .attribute-skill-label {
-  display: inline-flex;
-  align-items: center;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  min-height: 28px;
-  margin-top: 0;
-  line-height: 1.2;
-}
-
-.brinkwood.actor.pc.character .attributes-container button.dot-value:focus-visible::before {
-  outline: 3px solid var(--bw-focus);
-  outline-offset: 3px;
 }
 
 .brinkwood.actor.pc.character button.effects-category__add {

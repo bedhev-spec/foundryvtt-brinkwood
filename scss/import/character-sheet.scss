@@ -337,19 +337,6 @@
     min-width: 0;
   }
 
-  .attribute-label,
-  .attribute-skill-label {
-    border: 0;
-    background: transparent;
-    font: inherit;
-    cursor: pointer;
-
-    &:focus-visible {
-      outline: 3px solid var(--bw-focus);
-      outline-offset: 2px;
-    }
-  }
-
   .tab[data-tab] {
     display: none;
     min-height: 0;
@@ -363,82 +350,6 @@
   .attributes {
     width: 200px;
     flex: 0 0 200px;
-    color: $almost_black;
-
-    .attribute {
-      margin-bottom: 10px;
-    }
-
-    .stripe {
-      padding-left: 5px;
-      background: $almost_black;
-      color: $almost_white;
-      font-size: 17px;
-    }
-
-    .attribute-label,
-    .attribute-skill-label {
-      color: inherit;
-      font-weight: bold;
-      text-transform: uppercase;
-      text-shadow: none;
-    }
-
-    .attribute-skill-label {
-      margin-top: 0.3em;
-    }
-
-    .attributes-exp {
-      position: relative;
-      margin-top: 1em;
-    }
-
-    .attributes-container {
-      display: flex;
-      align-items: center;
-      margin: 3px 0;
-
-      button.dot-value {
-        display: inline-grid;
-        width: 28px;
-        height: 28px;
-        margin: 0;
-        padding: 0;
-        border: 0;
-        border-radius: 0;
-        background: transparent;
-        color: transparent;
-        cursor: pointer;
-        line-height: 1;
-        place-items: center;
-
-        &::before {
-          width: 13px;
-          height: 13px;
-          border: 2px solid var(--bw-ink-soft);
-          border-radius: 50%;
-          content: "";
-        }
-
-        &.dot-value--filled::before {
-          border-color: var(--bw-ink);
-          background: var(--bw-ink);
-        }
-
-        &:hover:not(:disabled)::before {
-          border-color: var(--bw-accent);
-        }
-
-        &:focus-visible {
-          outline: 3px solid var(--bw-focus);
-          outline-offset: 1px;
-        }
-
-        &:disabled {
-          cursor: default;
-        }
-      }
-    }
   }
 
   .traits,

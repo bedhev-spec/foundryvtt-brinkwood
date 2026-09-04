@@ -629,10 +629,12 @@ test("character skill updates refresh flat pip state without a sheet rerender", 
 
 test("Mask trackers update without a sheet rerender and refresh their output", async () => {
   const updates = [];
+  const classes = new Set(["dot-value", "dot-value--empty"]);
   const tooth = { src: "" };
   const output = { textContent: "0 / 8" };
   const dot = {
     dataset: { path: "experience.value", value: "2", max_value: "8" },
+    classList: { toggle(name, enabled) { enabled ? classes.add(name) : classes.delete(name); } },
     setAttribute(name, value) { this[name] = value; },
     querySelector(selector) { return selector === "img" ? tooth : null; }
   };
@@ -658,6 +660,8 @@ test("Mask trackers update without a sheet rerender and refresh their output", a
 
   assert.deepEqual(updates, [[{ "system.experience.value": 2 }, { render: false }]]);
   assert.equal(dot["aria-pressed"], "true");
+  assert.equal(classes.has("dot-value--filled"), true);
+  assert.equal(classes.has("dot-value--empty"), false);
   assert.equal(output.textContent, "2 / 8");
   assert.match(tooth.src, /stresstooth-blue\.png$/);
 });

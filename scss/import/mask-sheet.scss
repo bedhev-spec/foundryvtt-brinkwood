@@ -36,7 +36,7 @@
   }
 
   .mask-sheet__identity-block {
-    grid-template-columns: minmax(150px, 200px) minmax(0, 1fr);
+    grid-template-columns: minmax(150px, 200px) minmax(230px, 1fr) minmax(260px, 0.9fr);
   }
 
   .mask-sheet__identity {
@@ -132,7 +132,7 @@
       min-width: 0;
     }
 
-    > h2, .mask-attributes > h2 {
+    > h2 {
       margin: 0 0 10px;
       color: var(--bw-ink);
       font-size: 1rem;
@@ -143,7 +143,7 @@
 
   .mask-sheet__traits-workspace {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(190px, 0.42fr);
+    grid-template-columns: minmax(0, 1fr);
     gap: 16px;
     align-items: start;
     width: 100%;
@@ -151,6 +151,8 @@
   }
 
   .mask-sheet__trait-library {
+    grid-column: 1 / -1;
+    inline-size: 100%;
     min-width: 0;
   }
 
@@ -178,45 +180,26 @@
     }
   }
 
+  // The shared Attribute presentation lives beside Mask identity details.
+  // This sheet owns only its header-grid placement and responsive stacking.
   .mask-attributes {
+    align-self: start;
     min-width: 0;
   }
 
-  .mask-attributes {
-    padding: 10px;
-    border: 1px solid var(--bw-rule);
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.25);
+  .mask-attributes .attribute {
+    margin-bottom: 0;
   }
 
-  .mask-attributes__skills { display: grid; gap: 8px; }
-
-  .mask-skill {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+  .mask-attributes .flex-horizontal {
+    display: block;
+    width: 100%;
     min-width: 0;
   }
 
-  .mask-skill__controls { display: flex; flex: 0 0 auto; }
-
-  .mask-skill__controls .dot-value {
-    min-width: 22px;
-    padding: 2px 4px;
-    border: 0;
-    background: transparent;
-    color: var(--bw-accent);
-    font-size: 1rem;
-    line-height: 1;
-  }
-
-  .attribute-skill-label {
-    min-width: 0;
-    color: var(--bw-ink);
-    font-size: 0.9rem;
-    font-weight: 700;
-    text-align: right;
+  .mask-attributes__skills {
+    display: grid;
+    gap: 0;
   }
 
   .mask-sheet__empty, .mask-attributes__empty {
@@ -240,15 +223,39 @@
     min-width: 0;
   }
 
+  @container (max-width: 800px) {
+    .mask-sheet__identity-block {
+      grid-template-columns: minmax(150px, 200px) minmax(0, 1fr);
+    }
+
+    .mask-attributes {
+      grid-column: 1 / -1;
+    }
+  }
+
   @container (max-width: 620px) {
     .mask-sheet__trackers { grid-column: 1 / -1; }
-    .mask-sheet__traits-workspace { grid-template-columns: minmax(0, 1fr); }
-    .mask-attributes__skills { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @container (max-width: 480px) {
+    .mask-sheet__identity-block {
+      grid-template-columns: 96px minmax(0, 1fr);
+    }
+
+    .mask-sheet__identity-block .sheet-identity__portrait {
+      grid-row: span 3;
+    }
+
+    .mask-sheet__identity-block .sheet-identity__portrait-frame {
+      width: 96px;
+      height: 96px;
+      max-width: 96px;
+      max-height: 96px;
+    }
   }
 
   @container (max-width: 410px) {
     form.mask-sheet { padding: 10px; }
-    .mask-attributes__skills { grid-template-columns: 1fr; }
 
   }
 }

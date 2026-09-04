@@ -70,29 +70,6 @@
 
 /* The value ends beside the fixed × column; width remains available for
  * multi-line identities rather than being shortened by the action. */
-/* Stable action rows: labels stay fixed while only the circle artwork is optically aligned. */
-.brinkwood.actor.pc.character .attributes .attributes-container {
-  display: grid;
-  grid-template-columns: repeat(4, 28px) minmax(0, 1fr);
-  align-items: center;
-  min-height: 28px;
-}
-
-.brinkwood.actor.pc.character .attributes .attributes-container button.dot-value {
-  align-self: center;
-  transform: none;
-}
-
-.brinkwood.actor.pc.character .attributes .attributes-container button.dot-value::before {
-  transform: translateY(7px);
-}
-
-.brinkwood.actor.pc.character .attributes .attribute-skill-label {
-  align-self: center;
-  min-height: 28px;
-  margin-top: 0;
-}
-
 /* Hide the zero/nullifier glyph while retaining the clock and progress text. */
 .brinkwood.actor.pc.character .character-scars-clock .clock-zero-label,
 .brinkwood.actor.pc.character .character-oath-clock .clock-zero-label {

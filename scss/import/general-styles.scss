@@ -248,6 +248,138 @@ section {
   color: var(--bw-inverse);
 }
 
+// Character and Mask expose a different number of Attribute families, but
+// each family uses this same stripe, rating-dot, and skill-label language.
+// Sheet styles retain only their placement and column geometry.
+.sheet-attribute-presentation {
+  color: $almost_black;
+
+  .attribute {
+    min-width: 0;
+    margin-bottom: 10px;
+  }
+
+  .stripe {
+    padding-left: 5px;
+    background: $almost_black;
+    color: $almost_white;
+    font-size: 17px;
+  }
+
+  .attribute-label,
+  .attribute-skill-label {
+    color: inherit;
+    font-weight: bold;
+    text-shadow: none;
+    text-transform: uppercase;
+  }
+
+  button.attribute-label,
+  button.attribute-skill-label {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+
+    &:focus-visible {
+      outline: 3px solid var(--bw-focus);
+      outline-offset: 2px;
+    }
+  }
+
+  h2.attribute-label {
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: bold;
+    line-height: inherit;
+  }
+
+  .attribute-skill-label {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    min-height: 28px;
+    margin-top: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+
+  .attributes-exp {
+    position: relative;
+    margin-top: 0;
+  }
+
+  .attributes-container {
+    display: grid;
+    grid-template-columns: repeat(4, 28px) minmax(0, 1fr);
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    min-height: 28px;
+    margin: 3px 0;
+    line-height: 1;
+
+    button.dot-value {
+      display: inline-grid;
+      align-self: center;
+      width: 28px;
+      height: 28px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: transparent;
+      cursor: pointer;
+      line-height: 1;
+      place-items: center;
+
+      &::before {
+        width: 13px;
+        height: 13px;
+        border: 2px solid var(--bw-ink-soft);
+        border-radius: 50%;
+        content: "";
+        transform: translateY(7px);
+      }
+
+      &.dot-value--filled::before {
+        border-color: var(--bw-ink);
+        background: var(--bw-ink);
+      }
+
+      &:hover:not(:disabled)::before {
+        border-color: var(--bw-accent);
+      }
+
+      &:focus,
+      &:active {
+        outline: 0;
+        box-shadow: none;
+      }
+
+      &:focus-visible {
+        outline: 3px solid var(--bw-focus);
+        outline-offset: 1px;
+      }
+
+      &:focus-visible::before {
+        outline: 3px solid var(--bw-focus);
+        outline-offset: 3px;
+      }
+
+      &:disabled {
+        cursor: default;
+      }
+    }
+  }
+}
+
 .editor,
 .editor-content,
 prose-mirror {
