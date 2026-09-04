@@ -34,7 +34,7 @@ const { BladesActiveEffect } = await import("../module/blades-active-effect.js")
 const { BladesSheet } = await import("../module/blades-sheet.js");
 const { BladesActorSheet, prepareLoadoutCapacity } = await import("../module/blades-actor-sheet.js");
 const { BladesItemSheet, prepareItemSheetPermissions } = await import("../module/blades-item-sheet.js");
-const { BladesMaskSheet, getMaskTypePresentation } = await import("../module/blades-mask-sheet.js");
+const { BladesMaskSheet, getMaskTypePresentation, MASK_SHEET_DEFAULT_WIDTH, maskSheetWidthForAttributes } = await import("../module/blades-mask-sheet.js");
 const { formControlUpdate, queueDocumentPathUpdate } = await import("../module/sheet-dom.js");
 const { syncOpenActorTrackers } = await import("../module/sheet-tracker-sync.js");
 const { BladesRebelionSheet } = await import("../module/blades-rebelion-sheet.js");
@@ -70,6 +70,83 @@ test("Mask primary tabs default to Traits and preserve valid remembered selectio
   BladesMaskSheet.prototype._ensureValidPrimaryTab.call(sheet, unavailableEffectsContext);
   assert.equal(sheet.tabGroups.primary, "traits");
   assert.equal(unavailableEffectsContext.tabs.primary, "traits");
+});
+
+test("Mask Type availability resizes only on transitions and preserves manual sizing during configured rerenders", async () => {
+  assert.equal(MASK_SHEET_DEFAULT_WIDTH, 700);
+  assert.equal(maskSheetWidthForAttributes(700, undefined), 900);
+  assert.equal(maskSheetWidthForAttributes(700, 880), 848);
+  assert.equal(maskSheetWidthForAttributes(980, 880), 980);
+
+  const positions = [];
+  const sheet = {
+    position: { width: 700 },
+    setPosition(position) {
+      positions.push(position);
+      this.position.width = position.width;
+    },
+    _expandForMaskAttributes: BladesMaskSheet.prototype._expandForMaskAttributes,
+    _shrinkForMaskAttributes: BladesMaskSheet.prototype._shrinkForMaskAttributes,
+    _resizeForMaskAttributes: BladesMaskSheet.prototype._resizeForMaskAttributes,
+    _startMaskAttributeResizeTransition() { return null; },
+  };
+
+  await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, false);
+  assert.deepEqual(positions, []);
+
+  await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, true);
+  assert.deepEqual(positions, [{ width: 900 }]);
+
+  // A user can make the configured sheet narrower or wider. Re-renders must
+  // preserve both instead of restoring the automatic target width.
+  sheet.position.width = 760;
+  await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, true);
+  assert.deepEqual(positions, [{ width: 900 }]);
+
+  sheet.position.width = 980;
+  await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, true);
+  assert.deepEqual(positions, [{ width: 900 }]);
+
+  await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, false);
+  assert.deepEqual(positions, [{ width: 900 }, { width: 700 }]);
+  assert.equal(sheet.position.width, 700);
+
+  // A newly selected Mask Type may expand again after removal.
+  await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, true);
+  assert.deepEqual(positions, [{ width: 900 }, { width: 700 }, { width: 900 }]);
+
+  await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, false);
+  assert.deepEqual(positions, [{ width: 900 }, { width: 700 }, { width: 900 }, { width: 700 }]);
+});
+
+test("automatic Mask resize transition is transient and honors reduced motion", () => {
+  const classes = new Set();
+  const listeners = new Map();
+  const frame = {
+    classList: {
+      add(name) { classes.add(name); },
+      remove(name) { classes.delete(name); },
+    },
+    closest() { return this; },
+    addEventListener(name, listener) { listeners.set(name, listener); },
+    removeEventListener(name) { listeners.delete(name); },
+  };
+  const sheet = { element: frame };
+  const previousMatchMedia = globalThis.matchMedia;
+
+  try {
+    globalThis.matchMedia = () => ({ matches: false });
+    BladesMaskSheet.prototype._startMaskAttributeResizeTransition.call(sheet);
+    assert.equal(classes.has("mask-sheet--attribute-resizing"), true);
+    listeners.get("transitionend")({ target: frame, propertyName: "width" });
+    assert.equal(classes.has("mask-sheet--attribute-resizing"), false);
+
+    globalThis.matchMedia = () => ({ matches: true });
+    assert.equal(BladesMaskSheet.prototype._startMaskAttributeResizeTransition.call(sheet), null);
+    assert.equal(classes.has("mask-sheet--attribute-resizing"), false);
+  } finally {
+    globalThis.matchMedia = previousMatchMedia;
+  }
 });
 
 function effectEvent(action = "create", effectId = null, effectType = "passive") {

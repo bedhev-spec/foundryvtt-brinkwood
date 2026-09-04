@@ -9,6 +9,24 @@ import { formControlUpdate, handleActorNameEnter, persistActorNameChange, queueD
 
 export { handleActorNameEnter as handleMaskNameEnter };
 
+export const MASK_SHEET_DEFAULT_WIDTH = 700;
+export const MASK_SHEET_ATTRIBUTES_WIDTH = 900;
+export const MASK_SHEET_VIEWPORT_GUTTER = 32;
+const MASK_SHEET_RESIZING_CLASS = "mask-sheet--attribute-resizing";
+const MASK_SHEET_RESIZE_DURATION = 180;
+
+/**
+ * Return the width used when a configured Mask adds its Attribute column.
+ * A previously wider manual resize always wins; this helper never shrinks.
+ */
+export function maskSheetWidthForAttributes(currentWidth, viewportWidth) {
+  const current = Number.isFinite(currentWidth) ? currentWidth : MASK_SHEET_DEFAULT_WIDTH;
+  const viewportLimit = Number.isFinite(viewportWidth)
+    ? Math.max(0, viewportWidth - MASK_SHEET_VIEWPORT_GUTTER)
+    : MASK_SHEET_ATTRIBUTES_WIDTH;
+  return Math.max(current, Math.min(MASK_SHEET_ATTRIBUTES_WIDTH, viewportLimit));
+}
+
 export function getMaskTypePresentation(typeName, attributes) {
   const maskAttributes = attributes[typeName];
   const typeLang = `BITD.${capitalize(typeName)}`;
@@ -53,9 +71,9 @@ export class BladesMaskSheet extends BladesSheet {
 
   static DEFAULT_OPTIONS = {
     classes: ["brinkwood", "sheet", "actor", "pc", "mask"],
-    // The header now carries the selected Mask's Attribute family beside the
-    // identity details; this keeps all three columns readable at first open.
-    position: { width: 900, height: 840 },
+    // An unconfigured Mask keeps the compact initial sheet. Its selected Mask
+    // Type adds Attribute UI and expands the already-open ApplicationV2 frame.
+    position: { width: MASK_SHEET_DEFAULT_WIDTH, height: 840 },
     // Explicit change handlers below are the only Mask persistence path.
     form: { submitOnChange: false },
     tabGroups: { primary: "traits" },
@@ -148,11 +166,68 @@ export class BladesMaskSheet extends BladesSheet {
     context.tabs.primary = "traits";
   }
 
+  /** Expand after Mask Type configuration; clearing it returns the sheet to its compact width. */
+  async _expandForMaskAttributes() {
+    const currentWidth = Number(this.position?.width) || MASK_SHEET_DEFAULT_WIDTH;
+    const viewportWidth = globalThis.window?.innerWidth ?? globalThis.document?.documentElement?.clientWidth;
+    const nextWidth = maskSheetWidthForAttributes(currentWidth, viewportWidth);
+    return this._resizeForMaskAttributes(nextWidth);
+  }
+
+  async _shrinkForMaskAttributes() {
+    return this._resizeForMaskAttributes(MASK_SHEET_DEFAULT_WIDTH);
+  }
+
+  async _resizeForMaskAttributes(nextWidth) {
+    const currentWidth = Number(this.position?.width) || MASK_SHEET_DEFAULT_WIDTH;
+    if (nextWidth === currentWidth || typeof this.setPosition !== "function") return;
+    const stopTransition = this._startMaskAttributeResizeTransition();
+    try {
+      return await this.setPosition({ width: nextWidth });
+    } catch (error) {
+      stopTransition?.();
+      throw error;
+    }
+  }
+
+  _startMaskAttributeResizeTransition() {
+    if (globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) return null;
+    const frame = this.element?.closest?.(".brinkwood.actor.mask") ?? this.element;
+    if (!frame?.classList) return null;
+
+    frame.classList.add(MASK_SHEET_RESIZING_CLASS);
+    // Commit the transient class before ApplicationV2 writes its inline width.
+    void frame.offsetWidth;
+
+    let timeout;
+    const stop = () => {
+      globalThis.clearTimeout(timeout);
+      frame.removeEventListener?.("transitionend", onTransitionEnd);
+      frame.classList.remove(MASK_SHEET_RESIZING_CLASS);
+    };
+    const onTransitionEnd = event => {
+      if (event.target === frame && event.propertyName === "width") stop();
+    };
+    frame.addEventListener?.("transitionend", onTransitionEnd);
+    timeout = globalThis.setTimeout(stop, MASK_SHEET_RESIZE_DURATION + 80);
+    return stop;
+  }
+
+  async _syncMaskAttributeAvailability(hasMaskType) {
+    const available = Boolean(hasMaskType);
+    const wasAvailable = Boolean(this._maskAttributesAvailable);
+    const becameAvailable = available && !this._maskAttributesAvailable;
+    this._maskAttributesAvailable = available;
+    if (becameAvailable) await this._expandForMaskAttributes();
+    else if (!available && wasAvailable) await this._shrinkForMaskAttributes();
+  }
+
   /* -------------------------------------------- */
 
   /** @override */
   async _onRender(context, options) {
     await super._onRender(context, options);
+    await this._syncMaskAttributeAvailability(Boolean(context.maskItem));
     this._maskSheetListenerController?.abort();
     const html = this.element;
     this._maskSheetListenerController = new AbortController();

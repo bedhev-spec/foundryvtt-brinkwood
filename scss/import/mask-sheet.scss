@@ -2,6 +2,10 @@
   min-width: 0;
   color: var(--bw-ink);
 
+  &.mask-sheet--attribute-resizing {
+    transition: width 180ms ease;
+  }
+
   form.mask-sheet {
     // The fixed ApplicationV2 frame keeps identity and tabs stationary; only
     // the active shared tab panel scrolls.
@@ -37,6 +41,7 @@
 
   .mask-sheet__identity-block {
     grid-template-columns: minmax(150px, 200px) minmax(230px, 1fr) minmax(260px, 0.9fr);
+    column-gap: 20px;
   }
 
   .mask-sheet__identity {
@@ -257,5 +262,11 @@
   @container (max-width: 410px) {
     form.mask-sheet { padding: 10px; }
 
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &.mask-sheet--attribute-resizing {
+      transition: none;
+    }
   }
 }
