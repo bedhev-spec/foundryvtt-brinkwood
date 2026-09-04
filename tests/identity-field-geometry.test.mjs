@@ -19,3 +19,16 @@ test("Character Name and Alias share exact field geometry while retaining distin
   assert.match(styles, /\.sheet-identity__name-box[\s\S]*?\.bw-text-field\s*\{[\s\S]*?font-size:\s*1\.35rem/);
   assert.match(styles, /\.sheet-identity__alias-box \.alias\s*\{[\s\S]*?font-size:\s*1rem/);
 });
+
+test("Character identity rows keep selected and empty values clear of separators", async () => {
+  const [character, sharedStyles, legacyEffects] = await Promise.all([
+    read("templates/actor-sheet.html"),
+    read("scss/import/sheet-identity.scss"),
+    read("scss/import/legacy-character-effects.scss"),
+  ]);
+
+  assert.match(character, /class="sheet-identity__rows sheet-identity__rows--separated"/);
+  assert.match(sharedStyles, /\.sheet-identity \.sheet-identity__rows--separated\s*\{[\s\S]*?grid-auto-rows:\s*28px/);
+  assert.match(sharedStyles, /\.sheet-identity \.sheet-identity__rows--separated \.sheet-identity__row\s*\{[\s\S]*?height:\s*28px;[\s\S]*?min-height:\s*28px;[\s\S]*?border-block-end:\s*1px solid rgba\(141, 98, 93, 0\.3\);[\s\S]*?box-shadow:\s*none/);
+  assert.doesNotMatch(legacyEffects, /\.name-alias \.item-block \.item\s*\{/);
+});

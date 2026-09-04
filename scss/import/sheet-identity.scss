@@ -206,8 +206,15 @@
 
 // The list owns relationships between rows. A single Mask Type row deliberately
 // has no divider; Character's multi-row Identity list opts into this treatment.
+.sheet-identity .sheet-identity__rows--separated {
+  grid-auto-rows: 28px;
+}
+
 .sheet-identity .sheet-identity__rows--separated .sheet-identity__row {
-  box-shadow: inset 0 -1px 0 rgba(141, 98, 93, 0.3);
+  height: 28px;
+  min-height: 28px;
+  border-block-end: 1px solid rgba(141, 98, 93, 0.3);
+  box-shadow: none;
 }
 
 .sheet-identity .sheet-identity__row .item-class-label {

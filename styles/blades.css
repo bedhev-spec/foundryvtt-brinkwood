@@ -3354,8 +3354,15 @@
   overflow: visible;
 }
 
+.sheet-identity .sheet-identity__rows--separated {
+  grid-auto-rows: 28px;
+}
+
 .sheet-identity .sheet-identity__rows--separated .sheet-identity__row {
-  box-shadow: inset 0 -1px 0 rgba(141, 98, 93, 0.3);
+  height: 28px;
+  min-height: 28px;
+  border-block-end: 1px solid rgba(141, 98, 93, 0.3);
+  box-shadow: none;
 }
 
 .sheet-identity .sheet-identity__row .item-class-label {
@@ -4230,17 +4237,6 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   height: 26px;
   margin-left: 0;
   object-fit: fill;
-}
-
-.brinkwood.actor.pc.character .name-alias .item-block .item {
-  position: relative;
-  box-sizing: border-box;
-  height: 26px;
-  min-height: 26px;
-  margin: 0 0 0 1em;
-  padding-right: 22px;
-  align-items: center;
-  gap: 4px;
 }
 
 .brinkwood.actor.pc.character .character-identity-choices .item-block {
