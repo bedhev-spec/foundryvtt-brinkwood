@@ -334,8 +334,9 @@ export class BladesActor extends foundry.documents.Actor {
     const requestedTraitSourceIds = traitSourceIds ? new Set(traitSourceIds) : null;
     const traits = (compendiumTraits ?? await traitPack.getDocuments())
       .filter(trait => trait.type === "trait"
-        && normalizedTraitSourceName(trait.system.class) === normalizedTraitSourceName(data.name)
-        && (!requestedTraitSourceIds || requestedTraitSourceIds.has(trait.id ?? trait._id)));
+        && (requestedTraitSourceIds
+          ? requestedTraitSourceIds.has(trait.id ?? trait._id)
+          : normalizedTraitSourceName(trait.system.class) === normalizedTraitSourceName(data.name)));
     const alreadyGranted = new Set(this.items
       .filter(item => item.type === "trait" && item.flags?.brinkwood?.traitGrant?.sourceItemId === sourceItemId)
       .map(item => item.flags.brinkwood.traitGrant.traitSourceId));
@@ -477,7 +478,11 @@ export class BladesActor extends foundry.documents.Actor {
 
       let created;
       try {
-        [created] = await this.createEmbeddedDocuments("Item", [requested]);
+        [created] = await this.createEmbeddedDocuments("Item", [requested], {
+          // BladesItem's legacy distinct-item hook must not remove the old
+          // Mask during this create. This command owns replacement ordering.
+          brinkwoodConfigureMask: true,
+        });
         if (!created) throw new Error("Mask configuration did not create a Mask item.");
         await this.syncTraitGrantsForSources([created]);
 

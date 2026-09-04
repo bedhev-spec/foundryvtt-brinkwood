@@ -203,23 +203,29 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
     if (!this.isEditable) return;
     const pickerKey = event.currentTarget.dataset.itemType;
     this._itemPickerRequests ??= new Map();
-    if (this._itemPickerRequests.has(pickerKey)) {
-      return this._itemPickerRequests.get(pickerKey);
+    const existing = this._itemPickerRequests.get(pickerKey);
+    if (existing) {
+      existing.dialog?.bringToFront();
+      return existing.request;
     }
 
-    const request = this._openItemPicker(event.currentTarget);
-    this._itemPickerRequests.set(pickerKey, request);
+    const entry = { dialog: null, request: null };
+    const request = this._openItemPicker(event.currentTarget, {
+      onDialog: dialog => { entry.dialog = dialog; },
+    });
+    entry.request = request;
+    this._itemPickerRequests.set(pickerKey, entry);
     try {
       return await request;
     } finally {
-      if (this._itemPickerRequests.get(pickerKey) === request) {
+      if (this._itemPickerRequests.get(pickerKey) === entry) {
         this._itemPickerRequests.delete(pickerKey);
       }
     }
   }
 
   /** Open one picker request; _onItemAddClick serializes access to this path. */
-  async _openItemPicker(el) {
+  async _openItemPicker(el, { onDialog } = {}) {
     const item_type = el.dataset.itemType;
     const distinct  = el.dataset.distinct;
     const input_type = distinct !== undefined ? "radio" : "checkbox";
@@ -253,6 +259,7 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
       title: `${game.i18n.localize("Add")} ${item_type}`,
       addLabel: game.i18n.localize("Add"),
       tooltipLabel: game.i18n.localize("BITD.ItemDetails"),
+      onDialog,
     });
 
     if (!selectedIds?.length) return;

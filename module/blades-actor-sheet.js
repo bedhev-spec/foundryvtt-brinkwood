@@ -96,8 +96,14 @@ position: { width: 700, height: 1170 },
     for (const item of context.items) {
       const descriptionRoot = identityDefinitions.find(({ itemType }) => itemType === item.type)?.descriptionRoot;
       if (!descriptionRoot) continue;
+      const description = game.i18n.localize(`${descriptionRoot}.${item.name}`);
+      const enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+        description,
+        { async: true, relativeTo: this.document, secrets: this.document.isOwner },
+      );
       item.identityTooltipHtml = renderDescriptionTooltip(
-        game.i18n.localize(`${descriptionRoot}.${item.name}`),
+        description,
+        () => enrichedDescription,
       );
     }
 

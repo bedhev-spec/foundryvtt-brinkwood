@@ -72,7 +72,7 @@ export function createHeightResizablePickerDialog(DialogV2) {
 }
 
 /** Present a height-resizable picker whose list owns overflow scrolling. */
-export function promptItemPicker({ rows, inputType, title, addLabel, tooltipLabel }) {
+export function promptItemPicker({ rows, inputType, title, addLabel, tooltipLabel, onDialog }) {
   const PickerDialog = createHeightResizablePickerDialog(foundry.applications.api.DialogV2);
   return PickerDialog.prompt({
       // Keep Foundry's native DialogV2 appearance. This class exists only to
@@ -88,6 +88,7 @@ export function promptItemPicker({ rows, inputType, title, addLabel, tooltipLabe
       label: addLabel,
       callback: (_event, button, dialog) => readItemPickerSelection(button, dialog),
     },
+    render: (_event, dialog) => onDialog?.(dialog),
     rejectClose: false,
   });
 }

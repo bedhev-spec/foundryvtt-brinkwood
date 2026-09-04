@@ -55,15 +55,20 @@ test("shared item picker owns rendering, height-only resizing, and list scrollin
       return "selection-promise";
     }
   };
+  let renderedDialog;
   assert.equal(promptItemPicker({
     rows: [],
     inputType: "radio",
     title: "Add identity",
     addLabel: "Add",
     tooltipLabel: "Details",
+    onDialog: dialog => { renderedDialog = dialog; },
   }), "selection-promise");
   assert.equal(dialogOptions.window.resizable, true);
   assert.equal(dialogOptions.position.height, 220);
+  const dialogReference = {};
+  dialogOptions.render({}, dialogReference);
+  assert.equal(renderedDialog, dialogReference);
 
   class DialogStub {
     async _onFirstRender() {}
@@ -124,9 +129,13 @@ test("a sheet permits one item picker request per item type", async () => {
 
   const openCounts = new Map();
   const finishPickers = new Map();
-  sheet._openItemPicker = async element => {
+  const dialogs = new Map();
+  sheet._openItemPicker = async (element, { onDialog }) => {
     const itemType = element.dataset.itemType;
     openCounts.set(itemType, (openCounts.get(itemType) ?? 0) + 1);
+    const dialog = { bringToFrontCount: 0, bringToFront() { this.bringToFrontCount += 1; } };
+    dialogs.set(itemType, dialog);
+    onDialog(dialog);
     await new Promise(resolve => { finishPickers.set(itemType, resolve); });
   };
 
@@ -140,6 +149,7 @@ test("a sheet permits one item picker request per item type", async () => {
 
   assert.equal(openCounts.get("pact"), 1);
   assert.equal(openCounts.get("profession"), 1);
+  assert.equal(dialogs.get("pact").bringToFrontCount, 1);
   assert.equal(sheet._itemPickerRequests.size, 2);
 
   finishPickers.get("pact")();
