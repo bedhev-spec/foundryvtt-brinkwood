@@ -37,11 +37,12 @@ test("Character identity rows keep selected and empty values clear of separators
   assert.match(row, /class="identity-choice__slot identity-choice__blank"/);
   assert.match(row, /class="item-add-popup identity-choice__text"/);
   assert.match(row, /class="identity-choice__text">\{\{localize row\.label\}\}<\/span>/);
-  assert.match(row, /class="item-body item-add-popup identity-choice__text"[\s\S]*?<span class="item-name">\{\{row\.item\.name\}\}<\/span>/);
-  assert.match(row, /\{\{else\}\}<div class="item-body identity-choice__text"[\s\S]*?<span class="item-name">\{\{row\.item\.name\}\}<\/span>/);
+  assert.match(row, /<button type="button" class="item-body identity-choice__text\{\{#if row\.reselect\}\} item-add-popup\{\{\/if\}\}"[\s\S]*?<span class="item-name">\{\{row\.item\.name\}\}<\/span><\/button>/);
+  assert.doesNotMatch(row, /\{\{#if row\.reselect\}\}<button|\{\{else\}\}<div class="item-body/);
   assert.match(sharedStyles, /\.sheet-identity \.identity-choice__slot\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) 18px;[\s\S]*?column-gap:\s*4px;[\s\S]*?height:\s*28px;[\s\S]*?margin:\s*0;[\s\S]*?padding:\s*0/);
-  assert.match(sharedStyles, /\.sheet-identity \.identity-choice__text\s*\{[\s\S]*?display:\s*flex;[\s\S]*?box-sizing:\s*border-box;[\s\S]*?height:\s*28px;[\s\S]*?min-height:\s*28px;[\s\S]*?margin:\s*0;[\s\S]*?padding:\s*0;[\s\S]*?border:\s*0;[\s\S]*?font:\s*inherit;[\s\S]*?align-items:\s*center;[\s\S]*?line-height:\s*1\.25/);
-  assert.match(sharedStyles, /\.sheet-identity \.identity-choice__value \.item-name\s*\{[\s\S]*?justify-content:\s*flex-end/);
+  assert.match(sharedStyles, /\.sheet-identity \.identity-choice__text\s*\{[\s\S]*?display:\s*flex;[\s\S]*?box-sizing:\s*border-box;[\s\S]*?height:\s*28px;[\s\S]*?min-height:\s*28px;[\s\S]*?margin:\s*0;[\s\S]*?padding:\s*0;[\s\S]*?border:\s*0;[\s\S]*?font:\s*inherit;[\s\S]*?align-items:\s*center;[\s\S]*?line-height:\s*28px/);
+  assert.match(sharedStyles, /\.sheet-identity \.identity-choice__value \.item-name\s*\{[\s\S]*?display:\s*block;[\s\S]*?height:\s*28px;[\s\S]*?line-height:\s*28px/);
+  assert.match(sharedStyles, /\.sheet-identity \.identity-choice__remove\s*\{[\s\S]*?height:\s*28px;[\s\S]*?min-height:\s*28px;[\s\S]*?line-height:\s*28px/);
   assert.match(sharedStyles, /\.sheet-identity \.sheet-identity__rows\s*\{[\s\S]*?grid-auto-rows:\s*28px/);
   assert.match(sharedStyles, /\.sheet-identity \.sheet-identity__rows--separated \.sheet-identity__row\s*\{[^}]*border-block-end:\s*1px solid rgba\(141, 98, 93, 0\.3\);[^}]*box-shadow:\s*none/);
   assert.doesNotMatch(sharedStyles, /\.sheet-identity \.sheet-identity__rows--separated \.sheet-identity__row\s*\{[^}]*(?:height|min-height)\s*:/);
