@@ -184,7 +184,7 @@
 
 .sheet-identity .sheet-identity__rows {
   display: grid;
-  grid-auto-rows: 26px;
+  grid-auto-rows: 28px;
   row-gap: 0;
   padding-right: 0;
 }
@@ -197,8 +197,8 @@
   align-items: center;
   box-sizing: border-box;
   width: 100%;
-  height: 26px;
-  min-height: 26px;
+  height: 28px;
+  min-height: 28px;
   margin: 0;
   padding: 0;
   overflow: visible;
@@ -206,13 +206,7 @@
 
 // The list owns relationships between rows. A single Mask Type row deliberately
 // has no divider; Character's multi-row Identity list opts into this treatment.
-.sheet-identity .sheet-identity__rows--separated {
-  grid-auto-rows: 28px;
-}
-
 .sheet-identity .sheet-identity__rows--separated .sheet-identity__row {
-  height: 28px;
-  min-height: 28px;
   border-block-end: 1px solid rgba(141, 98, 93, 0.3);
   box-shadow: none;
 }
@@ -228,8 +222,8 @@
 .sheet-identity .identity-choice__text {
   display: flex;
   box-sizing: border-box;
-  height: 26px;
-  min-height: 26px;
+  height: 28px;
+  min-height: 28px;
   margin: 0;
   padding: 0;
   border: 0;
@@ -258,8 +252,8 @@
   display: grid;
   box-sizing: border-box;
   min-width: 0;
-  height: 26px;
-  min-height: 26px;
+  height: 28px;
+  min-height: 28px;
   align-items: center;
 }
 
@@ -271,7 +265,7 @@
   box-sizing: border-box;
   min-width: 0;
   width: 100%;
-  height: 26px;
+  height: 28px;
   margin: 0;
   padding: 0;
   line-height: 1;
@@ -284,7 +278,7 @@
   justify-content: flex-end;
   min-width: 0;
   width: 100%;
-  height: 26px;
+  height: 28px;
   align-items: center;
   overflow: hidden;
 }
