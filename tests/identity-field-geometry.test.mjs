@@ -32,9 +32,16 @@ test("Character identity rows keep selected and empty values clear of separators
   assert.match(character, /class="sheet-identity__rows sheet-identity__rows--separated"/);
   assert.match(row, /class="item identity-choice__slot identity-choice__value/);
   assert.match(row, /class="identity-choice__slot identity-choice__blank"/);
+  assert.match(row, /class="item-add-popup identity-choice__text"/);
+  assert.match(row, /class="identity-choice__text">\{\{localize row\.label\}\}<\/span>/);
+  assert.match(row, /class="item-name identity-choice__text">\{\{row\.item\.name\}\}<\/span>/);
   assert.match(sharedStyles, /\.sheet-identity \.identity-choice__slot\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) 18px;[\s\S]*?column-gap:\s*4px;[\s\S]*?height:\s*26px;[\s\S]*?margin:\s*0;[\s\S]*?padding:\s*0/);
+  assert.match(sharedStyles, /\.sheet-identity \.identity-choice__text\s*\{[\s\S]*?display:\s*flex;[\s\S]*?box-sizing:\s*border-box;[\s\S]*?height:\s*26px;[\s\S]*?min-height:\s*26px;[\s\S]*?align-items:\s*center;[\s\S]*?line-height:\s*1\.25/);
+  assert.match(sharedStyles, /\.sheet-identity \.identity-choice__value \.item-name\s*\{[\s\S]*?justify-content:\s*flex-end/);
   assert.match(sharedStyles, /\.sheet-identity \.sheet-identity__rows--separated\s*\{[\s\S]*?grid-auto-rows:\s*28px/);
   assert.match(sharedStyles, /\.sheet-identity \.sheet-identity__rows--separated \.sheet-identity__row\s*\{[\s\S]*?height:\s*28px;[\s\S]*?min-height:\s*28px;[\s\S]*?border-block-end:\s*1px solid rgba\(141, 98, 93, 0\.3\);[\s\S]*?box-shadow:\s*none/);
   assert.match(characterStyles, /\.item-block:not\(\.sheet-identity__row\)\s*\{/);
+  assert.match(characterStyles, /\.sheet-identity__details > \.sheet-identity__rows,\s*\.sheet-identity__trackers > \.big-teeth-section\s*\{[\s\S]*?transform:\s*translateY\(10px\)/);
+  assert.doesNotMatch(characterStyles, /\.sheet-identity__details > \.sheet-identity__rows,\s*\.sheet-identity__trackers > \.big-teeth-section\s*\{[^}]*(?:margin|padding|top|inset)[^}]*:/);
   assert.doesNotMatch(legacyEffects, /\.name-alias \.item-block \.item\s*\{/);
 });

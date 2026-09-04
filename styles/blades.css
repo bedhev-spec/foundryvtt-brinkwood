@@ -969,6 +969,10 @@
 .brinkwood.actor.pc.character .character-identity-choices {
   padding-right: 0;
 }
+.brinkwood.actor.pc.character .sheet-identity__details > .sheet-identity__rows,
+.brinkwood.actor.pc.character .sheet-identity__trackers > .big-teeth-section {
+  transform: translateY(10px);
+}
 .brinkwood.actor.pc.character {
   /* The selected value owns an inner action track because its remove control
    * is nested inside the value rather than being a sibling of the outer row. */
@@ -3371,10 +3375,11 @@
   padding: 0;
 }
 
-.sheet-identity .sheet-identity__row .item-class-label,
-.sheet-identity .identity-choice__value .item-body {
+.sheet-identity .identity-choice__text {
   display: flex;
+  box-sizing: border-box;
   height: 26px;
+  min-height: 26px;
   align-items: center;
   line-height: 1.25;
 }
@@ -3444,6 +3449,7 @@
 }
 
 .sheet-identity .identity-choice__value .item-name {
+  justify-content: flex-end;
   min-width: 0;
   width: 100%;
   text-align: right;

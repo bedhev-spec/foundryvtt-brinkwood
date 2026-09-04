@@ -25,7 +25,7 @@ test("Mask uses the shared identity contract rather than an inline header implem
   assert.match(portrait, /data-action="editImage" data-edit="img" role="button" tabindex="0"/);
   assert.match(name, /class="name bw-text-field"/);
   assert.match(row, /class="item-delete identity-choice__remove"/);
-  assert.match(row, /class="item-body item-add-popup"[\s\S]*?class="item-name"/);
+  assert.match(row, /class="item-body item-add-popup"[\s\S]*?class="item-name identity-choice__text"/);
   assert.match(tracker, /data-path="\{\{\.\.\/trackerPath\}\}"/);
   assert.match(sharedStyles, /\.sheet-identity__portrait-frame[\s\S]*?width:\s*200px[\s\S]*?height:\s*200px/);
   assert.match(sharedStyles, /\.sheet-identity \.sheet-identity__rows\s*\{[\s\S]*?grid-auto-rows:\s*26px/);

@@ -223,12 +223,13 @@
   padding: 0;
 }
 
-// Picker and selected value share one centered text track. This keeps their
-// allocated space and glyph metrics identical; only value truncation differs.
-.sheet-identity .sheet-identity__row .item-class-label,
-.sheet-identity .identity-choice__value .item-body {
+// Picker and selected value share one centered text primitive. Applying the
+// metrics to the text-bearing nodes avoids native button line-box differences.
+.sheet-identity .identity-choice__text {
   display: flex;
+  box-sizing: border-box;
   height: 26px;
+  min-height: 26px;
   align-items: center;
   line-height: 1.25;
 }
@@ -288,6 +289,7 @@
   outline-offset: 2px;
 }
 .sheet-identity .identity-choice__value .item-name {
+  justify-content: flex-end;
   min-width: 0;
   width: 100%;
   text-align: right;

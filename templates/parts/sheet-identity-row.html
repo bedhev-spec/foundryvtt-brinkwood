@@ -1,11 +1,11 @@
 <div class="item-block sheet-identity__row">
   <div class="item-class-label">
-    {{#if editable}}<button type="button" class="item-add-popup" data-distinct="true" data-item-type="{{row.itemType}}">{{localize row.label}}</button>{{else}}<span>{{localize row.label}}</span>{{/if}}
+    {{#if editable}}<button type="button" class="item-add-popup identity-choice__text" data-distinct="true" data-item-type="{{row.itemType}}">{{localize row.label}}</button>{{else}}<span class="identity-choice__text">{{localize row.label}}</span>{{/if}}
   </div>
   <div class="identity-choice__track">
     {{#if row.item}}
     <div class="item identity-choice__slot identity-choice__value{{#if row.item.identityTooltipHtml}} tooltip{{/if}}" data-item-id="{{row.item._id}}" data-tooltip-html="{{row.item.identityTooltipHtml}}" data-tooltip-class="brinkwood-item-tooltip-shell" data-tooltip-direction="RIGHT">
-      {{#if row.reselect}}<button type="button" class="item-body item-add-popup" data-distinct="true" data-item-type="{{row.itemType}}" aria-label="{{localize row.label}}: {{row.item.name}}"><span class="item-name">{{row.item.name}}</span></button>{{else}}<div class="item-body"{{#if editable}} role="button" tabindex="0"{{/if}}><span class="item-name">{{row.item.name}}</span></div>{{/if}}
+      {{#if row.reselect}}<button type="button" class="item-body item-add-popup" data-distinct="true" data-item-type="{{row.itemType}}" aria-label="{{localize row.label}}: {{row.item.name}}"><span class="item-name identity-choice__text">{{row.item.name}}</span></button>{{else}}<div class="item-body"{{#if editable}} role="button" tabindex="0"{{/if}}><span class="item-name identity-choice__text">{{row.item.name}}</span></div>{{/if}}
       {{#if editable}}<button type="button" class="item-delete identity-choice__remove" title="{{localize row.deleteLabel}}" aria-label="{{localize row.deleteLabel}}"><span aria-hidden="true">&times;</span></button>{{/if}}
     </div>
     {{else}}<div class="identity-choice__slot identity-choice__blank" aria-hidden="true"></div>{{/if}}

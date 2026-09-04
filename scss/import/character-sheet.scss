@@ -15,6 +15,13 @@
     padding-right: 0;
   }
 
+  // Create breathing room below Name and Alias without changing the header's
+  // flow height or moving the Attributes/Bans region that follows it.
+  .sheet-identity__details > .sheet-identity__rows,
+  .sheet-identity__trackers > .big-teeth-section {
+    transform: translateY(10px);
+  }
+
   /* The selected value owns an inner action track because its remove control
    * is nested inside the value rather than being a sibling of the outer row. */
   .character-identity-choices .item-block {
