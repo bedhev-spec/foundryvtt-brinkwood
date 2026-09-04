@@ -44,7 +44,7 @@ test("Character identity rows keep selected and empty values clear of separators
   assert.match(sharedStyles, /\.sheet-identity \.identity-choice__value \.item-name\s*\{[\s\S]*?display:\s*block;[\s\S]*?height:\s*28px;[\s\S]*?line-height:\s*28px/);
   assert.match(sharedStyles, /\.sheet-identity \.identity-choice__remove\s*\{[\s\S]*?height:\s*28px;[\s\S]*?min-height:\s*28px;[\s\S]*?line-height:\s*28px/);
   assert.match(sharedStyles, /\.sheet-identity \.sheet-identity__rows\s*\{[\s\S]*?grid-auto-rows:\s*28px/);
-  assert.match(sharedStyles, /\.sheet-identity \.sheet-identity__rows--separated \.sheet-identity__row\s*\{[^}]*border-block-end:\s*1px solid rgba\(141, 98, 93, 0\.3\);[^}]*box-shadow:\s*none/);
+  assert.match(sharedStyles, /\.sheet-identity \.sheet-identity__rows--separated \.sheet-identity__row\s*\{[^}]*border-block-end:\s*0;[^}]*box-shadow:\s*inset 0 -1px 0 rgba\(141, 98, 93, 0\.3\)/);
   assert.doesNotMatch(sharedStyles, /\.sheet-identity \.sheet-identity__rows--separated \.sheet-identity__row\s*\{[^}]*(?:height|min-height)\s*:/);
   assert.match(characterStyles, /\.item-block:not\(\.sheet-identity__row\)\s*\{/);
   assert.match(characterStyles, /\.sheet-identity__details > \.sheet-identity__rows,\s*\.sheet-identity__trackers > \.big-teeth-section\s*\{[\s\S]*?transform:\s*translateY\(10px\)/);
