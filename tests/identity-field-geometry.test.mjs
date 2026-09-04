@@ -36,6 +36,7 @@ test("Character identity rows keep selected and empty values clear of separators
   assert.match(row, /class="item-add-popup identity-choice__text"/);
   assert.match(row, /class="identity-choice__text">\{\{localize row\.label\}\}<\/span>/);
   assert.match(row, /class="item-name identity-choice__text">\{\{row\.item\.name\}\}<\/span>/);
+  assert.match(row, /\{\{else\}\}<div class="item-body identity-choice__text"[\s\S]*?<span class="item-name">\{\{row\.item\.name\}\}<\/span>/);
   assert.match(sharedStyles, /\.sheet-identity \.identity-choice__slot\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) 18px;[\s\S]*?column-gap:\s*4px;[\s\S]*?height:\s*26px;[\s\S]*?margin:\s*0;[\s\S]*?padding:\s*0/);
   assert.match(sharedStyles, /\.sheet-identity \.identity-choice__text\s*\{[\s\S]*?display:\s*flex;[\s\S]*?box-sizing:\s*border-box;[\s\S]*?height:\s*26px;[\s\S]*?min-height:\s*26px;[\s\S]*?align-items:\s*center;[\s\S]*?line-height:\s*1\.25/);
   assert.match(sharedStyles, /\.sheet-identity \.identity-choice__value \.item-name\s*\{[\s\S]*?justify-content:\s*flex-end/);

@@ -16,7 +16,7 @@ test("sheet tabs and action surfaces expose keyboard semantics", async () => {
   }
   assert.match(portrait, /data-action="editImage" data-edit="img" role="button" tabindex="0"/);
   assert.match(npc, /data-action="editImage" data-edit="img" role="button" tabindex="0"/);
-  assert.match(identityRow, /class="item-body"\{\{#if editable\}\} role="button" tabindex="0"/);
+  assert.match(identityRow, /class="item-body identity-choice__text"\{\{#if editable\}\} role="button" tabindex="0"/);
   assert.match(attributes, /<button type="button" class="attribute-label roll-die-attribute/);
   assert.match(attributes, /<button type="button" class="attribute-skill-label roll-die-attribute/);
   assert.match(baseSheet, /key === "Home"[\s\S]*?key === "End"[\s\S]*?key === "ArrowRight"[\s\S]*?key === "ArrowLeft"/);
