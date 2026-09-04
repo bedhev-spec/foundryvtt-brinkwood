@@ -31,28 +31,19 @@ test("Mask uses the shared identity contract rather than an inline header implem
   assert.doesNotMatch(styles, /\.mask-sheet__(?:header|portrait|item-list|item-open)\b/);
 });
 
-test("Mask name Enter leaves persistence to ApplicationV2 form submission", async () => {
-  const [baseSheet, controller] = await Promise.all([
-    read("module/blades-sheet.js"),
+test("Mask name delegates Enter and change persistence to shared helpers", async () => {
+  const [controller, dom] = await Promise.all([
     read("module/blades-mask-sheet.js"),
+    read("module/sheet-dom.js"),
   ]);
 
-  assert.match(baseSheet, /form:\s*\{\s*submitOnChange:\s*true\s*\}/);
-  const handlerSource = controller.match(/export function handleMaskNameEnter\(event\) \{[\s\S]*?\n\}/)?.[0];
-  assert.ok(handlerSource);
-  const handleMaskNameEnter = Function(`${handlerSource.replace("export ", "")}; return handleMaskNameEnter;`)();
-
-  const enter = {
-    key: "Enter",
-    isComposing: false,
-    prevented: 0,
-    blurred: 0,
-    preventDefault() { this.prevented += 1; },
-    currentTarget: { blur() { enter.blurred += 1; } },
-  };
-  handleMaskNameEnter(enter);
-  assert.deepEqual({ prevented: enter.prevented, blurred: enter.blurred }, { prevented: 1, blurred: 1 });
-  assert.doesNotMatch(handlerSource, /(?:document|actor)\.update\(/);
+  assert.match(controller, /form:\s*\{\s*submitOnChange:\s*false\s*\}/);
+  assert.match(controller, /"keydown",\s*handleActorNameEnter/);
+  assert.match(controller, /"change", event => this\._persistFormControl\(event\)/);
+  assert.match(controller, /persistActorNameChange\(this, event\)/);
+  assert.match(dom, /export function handleActorNameEnter\(event\)/);
+  assert.match(dom, /event\.currentTarget\?\.blur\(\)/);
+  assert.match(dom, /await sheet\.document\.update\(\{ name \}, \{ render: true \}\)/);
 });
 
 test("Mask styles retain shared-tab scroll geometry without old-header compatibility rules", async () => {

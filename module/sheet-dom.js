@@ -21,3 +21,27 @@ export function formControlUpdate(control) {
       : control.value ?? control.getAttribute?.("value") ?? "";
   return { [name]: value };
 }
+
+
+/** Prevent native submit; the ensuing blur emits the sheet's one change event. */
+export function handleActorNameEnter(event) {
+  if (event.key !== "Enter" || event.isComposing) return false;
+  event.preventDefault();
+  event.currentTarget?.blur();
+  return true;
+}
+
+/** Persist an Actor's root name once and request a Foundry-visible rerender. */
+export async function persistActorNameChange(sheet, event) {
+  if (!sheet?.isEditable) return false;
+
+  const input = event?.currentTarget;
+  const update = formControlUpdate(input);
+  if (!update || !Object.hasOwn(update, "name")) return false;
+
+  const name = update.name ?? "";
+  if (name === sheet.document.name) return false;
+
+  await sheet.document.update({ name }, { render: true });
+  return true;
+}

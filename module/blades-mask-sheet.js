@@ -5,6 +5,9 @@ import { capitalize } from "./blades-helpers.js";
 import { encumbranceLevelForLoadout, hasMuleAbility } from "./encumbrance.js";
 import { renderMaskPickerTooltip } from "./mask-picker-tooltip.js";
 import { maskActorImage } from "./actor-images.js";
+import { formControlUpdate, handleActorNameEnter, persistActorNameChange } from "./sheet-dom.js";
+
+export { handleActorNameEnter as handleMaskNameEnter };
 
 export function getMaskTypePresentation(typeName, attributes) {
   const maskAttributes = attributes[typeName];
@@ -41,16 +44,6 @@ export function updateMaskDotDisplay(element, value, maxValue) {
 }
 
 /**
- * Prevent native form submission; the shared Name `change` listener remains
- * the sole persistence path.
- */
-export function handleMaskNameEnter(event) {
-  if (event.key !== "Enter" || event.isComposing) return;
-  event.preventDefault();
-  event.currentTarget?.blur();
-}
-
-/**
  * Extend the basic BladesSheet for the Mask actor type.
  * @extends {BladesSheet}
  */
@@ -59,7 +52,8 @@ export class BladesMaskSheet extends BladesSheet {
   static DEFAULT_OPTIONS = {
     classes: ["brinkwood", "sheet", "actor", "pc", "mask"],
     position: { width: 700, height: 840 },
-    form: { submitOnChange: true },
+    // Explicit change handlers below are the only Mask persistence path.
+    form: { submitOnChange: false },
     tabGroups: { primary: "traits" },
   };
 
@@ -151,7 +145,7 @@ export class BladesMaskSheet extends BladesSheet {
     const listenerOptions = { signal: this._maskSheetListenerController.signal };
     this._bindSheetViewState(html, listenerOptions);
     html.querySelector('input[name="name"]')?.addEventListener(
-      "keydown", handleMaskNameEnter, listenerOptions);
+      "keydown", handleActorNameEnter, listenerOptions);
 
     // Open inventory item sheet
     html.querySelectorAll(".item-body").forEach(el =>
@@ -163,6 +157,10 @@ export class BladesMaskSheet extends BladesSheet {
     );
 
     if (!this.isEditable) return;
+
+    html.querySelectorAll('input[name], select[name], textarea[name], prose-mirror[name]').forEach(control =>
+      control.addEventListener("change", event => this._persistFormControl(event), listenerOptions)
+    );
 
     // Delete inventory item. The identity Mask is configuration, so removal
     // goes through the actor command that also removes its source-tagged trait.
@@ -192,6 +190,17 @@ export class BladesMaskSheet extends BladesSheet {
         Promise.resolve(action).finally(() => this._restoreSheetViewState());
       }, listenerOptions)
     );
+  }
+
+  /* -------------------------------------------- */
+
+  async _persistFormControl(event) {
+    if (!this.isEditable) return;
+    const control = event.currentTarget;
+    if (control.matches('input[name="name"]')) return persistActorNameChange(this, event);
+
+    const update = formControlUpdate(control);
+    if (update) await this.document.update(update, { render: control.matches("prose-mirror[name]") });
   }
 
   /* -------------------------------------------- */

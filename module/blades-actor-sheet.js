@@ -11,7 +11,7 @@ import { BladesHelpers } from "./blades-helpers.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
 import { preloadClockImages } from "./clock-utils.js";
 import { renderDescriptionTooltip } from "./item-tooltip.js";
-import { formControlUpdate } from "./sheet-dom.js";
+import { formControlUpdate, handleActorNameEnter, persistActorNameChange } from "./sheet-dom.js";
 
 export { prepareLoadoutCapacity } from "./character/loadout.js";
 
@@ -165,6 +165,8 @@ position: { width: 700, height: 1170 },
      const listenerOptions = { signal: this._characterSheetListenerController.signal };
      this._bindSheetViewState(html, listenerOptions);
      bindLoadoutControls(this, html, listenerOptions);
+     html.querySelector('input[name="name"]')?.addEventListener(
+       "keydown", handleActorNameEnter, listenerOptions);
      if (!this.isEditable) return;
 
        html.querySelectorAll('input[name], select[name], textarea[name], prose-mirror[name]').forEach(control => {
@@ -222,6 +224,7 @@ position: { width: 700, height: 1170 },
   async _persistFormControl(event) {
     if (!this.isEditable) return;
     const control = event.currentTarget;
+    if (control.matches('input[name="name"]')) return persistActorNameChange(this, event);
     // Clock radios have toggle-to-zero semantics in _onClockClick; a later
     // generic focus/change save would otherwise restore the selected segment.
     if (control.matches('select[name="system.selected_load_level"]')) return;
