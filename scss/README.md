@@ -4,7 +4,7 @@
 
 ## Ownership map
 
-- `import/sheet-tabs.scss` owns reusable tab colors, hover, focus, active, and transition visuals.
+- `import/sheet-tabs.scss` owns reusable tab colors, hover, focus, active, transition visuals, and bounded active-panel scrolling; sheet files own sizing and geometry.
 - `import/general-styles.scss` imports shared tab styling.
 - `import/character-sheet.scss` owns character-sheet layout, geometry, and scrolling.
 - `import/legacy-character-effects.scss` and `import/legacy-character-sheet-polish.scss` are narrow compatibility layers. Shared `.bw-checkbox-x` visuals live in `import/general-styles.scss`; sheets own only their size and placement. Keep an override sheet-scoped, documented, and limited to behavior that cannot live with its primary owner.

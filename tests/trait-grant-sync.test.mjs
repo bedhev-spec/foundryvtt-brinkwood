@@ -202,3 +202,27 @@ test("removing Class or Pact never removes traits", async () => {
     assert.equal(actor.items.some(item => item.id === "trait"), true);
   }
 });
+
+test("Judgement Mask resolves the rulebook spelling to Judgment compendium traits", async () => {
+  const judgmentTrait = compendiumTrait("trait-judgment", "Pronounce Sentence", "Judgment");
+  game.packs.set("brinkwood.trait", { getDocuments: async () => [judgmentTrait] });
+  const creates = [];
+  const actor = {
+    items: [],
+    createEmbeddedDocuments: async (type, data) => creates.push({ type, data }),
+  };
+
+  await BladesActor.prototype._addTraits.call(actor, {
+    id: "mask-judgement",
+    type: "mask",
+    name: "Judgement",
+  });
+
+  assert.equal(creates.length, 1);
+  assert.equal(creates[0].data[0].name, "Pronounce Sentence");
+  assert.deepEqual(creates[0].data[0].flags.brinkwood.traitGrant, {
+    sourceItemId: "mask-judgement",
+    sourceItemType: "mask",
+    traitSourceId: "trait-judgment",
+  });
+});

@@ -32,13 +32,11 @@ test("v13 image actions and editors are editable-only", async () => {
     "templates/items/simple.html",
     "templates/items/class.html",
     "templates/items/moot_decision.html",
-    "templates/items/trait.html"
+    "templates/items/trait.html",
+    "templates/parts/sheet-identity-portrait.html"
   ].map(read));
 
-  for (const template of templates) {
-    assert.match(template, /\{\{#if editable\}\}\s*data-action="editImage" data-edit="img"/);
-  }
-  assert.match(templates[0], /\{\{#if editable\}\}[\s\S]*?<prose-mirror name="system\.description"[^>]*data-document-uuid="\{\{actor\.uuid\}\}"[^>]*collaborate toggled>/);
+  for (const template of [...templates.slice(1), templates.at(-1)]) assert.match(template, /\{\{#if editable\}\}\s*data-action="editImage" data-edit="img"/); assert.match(templates[0], /parts\/sheet-identity-portrait\.html/); assert.match(templates[0], /\{\{#if editable\}\}[\s\S]*?<prose-mirror name="system\.description"[^>]*data-document-uuid="\{\{actor\.uuid\}\}"[^>]*collaborate toggled>/);
   assert.match(templates[1], /<prose-mirror name="system\.description"[^>]*data-document-uuid="\{\{actor\.uuid\}\}"[^>]*collaborate toggled>/);
   assert.match(templates[1], /<prose-mirror name="system\.notes"[^>]*data-document-uuid="\{\{actor\.uuid\}\}"[^>]*collaborate toggled>/);
   assert.ok(templates.every(template => !/\{\{editor\b/.test(template)));

@@ -814,16 +814,49 @@
 .brinkwood {
   /* Shared tab and panel visual language. Geometry stays with each sheet. */
 }
+.brinkwood .sheet-tab-workspace {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
+}
+.brinkwood .sheet-tab-content {
+  min-height: 0;
+  overflow: hidden;
+}
+.brinkwood .sheet-tab-content > .tab.active {
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
 .brinkwood .sheet-tabs, .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs, .brinkwood.actor.mask .mask-sheet__tabs {
   --bw-tab-surface: rgba(255, 255, 255, 0.28);
   --bw-tab-active: rgba(255, 255, 255, 0.52);
   --bw-tab-transition: 120ms ease;
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 36px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--bw-rule);
+  border-radius: 3px;
 }
 .brinkwood .sheet-tabs .item, .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item, .brinkwood.actor.mask .mask-sheet__tabs .item {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 7px 8px;
   color: var(--bw-ink-soft);
   background-color: var(--bw-tab-surface);
   border-bottom: 3px solid transparent;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  text-align: center;
+  white-space: nowrap;
   transition: background-color var(--bw-tab-transition), border-color var(--bw-tab-transition), box-shadow var(--bw-tab-transition), color var(--bw-tab-transition);
 }
 .brinkwood .sheet-tabs .item:hover:not(.active), .brinkwood .sheet-tabs .item:focus-visible:not(.active), .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item:hover:not(.active), .brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item:focus-visible:not(.active), .brinkwood.actor.mask .mask-sheet__tabs .item:hover:not(.active), .brinkwood.actor.mask .mask-sheet__tabs .item:focus-visible:not(.active) {
@@ -840,17 +873,16 @@
   outline: 3px solid var(--bw-focus);
   outline-offset: -3px;
 }
+.brinkwood .sheet-tabs button.item {
+  border: 0;
+  font: inherit;
+}
 .brinkwood {
   /* The legacy character sheet shares the same effect-tab state language. */
 }
 .brinkwood.actor.pc.character .effects-tabs {
   border: 1px solid var(--bw-rule);
   background: var(--bw-paper-deep);
-}
-.brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs {
-  border-left: 1px solid var(--bw-rule);
-  border-right: 1px solid var(--bw-rule);
-  border-radius: 3px;
 }
 .brinkwood.actor.pc.character .effects-tab {
   color: var(--bw-ink-soft);
@@ -1279,32 +1311,6 @@
 .brinkwood.actor.pc.character .character-attributes > .attributes {
   width: 100%;
   min-width: 0;
-}
-.brinkwood.actor.pc.character nav.tabs {
-  min-height: 36px;
-  margin-bottom: 0;
-  border-top: 1px solid rgba(25, 24, 19, 0.6);
-  border-bottom: 1px solid rgba(25, 24, 19, 0.6);
-}
-.brinkwood.actor.pc.character nav.tabs .item {
-  flex: 1 1 0;
-  padding: 7px 8px;
-  color: #191813;
-  text-align: left;
-  text-shadow: none;
-  white-space: nowrap;
-}
-.brinkwood.actor.pc.character nav.tabs .item.active {
-  background: var(--bw-paper-deep);
-  color: #191813;
-  font-weight: bold;
-  text-decoration: none;
-  box-shadow: inset 0 -3px var(--bw-accent);
-}
-.brinkwood.actor.pc.character nav.tabs button.item {
-  border: 0;
-  background: transparent;
-  font: inherit;
 }
 .brinkwood.actor.pc.character .attribute-label,
 .brinkwood.actor.pc.character .attribute-skill-label {
@@ -1746,10 +1752,6 @@
   margin-top: 0;
   padding-top: 10px;
 }
-.brinkwood.actor.pc.character .character-sheet__workspace > nav.tabs .item {
-  flex: 1 1 0;
-  min-width: 0;
-}
 .brinkwood.actor.pc.character .character-attributes {
   display: block;
   align-self: stretch;
@@ -1831,11 +1833,7 @@
   min-width: 0;
   min-height: 0;
   height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-gutter: stable;
-  scrollbar-width: thin;
+  overflow: hidden;
 }
 .brinkwood.actor.pc.character .character-sheet__workspace > .tab-content > .tab[data-tab].active {
   display: flex;
@@ -2278,6 +2276,10 @@
   color: var(--bw-ink);
 }
 .brinkwood.actor.mask form.mask-sheet {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+  overflow: hidden;
   box-sizing: border-box;
   width: 100%;
   min-height: 0;
@@ -2286,159 +2288,48 @@
   color: var(--bw-ink);
   background: rgba(247, 244, 237, 0.28);
 }
-.brinkwood.actor.mask form.mask-sheet input[type=text],
-.brinkwood.actor.mask form.mask-sheet textarea {
+.brinkwood.actor.mask form.mask-sheet input[type=text], .brinkwood.actor.mask form.mask-sheet textarea {
   box-sizing: border-box;
   border: 1px solid var(--bw-ink-soft);
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.6);
   color: var(--bw-ink);
 }
-.brinkwood.actor.mask form.mask-sheet button,
-.brinkwood.actor.mask form.mask-sheet a[role=tab] {
+.brinkwood.actor.mask form.mask-sheet button, .brinkwood.actor.mask form.mask-sheet a[role=tab] {
   font: inherit;
 }
-.brinkwood.actor.mask form.mask-sheet button:focus-visible,
-.brinkwood.actor.mask form.mask-sheet a[role=tab]:focus-visible {
+.brinkwood.actor.mask form.mask-sheet button:focus-visible, .brinkwood.actor.mask form.mask-sheet a[role=tab]:focus-visible {
   outline: 3px solid var(--bw-focus);
   outline-offset: 2px;
 }
-.brinkwood.actor.mask .mask-sheet__header {
-  display: grid;
-  grid-template-columns: 112px minmax(180px, 1fr) minmax(230px, 1.4fr);
-  gap: 16px;
-  align-items: start;
-  padding-bottom: 16px;
-  border-bottom: 2px solid var(--bw-rule);
-}
-.brinkwood.actor.mask .mask-sheet__portrait {
-  display: block;
-  width: 112px;
-  height: 112px;
-  border: 2px solid var(--bw-ink);
-  border-radius: 4px;
-  object-fit: cover;
-  cursor: pointer;
-}
-.brinkwood.actor.mask .mask-sheet__portrait[data-action=editImage]:focus-visible {
-  outline: 3px solid var(--bw-focus);
-  outline-offset: 2px;
+.brinkwood.actor.mask .mask-sheet__identity-block {
+  grid-template-columns: minmax(150px, 200px) minmax(0, 1fr);
 }
 .brinkwood.actor.mask .mask-sheet__identity {
   display: grid;
-  gap: 8px;
+  gap: 10px;
+  min-width: 0;
 }
-.brinkwood.actor.mask .mask-sheet__identity > label,
-.brinkwood.actor.mask .mask-sheet__identity .mask-sheet__item-heading span {
+.brinkwood.actor.mask .mask-sheet__trackers {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.brinkwood.actor.mask .mask-sheet__name-box {
+  display: grid;
+  gap: 4px;
+}
+.brinkwood.actor.mask .mask-sheet__name-box label, .brinkwood.actor.mask .mask-sheet__name-box .item-class-label {
   color: var(--bw-ink-soft);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-.brinkwood.actor.mask .mask-sheet__identity .name {
+.brinkwood.actor.mask .mask-sheet__name-box .name {
   width: 100%;
   padding: 6px 8px;
   font-size: 1.35rem;
-  font-weight: 700;
-}
-.brinkwood.actor.mask .mask-sheet__item-block {
-  display: grid;
-  gap: 5px;
-}
-.brinkwood.actor.mask .mask-sheet__item-heading,
-.brinkwood.actor.mask .mask-sheet__item,
-.brinkwood.actor.mask .mask-tracker__heading,
-.brinkwood.actor.mask .mask-skill {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.brinkwood.actor.mask .mask-sheet__item-heading button,
-.brinkwood.actor.mask .mask-sheet__item button,
-.brinkwood.actor.mask .mask-tracker button,
-.brinkwood.actor.mask .mask-skill button {
-  border: 0;
-  background: transparent;
-  color: inherit;
-}
-.brinkwood.actor.mask .mask-sheet__item-list {
-  display: grid;
-  gap: 4px;
-}
-.brinkwood.actor.mask .mask-sheet__item {
-  min-width: 0;
-  padding: 3px 5px;
-  border: 1px solid rgba(81, 70, 74, 0.35);
-  border-radius: 3px;
-}
-.brinkwood.actor.mask .mask-sheet__item-open {
-  min-width: 0;
-  padding: 2px 0;
-  overflow: hidden;
-  cursor: pointer;
-  font-weight: 700;
-  text-align: left;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.brinkwood.actor.mask .item-add-popup,
-.brinkwood.actor.mask .item-delete {
-  cursor: pointer;
-  color: var(--bw-accent) !important;
-  font-size: 0.85rem !important;
-  font-weight: 700;
-}
-.brinkwood.actor.mask .mask-sheet__trackers {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-.brinkwood.actor.mask .mask-tracker {
-  min-width: 0;
-  padding: 9px;
-  border: 1px solid var(--bw-rule);
-  border-radius: 4px;
-  background: var(--bw-paper-deep);
-}
-.brinkwood.actor.mask .mask-tracker__heading {
-  margin-bottom: 6px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-.brinkwood.actor.mask .mask-tracker__heading button {
-  padding: 0;
-  cursor: pointer;
-  font-weight: inherit;
-  text-transform: inherit;
-}
-.brinkwood.actor.mask .mask-tracker__heading output {
-  flex: 0 0 auto;
-  color: var(--bw-ink-soft);
-  font-variant-numeric: tabular-nums;
-}
-.brinkwood.actor.mask .mask-tracker__dots,
-.brinkwood.actor.mask .mask-skill__controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
-}
-.brinkwood.actor.mask .mask-tracker .dot-value {
-  width: 22px;
-  height: 28px;
-  padding: 0;
-  cursor: pointer;
-}
-.brinkwood.actor.mask .mask-tracker .dot-value:disabled {
-  cursor: default;
-  opacity: 0.72;
-}
-.brinkwood.actor.mask .mask-tracker .dot-value img {
-  display: block;
-  width: 22px;
-  height: 28px;
 }
 .brinkwood.actor.mask .mask-sheet__layout {
   display: grid;
@@ -2448,6 +2339,9 @@
   justify-self: stretch;
   width: 100%;
   min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
   padding-top: 16px;
 }
 .brinkwood.actor.mask .mask-sheet__main {
@@ -2455,30 +2349,9 @@
   grid-template-rows: auto minmax(0, 1fr);
   box-sizing: border-box;
   min-width: 0;
+  min-height: 0;
   width: 100%;
-}
-.brinkwood.actor.mask .mask-sheet__tabs {
-  display: flex;
-  gap: 2px;
-  margin: 0;
-  border-bottom: 2px solid var(--bw-ink);
-}
-.brinkwood.actor.mask .mask-sheet__tabs .item {
-  flex: 0 1 auto;
-  padding: 6px 10px;
-  cursor: pointer;
-  color: var(--bw-ink);
-  font-weight: 700;
-  text-decoration: none;
-}
-.brinkwood.actor.mask .mask-sheet__tabs .item.active {
-  background: var(--bw-ink);
-  color: var(--bw-inverse);
-}
-.brinkwood.actor.mask .mask-sheet__tabs button.item {
-  border: 0;
-  background: transparent;
-  font: inherit;
+  height: 100%;
 }
 .brinkwood.actor.mask .mask-sheet__panel {
   display: none;
@@ -2495,100 +2368,12 @@
   width: 100%;
   min-width: 0;
 }
-.brinkwood.actor.mask .mask-sheet__panel > h2,
-.brinkwood.actor.mask .mask-sheet__panel .mask-attributes > h2 {
+.brinkwood.actor.mask .mask-sheet__panel > h2, .brinkwood.actor.mask .mask-sheet__panel .mask-attributes > h2 {
   margin: 0 0 10px;
   color: var(--bw-ink);
   font-size: 1rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-}
-.brinkwood.actor.mask .mask-sheet__panel .editor,
-.brinkwood.actor.mask .mask-sheet__panel .editor-content,
-.brinkwood.actor.mask .mask-sheet__panel prose-mirror {
-  min-height: 180px;
-}
-.brinkwood.actor.mask {
-  /* Mask-only Living Parchment polish.  The shared effects partial renders
-   * <section> elements, so reset the legacy generic section flex rule here. */
-}
-.brinkwood.actor.mask .mask-sheet__header {
-  padding: 10px;
-  border: 1px solid rgba(141, 98, 93, 0.62);
-  border-radius: 8px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(224, 215, 197, 0.16));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.52), 0 2px 6px rgba(33, 27, 29, 0.08);
-}
-.brinkwood.actor.mask .mask-sheet__portrait {
-  border-color: rgba(33, 27, 29, 0.72);
-  box-shadow: 4px 4px 0 rgba(141, 98, 93, 0.18);
-}
-.brinkwood.actor.mask .mask-sheet__item {
-  border-width: 0 0 1px;
-  border-radius: 0;
-  background: transparent;
-}
-.brinkwood.actor.mask .mask-sheet__item:hover,
-.brinkwood.actor.mask .mask-sheet__item:focus-within {
-  background: rgba(143, 47, 53, 0.055);
-}
-.brinkwood.actor.mask .mask-sheet__item .identity-choice__remove {
-  display: inline-grid;
-  place-items: center;
-  flex: 0 0 18px;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  border-radius: 50%;
-  color: var(--bw-ink-soft) !important;
-  font-size: 1rem !important;
-  line-height: 1;
-}
-.brinkwood.actor.mask .mask-sheet__item .identity-choice__remove:hover,
-.brinkwood.actor.mask .mask-sheet__item .identity-choice__remove:focus-visible {
-  color: var(--bw-accent) !important;
-  background: rgba(143, 47, 53, 0.1);
-}
-.brinkwood.actor.mask .mask-tracker,
-.brinkwood.actor.mask .mask-attributes {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 1px 3px rgba(33, 27, 29, 0.07);
-}
-.brinkwood.actor.mask .mask-sheet__tabs .item {
-  transition: background-color 120ms ease, color 120ms ease, transform 120ms ease;
-}
-.brinkwood.actor.mask .mask-sheet__tabs .item:hover:not(.active) {
-  background: rgba(255, 255, 255, 0.32);
-}
-.brinkwood.actor.mask .mask-sheet__tabs .item.active {
-  box-shadow: inset 0 -3px 0 var(--bw-accent), 0 1px 3px rgba(33, 27, 29, 0.12);
-  transform: translateY(-1px);
-}
-.brinkwood.actor.mask .mask-sheet__panel[data-tab=effects] .effects-groups {
-  display: grid;
-  width: 100%;
-  min-width: 0;
-  gap: 10px;
-}
-.brinkwood.actor.mask .mask-sheet__panel[data-tab=effects] .effects-category {
-  display: block;
-  width: 100%;
-  min-width: 0;
-}
-.brinkwood.actor.mask .mask-sheet__panel[data-tab=effects] .effects-category__header {
-  min-height: 42px;
-  padding: 7px 10px 7px 12px;
-}
-.brinkwood.actor.mask .mask-sheet__panel[data-tab=effects] .effects-category__list {
-  width: 100%;
-  min-width: 0;
-}
-@media (prefers-reduced-motion: reduce) {
-  .brinkwood.actor.mask .mask-sheet__tabs .item {
-    transition-duration: 0.01ms;
-  }
-  .brinkwood.actor.mask .mask-sheet__tabs .item.active {
-    transform: none;
-  }
 }
 .brinkwood.actor.mask .mask-sheet__traits-workspace {
   display: grid;
@@ -2597,15 +2382,6 @@
   align-items: start;
   width: 100%;
   min-width: 0;
-}
-.brinkwood.actor.mask .mask-sheet__notes .editor,
-.brinkwood.actor.mask .mask-sheet__notes .editor-content,
-.brinkwood.actor.mask .mask-sheet__notes prose-mirror {
-  min-height: 160px;
-  padding: 10px 12px;
-  border: 1px solid var(--bw-rule);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.3);
 }
 .brinkwood.actor.mask .mask-sheet__trait-library {
   min-width: 0;
@@ -2616,98 +2392,78 @@
   justify-content: space-between;
   gap: 8px;
 }
-.brinkwood.actor.mask .mask-sheet__section-heading .item-add-popup {
-  padding: 2px 0;
-}
-.brinkwood.actor.mask .mask-attributes > h2 {
-  margin: 0 0 10px;
-  color: var(--bw-ink);
-  font-size: 1rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
 .brinkwood.actor.mask .mask-sheet__traits {
   display: grid;
   gap: 8px;
 }
-.brinkwood.actor.mask .mask-trait-card {
-  border: 1px solid rgba(81, 70, 74, 0.35);
-  border-left: 4px solid var(--bw-rule);
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.35);
-}
-.brinkwood.actor.mask .mask-trait-card__select {
-  padding: 8px 10px;
-}
-.brinkwood.actor.mask .mask-trait-card__title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-weight: 700;
-}
-.brinkwood.actor.mask .mask-trait-card__title input {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--bw-accent);
-}
-.brinkwood.actor.mask .mask-trait-card__description {
-  margin-top: 5px;
-  color: var(--bw-ink-soft);
+.brinkwood.actor.mask .mask-sheet__notes .editor,
+.brinkwood.actor.mask .mask-sheet__notes .editor-content,
+.brinkwood.actor.mask .mask-sheet__notes prose-mirror {
+  min-height: 160px;
+  padding: 10px 12px;
+  border: 1px solid var(--bw-rule);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.3);
 }
 .brinkwood.actor.mask .mask-attributes {
   min-width: 0;
+}
+.brinkwood.actor.mask .mask-attributes {
   padding: 10px;
   border: 1px solid var(--bw-rule);
-  border-radius: 4px;
-  background: var(--bw-paper-deep);
-}
-.brinkwood.actor.mask .mask-attributes > h2 {
-  margin: 0 0 8px;
-  font-size: 0.95rem;
-  text-transform: uppercase;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.25);
 }
 .brinkwood.actor.mask .mask-attributes__skills {
   display: grid;
-  gap: 7px;
+  gap: 8px;
 }
 .brinkwood.actor.mask .mask-skill {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+.brinkwood.actor.mask .mask-skill__controls {
+  display: flex;
+  flex: 0 0 auto;
 }
 .brinkwood.actor.mask .mask-skill__controls .dot-value {
-  min-width: 16px;
-  padding: 0;
-  cursor: pointer;
+  min-width: 22px;
+  padding: 2px 4px;
+  border: 0;
+  background: transparent;
   color: var(--bw-accent);
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1;
 }
-.brinkwood.actor.mask .mask-skill__controls .dot-value:disabled {
-  cursor: default;
-  opacity: 0.7;
-}
 .brinkwood.actor.mask .attribute-skill-label {
-  padding: 0;
-  cursor: pointer;
+  min-width: 0;
   color: var(--bw-ink);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 700;
   text-align: right;
 }
-.brinkwood.actor.mask .mask-sheet__empty,
-.brinkwood.actor.mask .mask-attributes__empty {
-  margin: 0;
+.brinkwood.actor.mask .mask-sheet__empty, .brinkwood.actor.mask .mask-attributes__empty {
+  margin: 10px 0;
   color: var(--bw-ink-soft);
   font-style: italic;
 }
+.brinkwood.actor.mask .mask-sheet__notes .editor, .brinkwood.actor.mask .mask-sheet__notes .editor-content, .brinkwood.actor.mask .mask-sheet__notes prose-mirror {
+  display: block;
+  min-height: 180px;
+  padding: 10px 12px;
+  border: 1px solid var(--bw-rule);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.3);
+}
+.brinkwood.actor.mask .mask-sheet__panel[data-tab=effects] .effects-groups,
+.brinkwood.actor.mask .mask-sheet__panel[data-tab=effects] .effects-category {
+  width: 100%;
+  min-width: 0;
+}
 @container (max-width: 620px) {
-  .brinkwood.actor.mask .mask-sheet__header {
-    grid-template-columns: 88px minmax(0, 1fr);
-  }
-  .brinkwood.actor.mask .mask-sheet__portrait {
-    width: 88px;
-    height: 88px;
-  }
   .brinkwood.actor.mask .mask-sheet__trackers {
     grid-column: 1/-1;
   }
@@ -2718,24 +2474,19 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-@container (max-width: 390px) {
+@container (max-width: 410px) {
   .brinkwood.actor.mask form.mask-sheet {
     padding: 10px;
   }
-  .brinkwood.actor.mask .mask-sheet__header {
-    grid-template-columns: 1fr;
-  }
-  .brinkwood.actor.mask .mask-sheet__portrait {
-    width: 72px;
-    height: 72px;
-  }
-  .brinkwood.actor.mask .mask-sheet__trackers,
   .brinkwood.actor.mask .mask-attributes__skills {
     grid-template-columns: 1fr;
   }
+  .brinkwood.actor.mask .mask-sheet__tabs {
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
   .brinkwood.actor.mask .mask-sheet__tabs .item {
-    padding-inline: 7px;
-    font-size: 0.9rem;
+    flex: 0 0 auto;
   }
 }
 .brinkwood.actor.rebelion {
@@ -3375,6 +3126,382 @@
   margin-bottom: 10px;
 }
 
+/* Shared first-section geometry for actor identity sheets. */
+.sheet-identity {
+  display: grid;
+  grid-template-columns: minmax(150px, 200px) minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 14px 20px;
+  min-width: 0;
+}
+
+.sheet-identity__portrait {
+  grid-row: span 2;
+  min-width: 0;
+}
+
+.sheet-identity__portrait-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.sheet-identity.bw-section-frame {
+  padding: 10px;
+  overflow: visible;
+}
+
+.sheet-identity__portrait-frame {
+  box-sizing: border-box;
+  width: 200px;
+  height: 200px;
+  max-width: 200px;
+  max-height: 200px;
+  object-fit: cover;
+  border: 1px solid rgba(33, 27, 29, 0.72);
+  background: rgba(224, 215, 197, 0.42);
+  box-shadow: 5px 5px 0 rgba(141, 98, 93, 0.2);
+  cursor: default;
+}
+.sheet-identity__portrait-frame[data-action=editImage]:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 2px;
+}
+
+.sheet-identity__field-box {
+  display: grid;
+  grid-template-rows: 16px 36px;
+  gap: 4px;
+  align-self: start;
+  min-width: 0;
+}
+.sheet-identity__field-box > label {
+  display: flex;
+  height: 16px;
+  align-self: end;
+  align-items: flex-end;
+  margin: 0;
+  line-height: 1;
+}
+.sheet-identity__field-box > input[type=text] {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  margin: 0;
+}
+
+.sheet-identity__name-box label {
+  color: var(--bw-ink-soft);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.sheet-identity__name-box .bw-text-field {
+  padding: 6px 8px;
+  font-size: 1.35rem;
+  font-weight: 400;
+}
+
+.bw-text-field:focus, .bw-text-field:focus-visible {
+  border-color: #191813;
+  outline: 0;
+  box-shadow: 0 0 0 1px rgba(25, 24, 19, 0.25);
+}
+
+.sheet-identity__alias-box .alias {
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.sheet-identity__trackers {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sheet-identity__trackers .big-teeth-section {
+  --legacy-tooth-pitch: 14px;
+  display: flex;
+  width: 100%;
+  margin-bottom: 0;
+  align-items: center;
+  min-width: 0;
+  border-top: 1px solid var(--bw-ink);
+  padding-block: 1.5px;
+}
+
+.sheet-identity__trackers .big-teeth-section:last-child {
+  border-bottom: 1px solid var(--bw-ink);
+}
+
+.sheet-identity__trackers .character-xp-section {
+  border-color: #315f82;
+}
+
+.sheet-identity__trackers .big-teeth {
+  display: flex;
+  gap: 1px;
+  align-items: center;
+  min-width: 0;
+}
+
+.sheet-identity__trackers .black-label {
+  display: grid;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: auto;
+  height: 26px !important;
+  padding: 2px 3px;
+  line-height: 22px;
+  font-size: calc(0.8rem + 2px);
+  place-items: center;
+}
+
+.sheet-identity__trackers .legacy-tracker-segments {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 1px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: 26px;
+  min-width: auto;
+  width: auto;
+  overflow: visible;
+}
+
+.sheet-identity__trackers .dot-value {
+  display: inline-flex;
+  flex: 0 0 var(--legacy-tooth-pitch);
+  align-items: center;
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 0 !important;
+  width: auto;
+  min-width: var(--legacy-tooth-pitch);
+  height: 26px;
+  margin: 0;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent;
+  box-shadow: none !important;
+  outline: none;
+}
+.sheet-identity__trackers .dot-value:hover, .sheet-identity__trackers .dot-value:active, .sheet-identity__trackers .dot-value:focus, .sheet-identity__trackers .dot-value:focus:not(:focus-visible) {
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none;
+}
+.sheet-identity__trackers .dot-value:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 1px;
+}
+.sheet-identity__trackers .dot-value:disabled {
+  cursor: default;
+}
+
+.sheet-identity__trackers img.big-teeth {
+  width: 12px;
+  height: 26px;
+  max-width: none;
+  margin-left: 0;
+  border: 0;
+}
+
+.sheet-identity__trackers .black-label > .rollable-text {
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  text-transform: inherit;
+}
+
+.sheet-identity .sheet-identity__rows {
+  display: grid;
+  grid-auto-rows: 26px;
+  row-gap: 0;
+  padding-right: 0;
+}
+
+.sheet-identity .sheet-identity__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  column-gap: 4px;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 26px;
+  min-height: 26px;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.sheet-identity .sheet-identity__rows--separated .sheet-identity__row {
+  box-shadow: inset 0 -1px 0 rgba(141, 98, 93, 0.3);
+}
+
+.sheet-identity .sheet-identity__row .item-class-label {
+  grid-column: 1;
+  min-width: 0;
+  padding: 0;
+}
+
+.sheet-identity .sheet-identity__row .item-class-label,
+.sheet-identity .identity-choice__value .item-body {
+  display: flex;
+  height: 26px;
+  align-items: center;
+  line-height: 1.25;
+}
+
+.sheet-identity .sheet-identity__row .item-class-label > button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  cursor: pointer;
+}
+.sheet-identity .sheet-identity__row .item-class-label > button:hover {
+  color: var(--bw-accent);
+  text-shadow: 0 0 0.2em rgba(143, 47, 53, 0.4);
+}
+.sheet-identity .sheet-identity__row .item-class-label > button:focus:not(:focus-visible) {
+  outline: 0;
+  box-shadow: none;
+}
+.sheet-identity .sheet-identity__row .item-class-label > button:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 1px;
+}
+
+.sheet-identity .identity-choice__track {
+  grid-column: 2;
+  display: grid;
+  box-sizing: border-box;
+  min-width: 0;
+  height: 26px;
+  min-height: 26px;
+  align-items: center;
+}
+
+.sheet-identity .identity-choice__value {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18px;
+  column-gap: 4px;
+  align-items: center;
+  min-width: 0;
+  height: 26px;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  overflow: hidden;
+}
+
+.sheet-identity .identity-choice__blank {
+  height: 26px;
+  min-height: 26px;
+}
+
+.sheet-identity .identity-choice__value .item-body {
+  grid-column: 1;
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+  width: 100%;
+  height: 26px;
+  align-items: center;
+  overflow: hidden;
+}
+
+.sheet-identity .identity-choice__value .item-name {
+  min-width: 0;
+  width: 100%;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sheet-identity .identity-choice__remove {
+  position: static;
+  transform: none;
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 18px;
+  cursor: pointer;
+}
+.sheet-identity .identity-choice__remove:hover {
+  color: var(--bw-accent);
+  text-shadow: none;
+}
+.sheet-identity .identity-choice__remove:focus:not(:focus-visible) {
+  outline: 0;
+  box-shadow: none;
+}
+.sheet-identity .identity-choice__remove:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 1px;
+}
+
+.sheet-identity .identity-choice__value.tooltip[data-tooltip-html] {
+  cursor: default;
+}
+
+.sheet-identity .identity-choice__value .item-body.item-add-popup {
+  display: flex;
+  justify-content: flex-end;
+  cursor: pointer;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  clip-path: none;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  line-height: 1.25;
+  text-transform: none;
+}
+
+@container (max-width: 640px) {
+  .sheet-identity {
+    grid-template-columns: minmax(110px, 150px) minmax(0, 1fr);
+  }
+  .sheet-identity__portrait {
+    grid-row: span 3;
+  }
+}
+@container (max-width: 480px) {
+  .sheet-identity {
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+}
 .chat-label {
   background-color: #191813;
   font-family: Kirsty, serif;
@@ -3916,6 +4043,14 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   background: #fffdf7;
   color: var(--bw-ink);
   box-shadow: inset 0 1px 2px rgba(33, 27, 29, 0.13);
+}
+
+/* This must follow the inset-shadow compatibility treatment above so every
+ * text field on the Character sheet keeps the Mask Sheet's black focus cue. */
+.brinkwood.actor.pc.character form.actor-sheet input[type=text]:focus {
+  border-color: #191813;
+  outline: 0;
+  box-shadow: 0 0 0 1px rgba(25, 24, 19, 0.25);
 }
 
 .brinkwood.actor.pc.character form.actor-sheet .character-identity-choices .item-block {

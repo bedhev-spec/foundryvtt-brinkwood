@@ -39,6 +39,30 @@ test("view state retains both form and window scroll independently", () => {
   assert.deepEqual(windowContent, { scrollTop: 34, scrollLeft: 5 });
 });
 
+test("bounded sheets preserve only the active tab panel scroll", () => {
+  const tab = { scrollTop: 57, scrollLeft: 2, dataset: { tab: "traits" } };
+  const form = { scrollTop: 12, scrollLeft: 3 };
+  const windowContent = { scrollTop: 34, scrollLeft: 5 };
+  const root = {
+    matches: () => false,
+    closest: selector => selector === ".window-content" ? windowContent : null,
+    querySelector: selector => selector === ".sheet-tab-content > .tab.active" ? tab
+      : selector === ".sheet-tab-content" ? {}
+      : selector === '.tab[data-group="primary"].active' ? tab
+      : selector === "form.actor-sheet" ? form
+      : null,
+  };
+
+  const state = captureSheetViewState(root);
+  tab.scrollTop = tab.scrollLeft = 0;
+  restoreSheetViewState(root, state, { setPrimaryTab: value => { root.primary = value; } });
+
+  assert.equal(root.primary, "traits");
+  assert.deepEqual(tab, { scrollTop: 57, scrollLeft: 2, dataset: { tab: "traits" } });
+  assert.deepEqual(form, { scrollTop: 0, scrollLeft: 0 });
+  assert.deepEqual(windowContent, { scrollTop: 0, scrollLeft: 0 });
+});
+
 test("effect activation synchronizes roving tab state and panels", () => {
   const classes = () => ({ active: false, toggle(_name, value) { this.active = value; } });
   const passive = { classList: classes(), setAttribute(name, value) { this[name] = value; } };

@@ -5,14 +5,15 @@ import { captureSheetViewState, restoreSheetViewState } from "../module/sheet-vi
 test("character view state restores only the inner tab viewport", () => {
   const form = { scrollTop: 212, scrollLeft: 8 };
   const windowContent = { scrollTop: 61, scrollLeft: 4 };
-  const tabViewport = { scrollTop: 145, scrollLeft: 2 };
+  const tabViewport = { scrollTop: 145, scrollLeft: 2, dataset: { tab: "downtime" } };
   const root = {
     matches: () => false,
     closest: selector => selector === ".window-content" ? windowContent : null,
     querySelector(selector) {
-      if (selector === ".character-sheet__workspace > .tab-content") return tabViewport;
+      if (selector === ".sheet-tab-content > .tab.active") return tabViewport;
+      if (selector === ".sheet-tab-content") return {};
       if (selector === "form.actor-sheet") return form;
-      if (selector === '.tab[data-group="primary"].active') return { dataset: { tab: "downtime" } };
+      if (selector === '.tab[data-group="primary"].active') return tabViewport;
       return null;
     },
   };

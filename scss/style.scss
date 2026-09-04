@@ -58,6 +58,8 @@ $hover-brightness: 0.8;
   }
 }
 
+@import 'import/sheet-identity.scss';
+
 //top-level styles
 @import 'import/chat.scss';
 @import 'import/dialogs.scss';

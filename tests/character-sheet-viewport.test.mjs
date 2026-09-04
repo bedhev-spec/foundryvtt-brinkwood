@@ -6,9 +6,10 @@ const root = new URL("../", import.meta.url);
 const read = file => readFile(new URL(file, root), "utf8");
 
 test("character sheet has one bounded frame and an internally scrolling tab viewport", async () => {
-  const [controller, styles, lateStyles, compiled] = await Promise.all([
+  const [controller, styles, tabStyles, lateStyles, compiled] = await Promise.all([
     read("module/blades-actor-sheet.js"),
     read("scss/import/character-sheet.scss"),
+    read("scss/import/sheet-tabs.scss"),
     read("scss/import/legacy-character-effects.scss"),
     read("styles/blades.css"),
   ]);
@@ -23,7 +24,8 @@ test("character sheet has one bounded frame and an internally scrolling tab view
   assert.match(styles, /form\.actor-sheet > \.bans-armor\s*\{[\s\S]*?margin:\s*0/);
   assert.match(styles, /form\.actor-sheet > \.character-attributes\s*\{[\s\S]*?margin-block-end:\s*-10px/);
   assert.match(styles, /character-sheet__workspace\s*\{[\s\S]*?min-height:\s*0[\s\S]*?height:\s*100%[\s\S]*?grid-template-rows:\s*auto minmax\(0, 1fr\)[\s\S]*?overflow:\s*hidden/);
-  assert.match(styles, /character-sheet__workspace > \.tab-content\s*\{[\s\S]*?display:\s*grid[\s\S]*?grid-template-rows:\s*minmax\(0, 1fr\)[\s\S]*?min-height:\s*0[\s\S]*?height:\s*100%[\s\S]*?overflow-y:\s*auto[\s\S]*?overscroll-behavior:\s*contain/);
+  assert.match(styles, /character-sheet__workspace > \.tab-content\s*\{[\s\S]*?display:\s*grid[\s\S]*?grid-template-rows:\s*minmax\(0, 1fr\)[\s\S]*?min-height:\s*0[\s\S]*?height:\s*100%[\s\S]*?overflow:\s*hidden/);
+  assert.match(tabStyles, /> \.tab\.active\s*\{[\s\S]*?overflow-y:\s*auto[\s\S]*?overscroll-behavior:\s*contain/);
   assert.match(styles, /character-sheet__workspace > \.tab-content > \.tab\[data-tab\]\.active\s*\{[\s\S]*?display:\s*flex[\s\S]*?min-height:\s*0[\s\S]*?height:\s*100%[\s\S]*?pointer-events:\s*auto/);
   assert.match(styles, /tab\[data-tab="loadout"\]\.active\s*\{[\s\S]*?position:\s*relative[\s\S]*?z-index:\s*0/);
   assert.doesNotMatch(lateStyles, /form\.actor-sheet\s*\{[\s\S]*?grid-template-rows:\s*auto auto minmax\(0, 1fr\)[\s\S]*?overflow:\s*hidden/);

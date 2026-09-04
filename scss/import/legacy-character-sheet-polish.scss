@@ -191,6 +191,14 @@
   box-shadow: inset 0 1px 2px rgba(33, 27, 29, 0.13);
 }
 
+/* This must follow the inset-shadow compatibility treatment above so every
+ * text field on the Character sheet keeps the Mask Sheet's black focus cue. */
+.brinkwood.actor.pc.character form.actor-sheet input[type="text"]:focus {
+  border-color: #191813;
+  outline: 0;
+  box-shadow: 0 0 0 1px rgba(25, 24, 19, 0.25);
+}
+
 .brinkwood.actor.pc.character form.actor-sheet .character-identity-choices .item-block {
   /* Keep labels in their existing track, while giving selected values a
    * quieter gutter before the fixed × affordance. */

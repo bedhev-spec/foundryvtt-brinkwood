@@ -10,7 +10,6 @@ import { encumbranceLevelForLoadout, hasMuleAbility } from "./encumbrance.js";
 import { BladesHelpers } from "./blades-helpers.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
 import { preloadClockImages } from "./clock-utils.js";
-import { escapeHTML } from "./html-utils.js";
 import { renderDescriptionTooltip } from "./item-tooltip.js";
 import { formControlUpdate } from "./sheet-dom.js";
 
@@ -97,8 +96,8 @@ position: { width: 700, height: 1170 },
     for (const item of context.items) {
       const descriptionRoot = identityDescriptionRoots[item.type];
       if (!descriptionRoot) continue;
-      item.identityTooltipHtml = escapeHTML(
-        renderDescriptionTooltip(game.i18n.localize(`${descriptionRoot}.${item.name}`)),
+      item.identityTooltipHtml = renderDescriptionTooltip(
+        game.i18n.localize(`${descriptionRoot}.${item.name}`),
       );
     }
 

@@ -10,6 +10,11 @@ export const preloadHandlebarsTemplates = async function() {
     // Actor Sheet Partials
     "systems/brinkwood/templates/parts/attributes.html",
     "systems/brinkwood/templates/parts/mask-attributes.html",
+    "systems/brinkwood/templates/parts/sheet-identity-field.html",
+    "systems/brinkwood/templates/parts/sheet-identity-name.html",
+    "systems/brinkwood/templates/parts/sheet-identity-portrait.html",
+    "systems/brinkwood/templates/parts/sheet-identity-row.html",
+    "systems/brinkwood/templates/parts/sheet-identity-tracker.html",
     "systems/brinkwood/templates/parts/active-effects.html",
 		"systems/brinkwood/templates/chat/roll-calculation.html",
     "systems/brinkwood/templates/parts/actor/downtime.html",

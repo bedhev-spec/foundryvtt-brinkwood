@@ -3,6 +3,8 @@ import { BladesSheet } from "./blades-sheet.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
 import { capitalize } from "./blades-helpers.js";
 import { encumbranceLevelForLoadout, hasMuleAbility } from "./encumbrance.js";
+import { renderMaskPickerTooltip } from "./mask-picker-tooltip.js";
+import { maskActorImage } from "./actor-images.js";
 
 export function getMaskTypePresentation(typeName, attributes) {
   const maskAttributes = attributes[typeName];
@@ -39,6 +41,16 @@ export function updateMaskDotDisplay(element, value, maxValue) {
 }
 
 /**
+ * Prevent native form submission; the shared Name `change` listener remains
+ * the sole persistence path.
+ */
+export function handleMaskNameEnter(event) {
+  if (event.key !== "Enter" || event.isComposing) return;
+  event.preventDefault();
+  event.currentTarget?.blur();
+}
+
+/**
  * Extend the basic BladesSheet for the Mask actor type.
  * @extends {BladesSheet}
  */
@@ -61,6 +73,8 @@ export class BladesMaskSheet extends BladesSheet {
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
 
+    context.img = maskActorImage(context.img);
+
     context.system.mask_attributes = context.system.attributes[context.system.type] ?? [];
     context.maskAttributesLabel = "BITD.Mask";
 
@@ -74,6 +88,10 @@ export class BladesMaskSheet extends BladesSheet {
 
     context.traits = context.items
       .filter(i => i.type === "trait")
+      .map(trait => ({
+        ...trait,
+        canDelete: context.isGM && !trait.flags?.brinkwood?.traitGrant,
+      }))
       .sort((a, b) => (a.system.purchased > b.system.purchased ? -1 : 1));
 
     // Calculate Load
@@ -84,8 +102,21 @@ export class BladesMaskSheet extends BladesSheet {
     loadout = Math.max(0, Math.min(10, loadout));
     context.system.loadout = loadout;
 
-    // Determine mask type from equipped mask item
-    context.system.type = context.items.find(i => i.type === "mask")?.name.toLowerCase() ?? context.system.type;
+    // Mask configuration is actor-owned and enforces a single embedded source.
+    // Keep a dedicated presentation object so templates never infer it from an
+    // arbitrary item loop.
+    context.maskItem = context.items.find(item => item.type === "mask") ?? null;
+    context.maskTypeLabel = context.maskItem?.name ?? "";
+    context.identityRows = [{
+      itemType: "mask",
+      label: "BITD.Mask",
+      deleteLabel: "BITD.TitleDeleteItem",
+      reselect: true,
+      item: context.maskItem?.name?.trim() ? context.maskItem : null,
+    }];
+
+    // Determine mask type from configured mask item
+    context.system.type = context.maskItem?.name.toLowerCase() ?? "";
     context.system.mask_attributes = [];
     if (context.system.type) {
       const typeName = context.system.type;
@@ -119,10 +150,13 @@ export class BladesMaskSheet extends BladesSheet {
     this._maskSheetListenerController = new AbortController();
     const listenerOptions = { signal: this._maskSheetListenerController.signal };
     this._bindSheetViewState(html, listenerOptions);
+    html.querySelector('input[name="name"]')?.addEventListener(
+      "keydown", handleMaskNameEnter, listenerOptions);
 
     // Open inventory item sheet
     html.querySelectorAll(".item-body").forEach(el =>
       el.addEventListener("click", ev => {
+        if (ev.currentTarget.classList.contains("item-add-popup")) return;
         const item = this.actor.items.get(ev.currentTarget.closest(".item").dataset.itemId);
         item?.sheet.render({ force: true });
       }, listenerOptions)
@@ -130,11 +164,17 @@ export class BladesMaskSheet extends BladesSheet {
 
     if (!this.isEditable) return;
 
-    // Delete inventory item
+    // Delete inventory item. The identity Mask is configuration, so removal
+    // goes through the actor command that also removes its source-tagged trait.
     html.querySelectorAll(".item-delete").forEach(el =>
       el.addEventListener("click", async ev => {
         const element = ev.currentTarget.closest(".item");
-        await this.actor.deleteEmbeddedDocuments("Item", [element.dataset.itemId]);
+        const item = this.actor.items.get(element.dataset.itemId);
+        if (item?.type === "mask") {
+          await this.actor.clearMaskConfiguration();
+        } else {
+          await this.actor.deleteEmbeddedDocuments("Item", [element.dataset.itemId]);
+        }
         element.remove();
       }, listenerOptions)
     );
@@ -176,6 +216,21 @@ export class BladesMaskSheet extends BladesSheet {
 
   _updateDotDisplay(element, value, maxValue) {
     updateMaskDotDisplay(element, value, maxValue);
+  }
+
+  _getItemPickerInputType(itemType, distinct) {
+    return itemType === "mask" ? "radio" : super._getItemPickerInputType(itemType, distinct);
+  }
+
+  _renderItemPickerTooltip(item, enrichedDescription) {
+    return renderMaskPickerTooltip(item, enrichedDescription);
+  }
+
+  /** Route the shared picker selection through the actor-owned Mask command. */
+  async _createPickedItems(items, { itemType } = {}) {
+    if (itemType !== "mask") return super._createPickedItems(items, { itemType });
+    const [mask] = items;
+    return mask ? this.actor.configureMask(mask) : [];
   }
 
 }

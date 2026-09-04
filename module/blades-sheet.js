@@ -212,11 +212,7 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
         this.document,
         this.document.isOwner,
       );
-      const itemTooltip = escapeHTML(renderItemTooltip(
-        e,
-        key => game.i18n.localize(key),
-        () => enrichedDescription,
-      ));
+      const itemTooltip = escapeHTML(this._renderItemPickerTooltip(e, enrichedDescription));
       const itemTooltipLabel = escapeHTML(game.i18n.localize("BITD.ItemDetails"));
       htmlContent += `<div class="item-picker-row">
         <input id="select-item-${itemId}" type="${input_type}" name="select_items" value="${itemId}">
@@ -248,7 +244,17 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
         delete data._id;
         return data;
       });
-    await this.document.createEmbeddedDocuments("Item", itemsToAdd);
+    await this._createPickedItems(itemsToAdd, { itemType: item_type });
+  }
+
+  /** Allow sheets to specialize picker help without duplicating dialog assembly. */
+  _renderItemPickerTooltip(item, enrichedDescription) {
+    return renderItemTooltip(item, key => game.i18n.localize(key), () => enrichedDescription);
+  }
+
+  /** Allow actor-specific sheets to route picker persistence to one command. */
+  async _createPickedItems(items, _options = {}) {
+    return this.document.createEmbeddedDocuments("Item", items);
   }
 
   /* -------------------------------------------- */

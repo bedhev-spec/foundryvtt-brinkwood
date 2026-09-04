@@ -1,67 +1,31 @@
 <form class="{{cssClass}} actor-sheet mask-sheet" data-actor-uuid="{{actor.uuid}}" autocomplete="off">
-  <header class="mask-sheet__header">
-  <img class="mask-sheet__portrait" src="{{img}}" title="{{name}}" alt="{{name}}"{{#if editable}} data-action="editImage" data-edit="img" role="button" tabindex="0" aria-label="{{localize 'BITD.Name'}}: {{name}}"{{/if}}>
+  <header class="mask-sheet__identity-block sheet-identity bw-section-frame">
+    {{> "systems/brinkwood/templates/parts/sheet-identity-portrait.html" img=img name=name editable=editable}}
 
-    <section class="mask-sheet__identity" aria-label="{{localize 'BITD.Mask'}}">
-      <label for="mask-{{_id}}-name">{{localize "BITD.Name"}}</label>
-      <input type="text" id="mask-{{_id}}-name" class="name" name="name" value="{{name}}">
+    <section class="mask-sheet__identity sheet-identity__details" aria-label="{{localize 'BITD.Mask'}}">
+      {{> "systems/brinkwood/templates/parts/sheet-identity-name.html" identityId=(concat "mask-" _id) name=name nameBoxClass="mask-sheet__name-box"}}
 
-      <div class="mask-sheet__item-block">
-        <div class="mask-sheet__item-heading">
-          <span>{{localize "BITD.Mask"}}</span>
-          {{#if editable}}
-          <button type="button" class="item-add-popup" data-distinct="true" data-item-type="mask">{{localize "Add"}}</button>
-          {{/if}}
-        </div>
-        <div id="mask-{{_id}}-items" class="mask-sheet__item-list">
-          {{#each items as |item|}}
-          {{#if (eq item.type "mask")}}
-          <article class="item mask-sheet__item" data-item-id="{{item._id}}">
-            <button type="button" class="item-body mask-sheet__item-open" aria-label="{{item.name}}">{{item.name}}</button>
-            {{#if ../editable}}
-            <button type="button" class="item-control item-delete identity-choice__remove" title="{{localize 'BITD.TitleDeleteItem'}}" aria-label="{{localize 'BITD.TitleDeleteItem'}}"><span aria-hidden="true">&times;</span></button>
-            {{/if}}
-          </article>
-          {{/if}}
-          {{/each}}
-        </div>
-      </div>
-    </section>
-
-    <section class="mask-sheet__trackers" aria-label="{{localize 'BITD.Experience'}}">
-      <div class="mask-tracker tooltip" data-tooltip="{{system.xp_tooltip}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
-        <div class="mask-tracker__heading">
-          <span>{{localize system.experience.name}}</span>
-          <output>{{system.experience.value}} / {{system.experience.max}}</output>
-        </div>
-        <div class="mask-tracker__dots" role="group" aria-label="{{localize system.experience.name}}">
-          {{#times_from_1 system.experience.max}}
-          <button type="button" class="dot-value" data-path="experience.value" data-max_value="{{../system.experience.max}}" data-value="{{this}}" aria-label="{{localize ../system.experience.name}} {{this}} of {{../system.experience.max}}" aria-pressed="{{#if (lt ../system.experience.value this)}}false{{else}}true{{/if}}"{{#unless ../editable}} disabled{{/unless}}>
-            {{#if (lt ../system.experience.value this)}}<img src="systems/brinkwood/styles/assets/teeth/stresstooth-halfgrey.png" alt="">{{else}}<img src="systems/brinkwood/styles/assets/teeth/stresstooth-blue.png" alt="">{{/if}}
-          </button>
-          {{/times_from_1}}
-        </div>
+      <div class="sheet-identity__rows">
+        {{#each identityRows as |row|}}
+        {{> "systems/brinkwood/templates/parts/sheet-identity-row.html" row=row editable=../editable}}
+        {{/each}}
       </div>
 
-      <div class="mask-tracker tooltip" data-tooltip="Mask.Essence.Tooltip" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">
-        <div class="mask-tracker__heading">
-          <button type="button" class="roll-die-attribute rollable-text" data-roll-attribute-label="Mask.Essence.Name" data-roll-value="{{system.oath}}">{{localize "Mask.Essence.Name"}}</button>
-          <output>{{system.essence.value}} / {{system.essence.max}}</output>
+      <section class="mask-sheet__trackers sheet-identity__trackers" aria-label="{{localize 'BITD.Experience'}}">
+        <div class="big-teeth-section mask-tracker">
+          {{> "systems/brinkwood/templates/parts/sheet-identity-tracker.html" trackerId=(concat "mask-" _id "-experience") trackerClass="mask-experience" tracker=system.experience label="BITD.Experience" trackerPath="experience.value" toothColor="blue" tooltip=system.xp_tooltip editable=editable}}
         </div>
-        <div class="mask-tracker__dots" role="group" aria-label="{{localize 'Mask.Essence.Name'}}">
-          {{#times_from_1 system.essence.max}}
-          <button type="button" class="dot-value" data-path="essence.value" data-max_value="{{../system.essence.max}}" data-value="{{this}}" aria-label="{{localize 'Mask.Essence.Name'}} {{this}} of {{../system.essence.max}}" aria-pressed="{{#if (lt ../system.essence.value this)}}false{{else}}true{{/if}}"{{#unless ../editable}} disabled{{/unless}}>
-            {{#if (lt ../system.essence.value this)}}<img src="systems/brinkwood/styles/assets/teeth/stresstooth-halfgrey.png" alt="">{{else}}<img src="systems/brinkwood/styles/assets/teeth/stresstooth-red.png" alt="">{{/if}}
-          </button>
-          {{/times_from_1}}
+
+        <div class="big-teeth-section mask-tracker">
+          {{> "systems/brinkwood/templates/parts/sheet-identity-tracker.html" trackerId=(concat "mask-" _id "-essence") trackerClass="mask-essence" tracker=system.essence trackerPath="essence.value" toothColor="red" tooltip="Mask.Essence.Tooltip" rollLabel="Mask.Essence.Name" rollValue=system.oath editable=editable}}
         </div>
-      </div>
+      </section>
     </section>
   </header>
 
   <div class="mask-sheet__layout">
-    <section class="mask-sheet__main">
-      <nav class="tabs mask-sheet__tabs" aria-label="{{localize 'BITD.Mask'}}" data-group="primary" role="tablist">
+    <section class="mask-sheet__main sheet-tab-workspace">
+      <nav class="tabs sheet-tabs mask-sheet__tabs" aria-label="{{localize 'BITD.Mask'}}" data-group="primary" role="tablist">
     <button type="button" id="mask-{{_id}}-tab-traits" class="item {{#if (eq tabs.primary "traits")}}active{{/if}}" data-action="tab" data-group="primary" data-tab="traits" role="tab" tabindex="{{#if (eq tabs.primary "traits")}}0{{else}}-1{{/if}}" aria-controls="mask-{{_id}}-panel-traits" aria-selected="{{#if (eq tabs.primary "traits")}}true{{else}}false{{/if}}">{{localize "BITD.Traits"}}</button>
     <button type="button" id="mask-{{_id}}-tab-notes" class="item {{#if (eq tabs.primary "mask-notes")}}active{{/if}}" data-action="tab" data-group="primary" data-tab="mask-notes" role="tab" tabindex="{{#if (eq tabs.primary "mask-notes")}}0{{else}}-1{{/if}}" aria-controls="mask-{{_id}}-panel-notes" aria-selected="{{#if (eq tabs.primary "mask-notes")}}true{{else}}false{{/if}}">{{localize "BITD.Notes"}}</button>
         {{#if isGM}}
@@ -69,6 +33,7 @@
         {{/if}}
       </nav>
 
+      <div class="mask-sheet__tab-content sheet-tab-content">
       <section id="mask-{{_id}}-panel-traits" class="tab mask-sheet__panel {{#if (eq tabs.primary "traits")}}active{{/if}}" data-group="primary" data-tab="traits" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-traits">
         <div class="mask-sheet__traits-workspace">
       <div class="mask-sheet__trait-library">
@@ -78,15 +43,7 @@
         </div>
             <div class="mask-sheet__traits">
               {{#each traits as |trait|}}
-              <article class="item mask-trait-card" data-item-id="{{trait._id}}">
-                <div class="item-select mask-trait-card__select" data-item-id="{{trait._id}}" data-item-list="traits">
-                  <label class="mask-trait-card__title" for="mask-{{../_id}}-trait-{{trait._id}}">
-                    <input type="checkbox" id="mask-{{../_id}}-trait-{{trait._id}}" class="dot" data-item-id="{{trait._id}}" {{#if trait.system.purchased}}checked{{/if}}{{#unless ../editable}} disabled{{/unless}}>
-                    <span>{{trait.name}}</span>
-                  </label>
-                  <div class="mask-trait-card__description">{{{trait.system.description}}}</div>
-                </div>
-              </article>
+              {{> "systems/brinkwood/templates/parts/actor/trait-card.html" itemId=trait._id title=trait.name description=trait.system.description purchased=trait.system.purchased editable=../editable canDelete=trait.canDelete}}
               {{else}}
               <p class="mask-sheet__empty">{{localize "BITD.Traits"}}</p>
               {{/each}}
@@ -111,6 +68,7 @@
         {{> "systems/brinkwood/templates/parts/active-effects.html"}}
       </section>
       {{/if}}
+      </div>
     </section>
   </div>
 </form>
