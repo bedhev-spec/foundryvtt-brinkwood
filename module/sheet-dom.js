@@ -22,6 +22,28 @@ export function formControlUpdate(control) {
   return { [name]: value };
 }
 
+/** Persist the shared Notes prose-mirror control through one Actor update. */
+export async function persistRichTextChange(sheet, event) {
+  if (!sheet?.isEditable) return false;
+  const control = event?.currentTarget;
+  if (!control?.matches?.("prose-mirror[name]")) return false;
+  const update = formControlUpdate(control);
+  if (!update) return false;
+  await sheet.document.update(update, { render: true });
+  return true;
+}
+
+/** Bind the shared Notes editor to the sheet's authoritative save handler. */
+export function bindRichTextPersistence(sheet, html, listenerOptions) {
+  html.querySelectorAll("prose-mirror[name]").forEach(control =>
+    control.addEventListener(
+      "change",
+      event => sheet._persistFormControl(event),
+      listenerOptions,
+    )
+  );
+}
+
 
 /** Prevent native submit; the ensuing blur emits the sheet's one change event. */
 export function handleActorNameEnter(event) {

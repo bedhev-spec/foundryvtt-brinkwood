@@ -59,12 +59,8 @@
         </div>
       </section>
 
-  <section id="mask-{{_id}}-panel-notes" class="tab mask-sheet__panel mask-sheet__notes {{#if (eq tabs.primary "mask-notes")}}active{{/if}}" data-group="primary" data-tab="mask-notes" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-notes">
-      {{#if editable}}
-      <prose-mirror name="system.description" value="{{system.description}}" data-document-uuid="{{actor.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
-      {{else}}
-      <div class="editor editor-content">{{{enrichedDescription}}}</div>
-      {{/if}}
+      <section id="mask-{{_id}}-panel-notes" class="tab mask-sheet__panel mask-sheet__notes sheet-notes {{#if (eq tabs.primary "mask-notes")}}active{{/if}}" data-group="primary" data-tab="mask-notes" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-notes">
+        {{> "systems/brinkwood/templates/parts/sheet-notes.html" editable=editable fieldName="system.description" fieldValue=system.description documentUuid=actor.uuid enrichedContent=enrichedDescription}}
       </section>
 
       {{#if isGM}}

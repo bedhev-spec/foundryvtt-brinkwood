@@ -1,0 +1,5 @@
+{{#if editable}}
+<prose-mirror class="sheet-notes__editor" name="{{fieldName}}" value="{{fieldValue}}" data-document-uuid="{{documentUuid}}" collaborate toggled>{{{enrichedContent}}}</prose-mirror>
+{{else}}
+<div class="editor editor-content sheet-notes__preview">{{{enrichedContent}}}</div>
+{{/if}}

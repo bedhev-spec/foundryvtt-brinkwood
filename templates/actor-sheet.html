@@ -173,13 +173,9 @@
     </div>
   </div>
 
-  <div id="character-{{_id}}-notes" class="tab flex-vertical {{#if (eq tabs.primary "character-notes")}}active{{/if}}" role="tabpanel" aria-labelledby="character-{{_id}}-tab-notes" data-group="primary" data-tab="character-notes">
-        {{#if editable}}
-        <prose-mirror name="system.description" value="{{system.description}}" data-document-uuid="{{actor.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
-        {{else}}
-        <div class="editor editor-content">{{{enrichedDescription}}}</div>
-        {{/if}}
-      </div>
+    <div id="character-{{_id}}-notes" class="tab flex-vertical sheet-notes {{#if (eq tabs.primary "character-notes")}}active{{/if}}" role="tabpanel" aria-labelledby="character-{{_id}}-tab-notes" data-group="primary" data-tab="character-notes">
+      {{> "systems/brinkwood/templates/parts/sheet-notes.html" editable=editable fieldName="system.description" fieldValue=system.description documentUuid=actor.uuid enrichedContent=enrichedDescription}}
+    </div>
 
       {{!-- Active Effects --}}
       {{#if isGM}}

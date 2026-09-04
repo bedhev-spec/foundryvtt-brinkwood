@@ -107,13 +107,6 @@
   line-height: 1.2;
 }
 
-&.actor.mask .mask-sheet__panel .editor-content,
-&.actor.mask .mask-sheet__panel prose-mirror {
-  min-height: 160px;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.16);
-}
-
 &.actor.mask .mask-sheet__panel .effects-category[data-effect-panel] {
   border: 0;
   border-radius: 0;

@@ -131,7 +131,16 @@
 		}
 	},
 	"Mask": {
-    "XP": {
+		"Descriptions": {
+			"Terror": "Turns fear and pain into righteous strength, shielding the oppressed by terrifying their oppressors.",
+			"Violence": "A relentless instrument that never negotiates, acting and protecting until the last vampire falls.",
+			"Lies": "The oldest Mask - both teacher and deceiver - knowing when lies heal and when truth cuts.",
+			"Riot": "The voice of the unheard, urging people toward action and justice.",
+			"Torment": "Embodies agony and relief, using necessary pain to protect, mend, and heal.",
+			"Judgement": "Pursues truth and reconciliation, striking the wicked, sparing the penitent, and strengthening the oppressed.",
+			"Ruin": "Represents slow decay and inevitable destruction through which rebirth becomes possible."
+		},
+		"XP": {
 			"Tooltip": "At the end of each session, mark 1 Mask XP (or 2 if performed multiple times)...<ul><li>If you fulfilled your oath.</li><li>If you defeated a vampire of a higher tier than your highest aspect.</li><li>If you fulfilled the condition unique to your mask.</li>",
 			"Lies": "<li>You taught someone else something or learned something important.</li></ul>",
 			"Ruin": "<li>You strengthened or reinforced an ally.</li></ul>",

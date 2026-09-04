@@ -1451,11 +1451,6 @@
   font-size: 1rem;
   line-height: 1.2;
 }
-.brinkwood.actor.mask .mask-sheet__panel .editor-content, .brinkwood.actor.mask .mask-sheet__panel prose-mirror {
-  min-height: 160px;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.16);
-}
 .brinkwood.actor.mask .mask-sheet__panel .effects-category[data-effect-panel] {
   border: 0;
   border-radius: 0;
@@ -1471,6 +1466,43 @@
   .brinkwood .sheet-tabs .item {
     transition-duration: 0.01ms;
   }
+}
+.brinkwood .sheet-notes {
+  min-width: 0;
+  min-height: 0;
+}
+.brinkwood .sheet-notes > .editor,
+.brinkwood .sheet-notes > prose-mirror {
+  display: block;
+  min-height: 260px;
+  border: 1px solid var(--bw-rule);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.35);
+}
+.brinkwood .sheet-notes .editor-content,
+.brinkwood .sheet-notes prose-mirror .ProseMirror {
+  box-sizing: border-box;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  padding-inline: 5px;
+  color: var(--bw-ink);
+}
+.brinkwood .sheet-notes prose-mirror .ProseMirror {
+  min-block-size: 218px;
+  cursor: text;
+}
+.brinkwood .sheet-notes .editor-content *,
+.brinkwood .sheet-notes prose-mirror .ProseMirror * {
+  max-inline-size: 100%;
+  color: inherit !important;
+  overflow-wrap: anywhere;
+}
+.brinkwood .sheet-notes .editor-edit {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: var(--bw-ink);
 }
 .brinkwood.actor.pc.character {
   /*
@@ -2462,34 +2494,6 @@
   width: 22px;
   height: 22px;
 }
-.brinkwood.actor.pc.character .tab[data-tab=character-notes] .editor,
-.brinkwood.actor.pc.character .tab[data-tab=character-notes] prose-mirror {
-  min-height: 260px;
-  border: 1px solid var(--bw-rule);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.35);
-}
-.brinkwood.actor.pc.character .tab[data-tab=character-notes] .editor-content,
-.brinkwood.actor.pc.character .tab[data-tab=character-notes] prose-mirror .ProseMirror {
-  box-sizing: border-box;
-  min-inline-size: 0;
-  max-inline-size: 100%;
-  padding-inline: 5px;
-  color: var(--bw-ink);
-}
-.brinkwood.actor.pc.character .tab[data-tab=character-notes] .editor-content *,
-.brinkwood.actor.pc.character .tab[data-tab=character-notes] prose-mirror .ProseMirror * {
-  max-inline-size: 100%;
-  color: inherit !important;
-  overflow-wrap: anywhere;
-}
-.brinkwood.actor.pc.character .tab[data-tab=character-notes] .editor-edit {
-  display: inline-grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  color: var(--bw-ink);
-}
 .brinkwood.actor.pc.character .downtime-actions {
   display: grid;
   width: 100%;
@@ -2800,15 +2804,6 @@
   display: grid;
   gap: 8px;
 }
-.brinkwood.actor.mask .mask-sheet__notes .editor,
-.brinkwood.actor.mask .mask-sheet__notes .editor-content,
-.brinkwood.actor.mask .mask-sheet__notes prose-mirror {
-  min-height: 160px;
-  padding: 10px 12px;
-  border: 1px solid var(--bw-rule);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.3);
-}
 .brinkwood.actor.mask .mask-attributes {
   align-self: start;
   min-width: 0;
@@ -2830,14 +2825,6 @@
   margin: 10px 0;
   color: var(--bw-ink-soft);
   font-style: italic;
-}
-.brinkwood.actor.mask .mask-sheet__notes .editor, .brinkwood.actor.mask .mask-sheet__notes .editor-content, .brinkwood.actor.mask .mask-sheet__notes prose-mirror {
-  display: block;
-  min-height: 180px;
-  padding: 10px 12px;
-  border: 1px solid var(--bw-rule);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.3);
 }
 .brinkwood.actor.mask .mask-sheet__panel[data-tab=effects] .effects-groups,
 .brinkwood.actor.mask .mask-sheet__panel[data-tab=effects] .effects-category {

@@ -3,9 +3,10 @@ import { BladesSheet } from "./blades-sheet.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
 import { capitalize } from "./blades-helpers.js";
 import { encumbranceLevelForLoadout, hasMuleAbility } from "./encumbrance.js";
-import { renderMaskPickerTooltip } from "./mask-picker-tooltip.js";
+import { renderDescriptionTooltip } from "./item-tooltip.js";
+import { maskDescriptionKey, renderMaskPickerTooltip } from "./mask-picker-tooltip.js";
 import { maskActorImage } from "./actor-images.js";
-import { formControlUpdate, handleActorNameEnter, persistActorNameChange, queueDocumentPathUpdate } from "./sheet-dom.js";
+import { bindRichTextPersistence, formControlUpdate, handleActorNameEnter, persistActorNameChange, persistRichTextChange, queueDocumentPathUpdate } from "./sheet-dom.js";
 import { normalizedTraitSourceName, traitHasCompendiumProvenance } from "./trait-grant-matching.js";
 
 export { handleActorNameEnter as handleMaskNameEnter };
@@ -16,7 +17,7 @@ export const MASK_SHEET_DEFAULT_WIDTH = 700;
 // Foundry's ApplicationV2 inner frame also consumes horizontal space, so the
 // configured target includes enough clearance for the 200px portrait, identity
 // details, the Character-sized Attribute family, and both 20px gaps.
-export const MASK_SHEET_ATTRIBUTES_WIDTH = 760;
+export const MASK_SHEET_ATTRIBUTES_WIDTH = 780;
 export const MASK_SHEET_VIEWPORT_GUTTER = 32;
 const MASK_SHEET_RESIZING_CLASS = "mask-sheet--attribute-resizing";
 const MASK_SHEET_ATTRIBUTES_ENTERING_CLASS = "mask-sheet--attributes-entering";
@@ -145,6 +146,19 @@ export class BladesMaskSheet extends BladesSheet {
     // Mask Traits are the automatic, source-tagged grants of the selected
     // Mask Type. Other actor traits remain untouched but do not belong here.
     context.maskItem = context.items.find(item => item.type === "mask") ?? null;
+    if (context.maskItem) {
+      const descriptionKey = maskDescriptionKey(context.maskItem.name);
+      const description = String(context.maskItem.system?.description ?? "").trim()
+        || (descriptionKey ? game.i18n.localize(descriptionKey) : "");
+      const enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+        description,
+        { async: true, relativeTo: this.document, secrets: this.document.isOwner },
+      );
+      context.maskItem.identityTooltipHtml = renderDescriptionTooltip(
+        description,
+        () => enrichedDescription,
+      );
+    }
     context.traits = getMaskTraitsForSource(context.items, context.maskItem)
       .map(trait => ({
         ...trait,
@@ -290,7 +304,8 @@ export class BladesMaskSheet extends BladesSheet {
 
     if (!this.isEditable) return;
 
-    html.querySelectorAll('input[name], select[name], textarea[name], prose-mirror[name]').forEach(control =>
+    bindRichTextPersistence(this, html, listenerOptions);
+    html.querySelectorAll('input[name], select[name], textarea[name]').forEach(control =>
       control.addEventListener("change", event => this._persistFormControl(event), listenerOptions)
     );
 
@@ -329,9 +344,10 @@ export class BladesMaskSheet extends BladesSheet {
     if (!this.isEditable) return;
     const control = event.currentTarget;
     if (control.matches('input[name="name"]')) return persistActorNameChange(this, event);
+    if (await persistRichTextChange(this, event)) return;
 
     const update = formControlUpdate(control);
-    if (update) await this.document.update(update, { render: control.matches("prose-mirror[name]") });
+    if (update) await this.document.update(update);
   }
 
   /* -------------------------------------------- */
