@@ -1,5 +1,6 @@
 
 import { BladesSheet } from "./blades-sheet.js";
+import { npcActorImage } from "./actor-images.js";
 
 /**
  * @extends {BladesSheet}
@@ -22,6 +23,7 @@ export class BladesNPCSheet extends BladesSheet {
   /** @override */
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
+    context.img = npcActorImage(context.img);
 
     context.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
       context.system.description,

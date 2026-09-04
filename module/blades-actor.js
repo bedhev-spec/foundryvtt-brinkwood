@@ -1,7 +1,7 @@
 import { bladesRoll } from "./blades-roll.js";
 import { readRollDialogValues } from "./roll-resolution.js";
 import { BladesHelpers } from "./blades-helpers.js";
-import { maskActorImage } from "./actor-images.js";
+import { maskActorImage, npcActorImage } from "./actor-images.js";
 
 const TRAIT_SOURCE_TYPES = new Set(["upbringing", "profession", "mask"]);
 const ACTION_POINT_SOURCE_TYPES = new Set([...TRAIT_SOURCE_TYPES, "class"]);
@@ -88,6 +88,10 @@ export class BladesActor extends foundry.documents.Actor {
 
     if (data.type === "mask") {
       data.img = maskActorImage(data.img);
+    }
+
+    if (data.type === "npc") {
+      data.img = npcActorImage(data.img);
     }
 
     // Characters use linked tokens so their token and sheet stay in sync.
