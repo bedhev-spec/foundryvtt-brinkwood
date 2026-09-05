@@ -58,10 +58,13 @@ $hover-brightness: 0.8;
   }
 }
 
+@import 'import/sheet-identity.scss';
+
 //top-level styles
 @import 'import/chat.scss';
 @import 'import/dialogs.scss';
 @import 'import/tooltip.scss';
+@import 'import/global-clocks.scss';
 
 // Character-sheet compatibility rules must be emitted last. They replace the
 // v11-era manifest stylesheets while retaining their established cascade.

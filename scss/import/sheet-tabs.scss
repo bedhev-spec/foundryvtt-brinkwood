@@ -1,25 +1,64 @@
 /* Shared tab and panel visual language. Geometry stays with each sheet. */
-.sheet-tabs,
-&.actor.pc.character .character-sheet__workspace > nav.tabs,
-&.actor.mask .mask-sheet__tabs {
-  --bw-tab-surface: rgba(255, 255, 255, 0.28);
-  --bw-tab-active: rgba(255, 255, 255, 0.52);
-  --bw-tab-transition: 120ms ease;
+
+.sheet-tab-workspace {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
 }
 
-.sheet-tabs .item,
-&.actor.pc.character .character-sheet__workspace > nav.tabs .item,
-&.actor.mask .mask-sheet__tabs .item {
+.sheet-tab-content {
+  min-height: 0;
+  overflow: hidden;
+
+  > .tab.active {
+    box-sizing: border-box;
+    height: 100%;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+  }
+}
+.sheet-tabs {
+  // Opaque component colors keep Character and Mask tabs identical even when
+  // their parent sheets use different parchment tokens.
+  --bw-tab-frame: #e0d7c5;
+  --bw-tab-surface: #e9e2d5;
+  --bw-tab-active: #f0ece3;
+  --bw-tab-transition: 120ms ease;
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 36px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--bw-rule);
+  border-radius: 3px;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bw-tab-frame);
+}
+
+.sheet-tabs .item {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 40px;
+  padding: 10px 12px;
   color: var(--bw-ink-soft);
   background-color: var(--bw-tab-surface);
   border-bottom: 3px solid transparent;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  text-align: center;
+  white-space: nowrap;
   transition: background-color var(--bw-tab-transition), border-color var(--bw-tab-transition), box-shadow var(--bw-tab-transition), color var(--bw-tab-transition);
 
   &:hover:not(.active),
   &:focus-visible:not(.active) {
     color: var(--bw-ink);
-    background-color: rgba(255, 255, 255, 0.44);
+      background-color: #eee9e1;
   }
 
   &.active {
@@ -35,46 +74,23 @@
   }
 }
 
-/* The legacy character sheet shares the same effect-tab state language. */
-&.actor.pc.character .effects-tabs {
-  border: 1px solid var(--bw-rule);
-  background: var(--bw-paper-deep);
+@container (max-width: 480px) {
+  .sheet-tabs {
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+
+  .sheet-tabs .item {
+    flex: 0 0 auto;
+  }
 }
 
-&.actor.pc.character .character-sheet__workspace > nav.tabs {
-  border-left: 1px solid var(--bw-rule);
-  border-right: 1px solid var(--bw-rule);
-  border-radius: 3px;
-}
-
-&.actor.pc.character .effects-tab {
-  color: var(--bw-ink-soft);
-  background: transparent;
-  cursor: pointer;
+.sheet-tabs button.item {
+  border: 0;
   font: inherit;
-  font-weight: 700;
-  transition: color var(--bw-tab-transition), background-color var(--bw-tab-transition), border-color var(--bw-tab-transition);
-
-  &:hover,
-  &:focus-visible,
-  &.active {
-    color: var(--bw-ink);
-    border-color: var(--bw-rule);
-    border-bottom-color: var(--bw-accent);
-  }
-
-  &.active {
-    background: rgba(255, 255, 255, 0.42);
-  }
-
-  &:focus-visible {
-    outline: 3px solid var(--bw-focus);
-    outline-offset: 1px;
-  }
 }
 
-.sheet-panel,
-&.actor.mask .mask-sheet__panel {
+.sheet-panel {
   background: rgba(255, 255, 255, 0.16);
   border: 1px solid rgba(141, 98, 93, 0.46);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
@@ -91,33 +107,6 @@
   line-height: 1.2;
 }
 
-&.actor.mask .mask-sheet__panel .editor-content,
-&.actor.mask .mask-sheet__panel prose-mirror {
-  min-height: 160px;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.16);
-}
-
-&.actor.mask .mask-sheet__panel .effects-tabs {
-  padding: 4px;
-  background: var(--bw-paper-deep);
-  border-bottom: 1px solid var(--bw-rule);
-
-  .effects-tab {
-    color: var(--bw-ink-soft);
-    background: transparent;
-    border-bottom: 2px solid transparent;
-    transition: color var(--bw-tab-transition), border-color var(--bw-tab-transition);
-
-    &:hover,
-    &:focus-visible,
-    &.active {
-      color: var(--bw-ink);
-      border-bottom-color: var(--bw-accent);
-    }
-  }
-}
-
 &.actor.mask .mask-sheet__panel .effects-category[data-effect-panel] {
   border: 0;
   border-radius: 0;
@@ -132,11 +121,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sheet-tabs .item,
-  &.actor.pc.character .character-sheet__workspace > nav.tabs .item,
-  &.actor.pc.character .effects-tab,
-  &.actor.mask .mask-sheet__tabs .item,
-  &.actor.mask .mask-sheet__panel .effects-tabs .effects-tab {
+  .sheet-tabs .item {
     transition-duration: 0.01ms;
   }
 }

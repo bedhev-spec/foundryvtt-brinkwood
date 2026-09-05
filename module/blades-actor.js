@@ -1,27 +1,16 @@
 import { bladesRoll } from "./blades-roll.js";
 import { readRollDialogValues } from "./roll-resolution.js";
 import { BladesHelpers } from "./blades-helpers.js";
+import { maskActorImage, npcActorImage } from "./actor-images.js";
+import {
+  compendiumSourceMetadata,
+  normalizedTraitSourceName,
+  traitHasCompendiumProvenance,
+} from "./trait-grant-matching.js";
 
 const TRAIT_SOURCE_TYPES = new Set(["upbringing", "profession", "mask"]);
 const ACTION_POINT_SOURCE_TYPES = new Set([...TRAIT_SOURCE_TYPES, "class"]);
 const isTraitSource = item => TRAIT_SOURCE_TYPES.has(item?.type);
-
-function compendiumSourceMetadata(item) {
-  return [
-    item.uuid,
-    item.flags?.core?.sourceId,
-    item._stats?.compendiumSource,
-    item.getFlag?.("core", "sourceId")
-  ].filter(value => typeof value === "string" && value.length);
-}
-
-function traitHasCompendiumProvenance(embeddedTrait, compendiumTrait) {
-  const compendiumId = compendiumTrait.id ?? compendiumTrait._id;
-  const expectedSources = new Set(compendiumSourceMetadata(compendiumTrait));
-  if (compendiumId) expectedSources.add(compendiumId);
-  return compendiumSourceMetadata(embeddedTrait).some(source =>
-    expectedSources.has(source) || (compendiumId && source.endsWith(`.${compendiumId}`)));
-}
 
 // Multiple document callbacks can request the same grant before the first
 // embedded-document create has synchronized back to this actor. Serialize that
@@ -44,6 +33,29 @@ function serializeTraitGrant(actor, sourceItemId, operation) {
   });
 }
 
+// Mask configuration is a single actor-level choice. Unlike ordinary item
+// creation, competing picker submissions must observe the previous complete
+// replacement before deciding which embedded Mask to retain.
+const maskConfigurationQueues = new WeakMap();
+function serializeMaskConfiguration(actor, operation) {
+  const prior = maskConfigurationQueues.get(actor) ?? Promise.resolve();
+  const next = prior.catch(() => undefined).then(operation);
+  maskConfigurationQueues.set(actor, next);
+  return next.finally(() => {
+    if (maskConfigurationQueues.get(actor) === next) {
+      maskConfigurationQueues.delete(actor);
+    }
+  });
+}
+
+function sameMaskChoice(existing, requested) {
+  const existingSource = compendiumSourceMetadata(existing);
+  const requestedSource = compendiumSourceMetadata(requested);
+  return existing.name === requested.name
+    && (!existingSource.length || !requestedSource.length
+      || existingSource.some(source => requestedSource.includes(source)));
+}
+
 /**
  * Extend the basic Actor
  * @extends {Actor}
@@ -54,6 +66,14 @@ export class BladesActor extends foundry.documents.Actor {
   static async create(data, options={}) {
 
     data.prototypeToken = data.prototypeToken || {};
+
+    if (data.type === "mask") {
+      data.img = maskActorImage(data.img);
+    }
+
+    if (data.type === "npc") {
+      data.img = npcActorImage(data.img);
+    }
 
     // Characters use linked tokens so their token and sheet stay in sync.
     if (data.type === "character") {
@@ -301,7 +321,7 @@ export class BladesActor extends foundry.documents.Actor {
 		await this.update(system);
 	}
 
-  async _addTraits(data, compendiumTraits = null, adoptLegacyTraits = false) {
+  async _addTraits(data, compendiumTraits = null, adoptLegacyTraits = false, traitSourceIds = null) {
     const traitPack = game.packs.get("brinkwood.trait");
     if (!traitPack) return;
 
@@ -311,8 +331,12 @@ export class BladesActor extends foundry.documents.Actor {
 
     // Compendium queries are indexed-field dependent in v13. Hydrate then
     // filter so every mapped automatic trait source works consistently.
+    const requestedTraitSourceIds = traitSourceIds ? new Set(traitSourceIds) : null;
     const traits = (compendiumTraits ?? await traitPack.getDocuments())
-      .filter(trait => trait.type === "trait" && trait.system.class === data.name);
+      .filter(trait => trait.type === "trait"
+        && (requestedTraitSourceIds
+          ? requestedTraitSourceIds.has(trait.id ?? trait._id)
+          : normalizedTraitSourceName(trait.system.class) === normalizedTraitSourceName(data.name)));
     const alreadyGranted = new Set(this.items
       .filter(item => item.type === "trait" && item.flags?.brinkwood?.traitGrant?.sourceItemId === sourceItemId)
       .map(item => item.flags.brinkwood.traitGrant.traitSourceId));
@@ -335,7 +359,8 @@ export class BladesActor extends foundry.documents.Actor {
           && traitHasCompendiumProvenance(item, trait));
         const exactMatches = provenanceMatches.length ? [] : legacyTraits.filter(item =>
           !adoptedTraitIds.has(item.id ?? item._id)
-          && item.name === trait.name && item.system?.class === data.name);
+          && item.name === trait.name
+          && normalizedTraitSourceName(item.system?.class) === normalizedTraitSourceName(data.name));
         const matches = provenanceMatches.length ? provenanceMatches : exactMatches;
         if (matches.length === 1) {
           const legacyTrait = matches[0];
@@ -378,25 +403,25 @@ export class BladesActor extends foundry.documents.Actor {
   }
 
   /** Synchronize traits for newly embedded source choices through the actor. */
-  async syncTraitGrantsForSources(sources, adoptLegacyTraits = false) {
+  async syncTraitGrantsForSources(sources, adoptLegacyTraits = false, traitSourceIds = null) {
     const traitSources = Array.from(sources ?? []).filter(isTraitSource);
     if (!traitSources.length) return;
     const traitPack = game.packs.get("brinkwood.trait");
     if (!traitPack) return;
     const compendiumTraits = await traitPack.getDocuments();
     for (const source of traitSources) {
-      await this._addTraits(source, compendiumTraits, adoptLegacyTraits);
+      await this._addTraits(source, compendiumTraits, adoptLegacyTraits, traitSourceIds);
     }
   }
 
   /** Retry trait synchronization for source documents already saved on this actor. */
-  async repairTraitGrantsForSourceIds(sourceIds, adoptLegacyTraits = false) {
+  async repairTraitGrantsForSourceIds(sourceIds, adoptLegacyTraits = false, traitSourceIds = null) {
     const requestedIds = new Set(
       (Array.isArray(sourceIds) ? sourceIds : [sourceIds]).filter(Boolean)
     );
     const sources = this.items.filter(item =>
       requestedIds.has(item.id ?? item._id) && isTraitSource(item));
-    return this.syncTraitGrantsForSources(sources, adoptLegacyTraits);
+    return this.syncTraitGrantsForSources(sources, adoptLegacyTraits, traitSourceIds);
   }
 
   /**
@@ -408,6 +433,98 @@ export class BladesActor extends foundry.documents.Actor {
   async reconcileTraitGrants() {
     await (this.syncTraitGrantsForSources
       ?? BladesActor.prototype.syncTraitGrantsForSources).call(this, this.items, true);
+  }
+
+  /**
+   * Configure this persistent Mask sheet's sole Mask source item.
+   *
+   * This is deliberately not an in-play Mask switch: actor fields (including
+   * XP, Essence, abilities, and notes) are never updated here. Deleting a
+   * source uses the public actor deletion path, which removes only traits
+   * tagged with that exact source. Foundry has no cross-document transaction,
+   * so create and strictly synchronize the replacement before removing any
+   * prior source. A later removal failure compensates by removing the new
+   * source and its tagged grants where possible.
+   */
+  async configureMask(maskData) {
+    if (maskData?.type !== "mask") {
+      throw new TypeError("Mask configuration requires an Item of type 'mask'.");
+    }
+
+    const requested = foundry.utils.deepClone(maskData);
+    delete requested._id;
+    delete requested.id;
+
+    return serializeMaskConfiguration(this, async () => {
+      const masks = this.items.filter(item => item.type === "mask");
+      const retained = masks.find(item => sameMaskChoice(item, requested));
+
+      // Selecting the already configured Mask is idempotent, while still
+      // repairing a legacy/failed grant and collapsing corrupted duplicates.
+      if (retained && masks.length === 1) {
+        await this.syncTraitGrantsForSources([retained]);
+        return retained;
+      }
+
+      if (retained) {
+        await this.syncTraitGrantsForSources([retained]);
+        const obsoleteIds = masks
+          .filter(item => item !== retained)
+          .map(item => item.id ?? item._id)
+          .filter(Boolean);
+        if (obsoleteIds.length) await this.deleteEmbeddedDocuments("Item", obsoleteIds);
+        return retained;
+      }
+
+      let created;
+      try {
+        [created] = await this.createEmbeddedDocuments("Item", [requested], {
+          // BladesItem's legacy distinct-item hook must not remove the old
+          // Mask during this create. This command owns replacement ordering.
+          brinkwoodConfigureMask: true,
+        });
+        if (!created) throw new Error("Mask configuration did not create a Mask item.");
+        await this.syncTraitGrantsForSources([created]);
+
+        const createdId = created.id ?? created._id;
+        const isPresent = Boolean(this.items.find(item => (item.id ?? item._id) === createdId && item.type === "mask"));
+        if (!isPresent) throw new Error("Mask configuration replacement was not persisted.");
+
+        const obsoleteIds = masks
+          .map(item => item.id ?? item._id)
+          .filter(Boolean);
+        if (obsoleteIds.length) await this.deleteEmbeddedDocuments("Item", obsoleteIds);
+        return created;
+      } catch (error) {
+        const createdId = created?.id ?? created?._id;
+        if (createdId) {
+          try {
+            await this.deleteEmbeddedDocuments("Item", [createdId]);
+          } catch (rollbackError) {
+            console.error("Brinkwood Mask configuration rollback failed", { actorId: this.id, createdId, rollbackError });
+          }
+        }
+        console.error("Brinkwood Mask configuration failed", {
+          actorId: this.id,
+          error
+        });
+        globalThis.ui?.notifications?.warn?.(
+          "The Mask configuration could not be saved. Please retry."
+        );
+        throw error;
+      }
+    });
+  }
+
+  /** Remove the configured Mask and only traits granted by its source. */
+  async clearMaskConfiguration() {
+    return serializeMaskConfiguration(this, async () => {
+      const ids = this.items
+        .filter(item => item.type === "mask")
+        .map(item => item.id ?? item._id)
+        .filter(Boolean);
+      return ids.length ? this.deleteEmbeddedDocuments("Item", ids) : [];
+    });
   }
 
   async _loadBasicItems() {

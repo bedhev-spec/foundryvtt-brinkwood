@@ -5,12 +5,13 @@ import test from "node:test";
 const root = new URL("../", import.meta.url);
 const read = file => readFile(new URL(file, root), "utf8");
 
-test("PC traits render as static, wrapping ruled cards", async () => {
-  const [template, partial, styles, sharedStyles] = await Promise.all([
+test("Character and Mask traits share one static, wrapping Trait Card component", async () => {
+  const [template, partial, styles, sharedStyles, componentStyles] = await Promise.all([
     read("templates/actor-sheet.html"),
     read("templates/parts/actor/trait-card.html"),
     read("scss/import/character-sheet.scss"),
     read("scss/import/general-styles.scss"),
+    read("scss/import/trait-card.scss"),
   ]);
 
   const traitsPanel = template.slice(
@@ -27,11 +28,13 @@ test("PC traits render as static, wrapping ruled cards", async () => {
   assert.doesNotMatch(partial, /effect-card|effect-control|disclosure|details-toggle/);
 
   assert.match(styles, /form\.actor-sheet \.tab\[data-tab="traits"\]/);
-  assert.match(styles, /\.trait-card \{[\s\S]*?min-width:\s*0[\s\S]*?min-height:\s*0[\s\S]*?height:\s*auto[\s\S]*?align-self:\s*start[\s\S]*?align-content:\s*start[\s\S]*?overflow:\s*visible/);
-  assert.match(styles, /\.trait-card__header \{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) auto/);
-  assert.match(styles, /\.trait-card__purchase \{[\s\S]*?appearance:\s*none\s*!important[\s\S]*?-webkit-appearance:\s*none\s*!important[\s\S]*?background:\s*#fff/);
-  assert.match(styles, /&:checked \{[\s\S]*?background-color:\s*#fff[\s\S]*?background-image:[\s\S]*?linear-gradient\(45deg[\s\S]*?linear-gradient\(-45deg/);
-  assert.match(styles, /\.trait-card__description \{[\s\S]*?max-height:\s*none[\s\S]*?align-self:\s*start[\s\S]*?overflow:\s*visible[\s\S]*?overflow-wrap:\s*anywhere/);
+  assert.match(sharedStyles, /@import 'trait-card\.scss';/);
+  assert.doesNotMatch(styles, /\.trait-card(?:__|\s*\{)/);
+  assert.match(componentStyles, /\.trait-card \{[\s\S]*?min-width:\s*0[\s\S]*?min-height:\s*0[\s\S]*?height:\s*auto[\s\S]*?align-self:\s*start[\s\S]*?align-content:\s*start[\s\S]*?overflow:\s*visible/);
+  assert.match(componentStyles, /\.trait-card__header \{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) auto[\s\S]*?background:\s*#e0d7c5/);
+  assert.match(componentStyles, /\.trait-card__purchase \{[\s\S]*?appearance:\s*none\s*!important[\s\S]*?-webkit-appearance:\s*none\s*!important[\s\S]*?background:\s*#fff/);
+  assert.match(componentStyles, /&:checked \{[\s\S]*?background-color:\s*#fff[\s\S]*?background-image:[\s\S]*?linear-gradient\(45deg[\s\S]*?linear-gradient\(-45deg/);
+  assert.match(componentStyles, /\.trait-card__description \{[\s\S]*?max-height:\s*none[\s\S]*?align-self:\s*start[\s\S]*?overflow:\s*visible[\s\S]*?overflow-wrap:\s*anywhere/);
   assert.match(sharedStyles, /\.bw-ruled-card \{[\s\S]*?border:\s*1px solid var\(--bw-rule\)[\s\S]*?border-left:\s*5px solid var\(--bw-accent\)[\s\S]*?border-radius:\s*6px[\s\S]*?background:\s*rgba\(255, 255, 255, 0\.3\)/);
   assert.match(sharedStyles, /\.bw-ruled-card__title-band \{[\s\S]*?padding:\s*9px 12px[\s\S]*?background:\s*var\(--bw-paper-deep\)/);
   assert.match(sharedStyles, /\.bw-ruled-card__title \{[\s\S]*?font-family:\s*"Crimson Text", serif[\s\S]*?font-size:\s*1\.2rem[\s\S]*?text-transform:\s*none/);

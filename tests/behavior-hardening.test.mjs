@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 globalThis.Hooks = { on() {} };
@@ -33,10 +34,220 @@ const { BladesActiveEffect } = await import("../module/blades-active-effect.js")
 const { BladesSheet } = await import("../module/blades-sheet.js");
 const { BladesActorSheet, prepareLoadoutCapacity } = await import("../module/blades-actor-sheet.js");
 const { BladesItemSheet, prepareItemSheetPermissions } = await import("../module/blades-item-sheet.js");
-const { BladesMaskSheet, getMaskTypePresentation } = await import("../module/blades-mask-sheet.js");
-const { formControlUpdate } = await import("../module/sheet-dom.js");
+const {
+  BladesMaskSheet,
+  getEligibleMaskTraits,
+  getMaskTraitsForSource,
+  getMaskTypePresentation,
+  MASK_SHEET_DEFAULT_WIDTH,
+  maskSheetWidthForAttributes,
+} = await import("../module/blades-mask-sheet.js");
+const { formControlUpdate, queueDocumentPathUpdate } = await import("../module/sheet-dom.js");
 const { syncOpenActorTrackers } = await import("../module/sheet-tracker-sync.js");
 const { BladesRebelionSheet } = await import("../module/blades-rebelion-sheet.js");
+
+test("Mask context validates its primary tab immediately after the base context", async () => {
+  const source = await readFile(new URL("../module/blades-mask-sheet.js", import.meta.url), "utf8");
+  assert.match(source, /async _prepareContext\(options\)\s*\{\s*const context = await super\._prepareContext\(options\);\s*this\._ensureValidPrimaryTab\(context\);/);
+});
+
+test("Mask primary tabs default to Traits and preserve valid remembered selections", () => {
+  const sheet = { tabGroups: { primary: undefined } };
+  const initialContext = { isGM: false, tabs: { primary: undefined } };
+
+  BladesMaskSheet.prototype._ensureValidPrimaryTab.call(sheet, initialContext);
+  assert.equal(sheet.tabGroups.primary, "traits");
+  assert.equal(initialContext.tabs.primary, "traits");
+
+  // A normal tab switch survives the next context preparation.
+  sheet.tabGroups.primary = "mask-notes";
+  const notesContext = { isGM: false, tabs: { primary: "mask-notes" } };
+  BladesMaskSheet.prototype._ensureValidPrimaryTab.call(sheet, notesContext);
+  assert.equal(sheet.tabGroups.primary, "mask-notes");
+  assert.equal(notesContext.tabs.primary, "mask-notes");
+
+  // Effects is a remembered tab only while that tab is available to a GM.
+  sheet.tabGroups.primary = "effects";
+  const effectsContext = { isGM: true, tabs: { primary: "effects" } };
+  BladesMaskSheet.prototype._ensureValidPrimaryTab.call(sheet, effectsContext);
+  assert.equal(sheet.tabGroups.primary, "effects");
+  assert.equal(effectsContext.tabs.primary, "effects");
+
+  const unavailableEffectsContext = { isGM: false, tabs: { primary: "effects" } };
+  BladesMaskSheet.prototype._ensureValidPrimaryTab.call(sheet, unavailableEffectsContext);
+  assert.equal(sheet.tabGroups.primary, "traits");
+  assert.equal(unavailableEffectsContext.tabs.primary, "traits");
+});
+
+test("Mask Type availability resizes only on transitions and preserves manual sizing during configured rerenders", async () => {
+  assert.equal(MASK_SHEET_DEFAULT_WIDTH, 700);
+  assert.equal(maskSheetWidthForAttributes(700, undefined), 780);
+  assert.equal(maskSheetWidthForAttributes(700, 880), 780);
+  assert.equal(maskSheetWidthForAttributes(980, 880), 980);
+
+  const positions = [];
+  const transitionOptions = [];
+  const sheet = {
+    position: { width: 700 },
+    setPosition(position) {
+      positions.push(position);
+      this.position.width = position.width;
+    },
+    _expandForMaskAttributes: BladesMaskSheet.prototype._expandForMaskAttributes,
+    _shrinkForMaskAttributes: BladesMaskSheet.prototype._shrinkForMaskAttributes,
+    _resizeForMaskAttributes: BladesMaskSheet.prototype._resizeForMaskAttributes,
+    _startMaskAttributeResizeTransition(options) {
+      transitionOptions.push(options);
+      return null;
+    },
+  };
+
+  await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, false);
+  assert.deepEqual(positions, []);
+  assert.deepEqual(transitionOptions, []);
+
+  await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, true);
+  assert.deepEqual(positions, [{ width: 780 }]);
+  assert.deepEqual(transitionOptions, [{ attributesEntering: true }]);
+
+  // A user can make the configured sheet narrower or wider. Re-renders must
+  // preserve both instead of restoring the automatic target width.
+  sheet.position.width = 780;
+  await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, true);
+  assert.deepEqual(positions, [{ width: 780 }]);
+
+  sheet.position.width = 980;
+  await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, true);
+  assert.deepEqual(positions, [{ width: 780 }]);
+
+  await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, false);
+  assert.deepEqual(positions, [{ width: 780 }, { width: 700 }]);
+  assert.deepEqual(transitionOptions.at(-1), { attributesEntering: false });
+  assert.equal(sheet.position.width, 700);
+
+  // A newly selected Mask Type may expand again after removal.
+  await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, true);
+  assert.deepEqual(positions, [{ width: 780 }, { width: 700 }, { width: 780 }]);
+
+  await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, false);
+  assert.deepEqual(positions, [{ width: 780 }, { width: 700 }, { width: 780 }, { width: 700 }]);
+});
+
+test("Mask Traits stay scoped to their source while picker offers every missing Trait", () => {
+  const mask = { id: "mask-judgement", type: "mask", name: "Judgement" };
+  const matchingGrant = {
+    id: "actor-trait-present",
+    type: "trait",
+    name: "Present",
+    system: { class: "Judgment" },
+    flags: { brinkwood: { traitGrant: { sourceItemId: mask.id, sourceItemType: "mask", traitSourceId: "trait-present" } } },
+  };
+  const otherMaskGrant = {
+    id: "actor-trait-other-mask",
+    type: "trait",
+    name: "Other Mask Grant",
+    system: { class: "Judgment" },
+    flags: { brinkwood: { traitGrant: { sourceItemId: "mask-violence", sourceItemType: "mask", traitSourceId: "trait-other-source" } } },
+  };
+  const sameIdNonMaskGrant = {
+    id: "actor-trait-same-id-non-mask",
+    type: "trait",
+    name: "Wrong Source Type",
+    system: { class: "Judgment" },
+    flags: { brinkwood: { traitGrant: { sourceItemId: mask.id, sourceItemType: "upbringing", traitSourceId: "trait-wrong-source-type" } } },
+  };
+  const manualTrait = { id: "actor-trait-manual", type: "trait", name: "Manual Existing", system: { class: "Judgment" }, flags: {} };
+  const provenanceTrait = {
+    id: "actor-trait-provenance",
+    type: "trait",
+    name: "Provenance Existing",
+    system: { class: "Judgment" },
+    flags: { core: { sourceId: "Compendium.brinkwood.trait.trait-provenance" } },
+  };
+  const actorItems = [mask, matchingGrant, otherMaskGrant, sameIdNonMaskGrant, manualTrait, provenanceTrait];
+  const candidates = [
+    { _id: "trait-present", type: "trait", name: "Present", system: { class: "Judgment" } },
+    { _id: "trait-missing", type: "trait", name: "Missing", system: { class: "Judgment" } },
+    { _id: "trait-wrong-mask", type: "trait", name: "Wrong Mask", system: { class: "Violence" } },
+    { _id: "trait-manual", type: "trait", name: "Manual Existing", system: { class: "Judgment" } },
+    { _id: "trait-provenance", type: "trait", name: "Provenance Existing", system: { class: "Judgment" } },
+    { _id: "trait-other-source", type: "trait", name: "Other Mask Grant", system: { class: "Judgment" } },
+    { _id: "trait-wrong-source-type", type: "trait", name: "Wrong Source Type", system: { class: "Judgment" } },
+  ];
+
+  assert.deepEqual(getMaskTraitsForSource(actorItems, mask), [matchingGrant]);
+  assert.deepEqual(getEligibleMaskTraits(candidates, actorItems, mask), [candidates[1], candidates[2]]);
+});
+
+test("Mask Trait picker delegates selected source IDs to the actor repair command", async () => {
+  const mask = { id: "mask-terror", type: "mask", name: "Terror" };
+  const selected = [{ _id: "trait-fear", type: "trait" }, { _id: "trait-silenced", type: "trait" }];
+  const calls = [];
+  const sheet = {
+    isEditable: true,
+    actor: {
+      items: [mask],
+      repairTraitGrantsForSourceIds(...args) { calls.push(args); return "repaired"; },
+    },
+  };
+
+  const result = await BladesMaskSheet.prototype._createPickedItems.call(
+    sheet,
+    [],
+    { itemType: "trait", selectedItems: selected },
+  );
+  assert.equal(result, "repaired");
+  assert.deepEqual(calls, [[[mask.id], false, ["trait-fear", "trait-silenced"]]]);
+
+  sheet.isEditable = false;
+  await BladesMaskSheet.prototype._createPickedItems.call(
+    sheet,
+    [],
+    { itemType: "trait", selectedItems: selected },
+  );
+  assert.equal(calls.length, 1);
+});
+
+test("automatic Mask resize transition is transient and honors reduced motion", () => {
+  const classes = new Set();
+  const listeners = new Map();
+  const frame = {
+    classList: {
+      add(name) { classes.add(name); },
+      remove(name) { classes.delete(name); },
+    },
+    closest() { return this; },
+    addEventListener(name, listener) { listeners.set(name, listener); },
+    removeEventListener(name) { listeners.delete(name); },
+  };
+  const sheet = { element: frame };
+  const previousMatchMedia = globalThis.matchMedia;
+
+  try {
+    globalThis.matchMedia = () => ({ matches: false });
+    BladesMaskSheet.prototype._startMaskAttributeResizeTransition.call(sheet, { attributesEntering: true });
+    assert.equal(classes.has("mask-sheet--attribute-resizing"), true);
+    assert.equal(classes.has("mask-sheet--attributes-entering"), true);
+    listeners.get("transitionend")({ target: frame, propertyName: "width" });
+    assert.equal(classes.has("mask-sheet--attribute-resizing"), false);
+    assert.equal(classes.has("mask-sheet--attributes-entering"), false);
+
+    BladesMaskSheet.prototype._startMaskAttributeResizeTransition.call(sheet);
+    assert.equal(classes.has("mask-sheet--attribute-resizing"), true);
+    assert.equal(classes.has("mask-sheet--attributes-entering"), false);
+    listeners.get("transitionend")({ target: frame, propertyName: "width" });
+
+    globalThis.matchMedia = () => ({ matches: true });
+    assert.equal(BladesMaskSheet.prototype._startMaskAttributeResizeTransition.call(
+      sheet,
+      { attributesEntering: true },
+    ), null);
+    assert.equal(classes.has("mask-sheet--attribute-resizing"), false);
+    assert.equal(classes.has("mask-sheet--attributes-entering"), false);
+  } finally {
+    globalThis.matchMedia = previousMatchMedia;
+  }
+});
 
 function effectEvent(action = "create", effectId = null, effectType = "passive") {
   return {
@@ -595,10 +806,12 @@ test("character skill updates refresh flat pip state without a sheet rerender", 
 
 test("Mask trackers update without a sheet rerender and refresh their output", async () => {
   const updates = [];
+  const classes = new Set(["dot-value", "dot-value--empty"]);
   const tooth = { src: "" };
   const output = { textContent: "0 / 8" };
   const dot = {
     dataset: { path: "experience.value", value: "2", max_value: "8" },
+    classList: { toggle(name, enabled) { enabled ? classes.add(name) : classes.delete(name); } },
     setAttribute(name, value) { this[name] = value; },
     querySelector(selector) { return selector === "img" ? tooth : null; }
   };
@@ -624,8 +837,97 @@ test("Mask trackers update without a sheet rerender and refresh their output", a
 
   assert.deepEqual(updates, [[{ "system.experience.value": 2 }, { render: false }]]);
   assert.equal(dot["aria-pressed"], "true");
+  assert.equal(classes.has("dot-value--filled"), true);
+  assert.equal(classes.has("dot-value--empty"), false);
   assert.equal(output.textContent, "2 / 8");
   assert.match(tooth.src, /stresstooth-blue\.png$/);
+});
+
+test("Actor effect controls ignore a second activation while the first is pending", async () => {
+  const original = BladesActiveEffect.onManageActiveEffect;
+  let release;
+  const pending = new Promise(resolve => { release = resolve; });
+  let calls = 0;
+  let captures = 0;
+  let restores = 0;
+  const control = {};
+  const sheet = {
+    actor: {},
+    _captureSheetViewState() { captures += 1; },
+    _restoreSheetViewState() { restores += 1; },
+  };
+
+  BladesActiveEffect.onManageActiveEffect = async () => {
+    calls += 1;
+    await pending;
+  };
+
+  try {
+    const action = () => BladesActiveEffect.onManageActiveEffect();
+    const first = BladesSheet.prototype._onActorEffectControl.call(sheet, { currentTarget: control }, action);
+    const second = BladesSheet.prototype._onActorEffectControl.call(sheet, { currentTarget: control }, action);
+    await Promise.resolve();
+
+    assert.equal(calls, 1);
+    assert.equal(await second, false);
+    release();
+    assert.equal(await first, true);
+    assert.deepEqual({ captures, restores }, { captures: 1, restores: 1 });
+
+    BladesActiveEffect.onManageActiveEffect = async () => { throw new Error("expected failure"); };
+    assert.equal(await BladesSheet.prototype._onActorEffectControl.call(sheet, { currentTarget: control }, action), false);
+    BladesActiveEffect.onManageActiveEffect = async () => undefined;
+    assert.equal(await BladesSheet.prototype._onActorEffectControl.call(sheet, { currentTarget: control }, action), true);
+  } finally {
+    BladesActiveEffect.onManageActiveEffect = original;
+  }
+});
+
+test("Character tracker updates serialize by path and preserve click order", async () => {
+  let releaseFirst;
+  const firstPending = new Promise(resolve => { releaseFirst = resolve; });
+  const values = [];
+  const document = {
+    system: { experience: { value: 0 } },
+    async update(update) {
+      const value = update["system.experience.value"];
+      values.push(value);
+      if (values.length === 1) await firstPending;
+      this.system.experience.value = value;
+    },
+  };
+  const sheet = {
+    isEditable: true,
+    document,
+    _updateTrackerDisplay() {},
+  };
+  const event = () => ({
+    preventDefault() {},
+    currentTarget: {
+      dataset: { path: "system.experience.value", value: "1", max_value: "4" },
+      parentElement: null,
+    },
+  });
+
+  const first = BladesActorSheet.prototype._onDotChange.call(sheet, event());
+  const second = BladesActorSheet.prototype._onDotChange.call(sheet, event());
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.deepEqual(values, [1]);
+
+  releaseFirst();
+  await Promise.all([first, second]);
+  assert.deepEqual(values, [1, 0]);
+  assert.equal(document.system.experience.value, 0);
+});
+
+test("document-path queues recover after a rejected update", async () => {
+  const document = {};
+  await assert.rejects(queueDocumentPathUpdate(document, "system.value", async () => {
+    throw new Error("expected failure");
+  }));
+
+  assert.equal(await queueDocumentPathUpdate(document, "system.value", async () => 2), 2);
 });
 
 test("actor update synchronization refreshes every open tracker renderer", () => {

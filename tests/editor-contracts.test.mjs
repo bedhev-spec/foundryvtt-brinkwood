@@ -32,13 +32,12 @@ test("v13 image actions and editors are editable-only", async () => {
     "templates/items/simple.html",
     "templates/items/class.html",
     "templates/items/moot_decision.html",
-    "templates/items/trait.html"
+    "templates/items/trait.html",
+    "templates/parts/sheet-identity-portrait.html",
+    "templates/parts/sheet-notes.html"
   ].map(read));
 
-  for (const template of templates) {
-    assert.match(template, /\{\{#if editable\}\}\s*data-action="editImage" data-edit="img"/);
-  }
-  assert.match(templates[0], /\{\{#if editable\}\}[\s\S]*?<prose-mirror name="system\.description"[^>]*data-document-uuid="\{\{actor\.uuid\}\}"[^>]*collaborate toggled>/);
+  for (const template of templates.slice(1, 7)) assert.match(template, /\{\{#if editable\}\}\s*data-action="editImage" data-edit="img"/); assert.match(templates[0], /parts\/sheet-identity-portrait\.html/); assert.match(templates[0], /parts\/sheet-notes\.html/); assert.match(templates[7], /\{\{#if editable\}\}[\s\S]*?<prose-mirror class="sheet-notes__editor" name="system\.description"[^>]*value="\{\{system\.description\}\}"[^>]*data-document-uuid="\{\{actor\.uuid\}\}"[^>]*collaborate toggled>/);
   assert.match(templates[1], /<prose-mirror name="system\.description"[^>]*data-document-uuid="\{\{actor\.uuid\}\}"[^>]*collaborate toggled>/);
   assert.match(templates[1], /<prose-mirror name="system\.notes"[^>]*data-document-uuid="\{\{actor\.uuid\}\}"[^>]*collaborate toggled>/);
   assert.ok(templates.every(template => !/\{\{editor\b/.test(template)));
@@ -49,9 +48,11 @@ test("v13 image actions and editors are editable-only", async () => {
 });
 
 test("native rich-text controls submit source fields while viewers receive enriched content", async () => {
+  const notesPartial = await read("templates/parts/sheet-notes.html");
+  assert.match(notesPartial, /name="system\.description" value="\{\{system\.description\}\}" data-document-uuid="\{\{actor\.uuid\}\}" collaborate toggled>\{\{\{enrichedDescription\}\}\}<\/prose-mirror>/);
+  assert.match(notesPartial, /\{\{else\}\}\s*<div class="editor editor-content sheet-notes__preview">\{\{\{enrichedDescription\}\}\}<\/div>/);
+
   const contracts = [
-    ["templates/actor-sheet.html", "system.description", "actor.uuid", "enrichedDescription"],
-    ["templates/mask-sheet.html", "system.description", "actor.uuid", "enrichedDescription"],
     ["templates/npc-sheet.html", "system.description", "actor.uuid", "enrichedDescription"],
     ["templates/npc-sheet.html", "system.notes", "actor.uuid", "enrichedNotes"],
     ...["simple", "trait", "class", "moot_decision"].map(type => [

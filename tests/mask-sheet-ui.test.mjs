@@ -5,67 +5,97 @@ import test from "node:test";
 const root = new URL("../", import.meta.url);
 const read = file => readFile(new URL(file, root), "utf8");
 
-test("Mask sheet uses compact, accessible, controller-compatible markup", async () => {
-  const [sheet, attributes] = await Promise.all([
+test("Mask uses the shared identity contract rather than an inline header implementation", async () => {
+  const [sheet, portrait, name, row, tracker, styles, sharedStyles] = await Promise.all([
     read("templates/mask-sheet.html"),
-    read("templates/parts/mask-attributes.html")
+    read("templates/parts/sheet-identity-portrait.html"),
+    read("templates/parts/sheet-identity-name.html"),
+    read("templates/parts/sheet-identity-row.html"),
+    read("templates/parts/sheet-identity-tracker.html"),
+    read("scss/import/mask-sheet.scss"),
+    read("scss/import/sheet-identity.scss"),
   ]);
 
-  assert.match(sheet, /class="\{\{cssClass\}\} actor-sheet mask-sheet"/);
-  assert.match(sheet, /data-action="editImage" data-edit="img"/);
-  assert.match(sheet, /class="dot-value" data-path="experience\.value"/);
-  assert.match(sheet, /class="dot-value" data-path="essence\.value"/);
-  assert.match(sheet, /data-group="primary" role="tablist"/);
-  assert.match(sheet, /data-action="tab"[^>]*role="tab"[^>]*aria-controls="mask-\{\{_id\}\}-panel-traits"/);
-  assert.match(sheet, /data-tab="traits"[^>]*role="tabpanel"[^>]*aria-labelledby="mask-\{\{_id\}\}-tab-traits"/);
-  assert.match(sheet, /class="tab mask-sheet__panel mask-sheet__notes[^>]*data-tab="mask-notes"/);
-  assert.match(sheet, /data-tab="effects"[\s\S]*?parts\/active-effects\.html/);
-  assert.match(sheet, /class="item-body mask-sheet__item-open"/);
-  assert.match(sheet, /class="item-control item-delete identity-choice__remove"[\s\S]*?<span aria-hidden="true">&times;<\/span>/);
-  assert.doesNotMatch(sheet, /item-control item-delete"[^>]*><i class="fas fa-trash"/);
-  assert.match(sheet, /class="item-select mask-trait-card__select"/);
-  assert.match(sheet, /class="mask-sheet__section-heading"[\s\S]*?class="item-add-popup" data-item-type="trait"/);
-  assert.doesNotMatch(sheet, /id="mask-\{\{_id\}\}-traits"/);
-  assert.doesNotMatch(attributes, /character-\{\{/);
-  assert.match(attributes, /localize maskAttributesLabel/);
-  assert.doesNotMatch(attributes, /concat system\.type_lang 'Short'/);
-  assert.match(attributes, /data-path="attributes\.\{\{\.\.\/\.\.\/system\.type\}\}\.skills/);
-  assert.match(attributes, /class="attribute-skill-label roll-die-attribute rollable-text"/);
+  assert.match(sheet, /class="mask-sheet__identity-block sheet-identity bw-section-frame\{\{#if maskItem\}\} mask-sheet__identity-block--with-attributes\{\{\/if\}\}"/);
+  assert.match(sheet, /parts\/sheet-identity-portrait\.html/);
+  assert.match(sheet, /parts\/sheet-identity-name\.html/);
+  assert.match(sheet, /parts\/sheet-identity-row\.html" row=row editable=\.\.\/editable/);
+  assert.equal((sheet.match(/parts\/sheet-identity-tracker\.html/g) ?? []).length, 2);
+  assert.doesNotMatch(sheet, /mask-sheet__header|mask-sheet__portrait|mask-tracker__|mask-sheet__item-list/);
+  assert.match(portrait, /data-action="editImage" data-edit="img" role="button" tabindex="0"/);
+  assert.match(name, /class="name bw-text-field"/);
+  assert.match(row, /class="item-delete identity-choice__remove"/);
+  assert.match(row, /class="item-body identity-choice__text\{\{#if row\.reselect\}\} item-add-popup\{\{\/if\}\}"[\s\S]*?class="item-name identity-choice__content"/);
+  assert.match(tracker, /data-path="\{\{\.\.\/trackerPath\}\}"/);
+  assert.match(sharedStyles, /\.sheet-identity__portrait-frame[\s\S]*?width:\s*200px[\s\S]*?height:\s*200px/);
+  assert.match(sharedStyles, /\.sheet-identity \.sheet-identity__rows\s*\{[\s\S]*?grid-auto-rows:\s*28px/);
+  assert.match(styles, /\.mask-sheet__identity-block\s*\{[\s\S]*?grid-template-columns:\s*minmax\(150px, 200px\) minmax\(0, 1fr\)/);
+  assert.match(styles, /\.mask-sheet__identity-block--with-attributes\s*\{[\s\S]*?grid-template-columns:\s*minmax\(150px, 200px\) minmax\(230px, 1fr\) 212px/);
+  assert.match(styles, /\.mask-sheet__identity\s*\{[^}]*display:\s*grid;[^}]*gap:\s*10px;[^}]*min-width:\s*0/);
+  assert.doesNotMatch(styles, /\.mask-sheet__identity\s*\{[^}]*(?:sheet-identity__rows|identity-choice__value)/);
+  assert.doesNotMatch(styles, /\.mask-sheet__(?:header|portrait|item-list|item-open)\b/);
 });
 
-test("Mask sheet delegates encumbrance policy to the shared calculation", async () => {
-  const controller = await read("module/blades-mask-sheet.js");
+test("Mask name delegates Enter and change persistence to shared helpers", async () => {
+  const [controller, dom] = await Promise.all([
+    read("module/blades-mask-sheet.js"),
+    read("module/sheet-dom.js"),
+  ]);
 
-  assert.match(controller, /from "\.\/encumbrance\.js"/);
-  assert.match(controller, /encumbranceLevelForLoadout\(loadout, hasMuleAbility\(context\.items\)\)/);
-  assert.doesNotMatch(controller, /const load_level\s*=/);
-  assert.doesNotMatch(controller, /\(C\) Mule/);
+  assert.match(controller, /form:\s*\{\s*submitOnChange:\s*false\s*\}/);
+  assert.match(controller, /"keydown",\s*handleActorNameEnter/);
+  assert.match(controller, /"change", event => this\._persistFormControl\(event\)/);
+  assert.match(controller, /persistActorNameChange\(this, event\)/);
+  assert.match(dom, /export function handleActorNameEnter\(event\)/);
+  assert.match(dom, /event\.currentTarget\?\.blur\(\)/);
+  assert.match(dom, /await sheet\.document\.update\(\{ name \}, \{ render: true \}\)/);
 });
 
-test("Mask styles are scoped and adapt to the sheet container", async () => {
+test("Mask styles retain shared-tab scroll geometry without old-header compatibility rules", async () => {
   const [entrypoint, source, compiled, sheet] = await Promise.all([
     read("scss/style.scss"),
     read("scss/import/mask-sheet.scss"),
     read("styles/blades.css"),
-    read("templates/mask-sheet.html")
+    read("templates/mask-sheet.html"),
   ]);
 
+  assert.match(entrypoint, /@import 'import\/sheet-identity\.scss'/);
   assert.match(entrypoint, /&\.actor\.mask\s*\{\s*@import 'import\/mask-sheet\.scss'/);
-  assert.match(source, /form\.mask-sheet\s*\{[\s\S]*container-type:\s*inline-size/);
+  assert.match(source, /form\.mask-sheet\s*\{[\s\S]*?grid-template-rows:\s*auto minmax\(0, 1fr\)[\s\S]*?height:\s*100%[\s\S]*?overflow:\s*hidden/);
+  assert.match(source, /\.mask-sheet__layout\s*\{[\s\S]*?min-height:\s*0[\s\S]*?overflow:\s*hidden/);
+  assert.match(source, /\.mask-sheet__main\s*\{[\s\S]*?grid-template-rows:\s*auto minmax\(0, 1fr\)[\s\S]*?height:\s*100%/);
   assert.match(source, /@container \(max-width: 620px\)/);
-  assert.match(source, /@container \(max-width: 390px\)/);
-  assert.match(source, /\.mask-sheet__layout\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)[\s\S]*?width:\s*100%/);
-  assert.match(source, /\.mask-sheet__main\s*\{[\s\S]*?box-sizing:\s*border-box[\s\S]*?width:\s*100%/);
-  assert.match(source, /\.mask-sheet__panel\s*\{[\s\S]*?width:\s*100%[\s\S]*?\.effects-groups\s*\{[\s\S]*?width:\s*100%/);
-  assert.match(source, /\.mask-sheet__traits-workspace\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) minmax\(190px, 0\.42fr\)/);
-  assert.match(sheet, /data-tab="traits"[\s\S]*?class="mask-sheet__traits-workspace"[\s\S]*?parts\/mask-attributes\.html/);
-  assert.match(source, /\.editor,[\s\S]*?\.editor-content,[\s\S]*?prose-mirror\s*\{[\s\S]*?min-height:\s*180px/);
-  assert.match(source, /\.mask-sheet__notes\s*\{[\s\S]*?min-height:\s*160px/);
-  assert.match(source, /\.mask-attributes > h2\s*\{/);
-  assert.match(source, /\.mask-sheet__section-heading\s*\{[\s\S]*?justify-content:\s*space-between/);
-  assert.match(source, /\.mask-sheet__panel\[data-tab="effects"\][\s\S]*?\.effects-category\s*\{[\s\S]*?display:\s*block/);
-  assert.match(source, /\.mask-sheet__item \.identity-choice__remove\s*\{/);
-  assert.match(source, /@media \(prefers-reduced-motion: reduce\)/);
-  assert.match(compiled, /\.brinkwood\.actor\.mask \.mask-sheet__header/);
-  assert.match(compiled, /@container \(max-width: 620px\)/);
+  assert.match(source, /@container \(max-width: 410px\)/);
+  assert.match(sheet, /class="mask-sheet__main sheet-tab-workspace"/);
+  assert.match(sheet, /class="mask-sheet__tab-content sheet-tab-content"/);
+  assert.doesNotMatch(source, /\.mask-sheet__(?:header|portrait|item-list|item-open)\b/);
+  assert.match(compiled, /\.sheet-identity__portrait-frame\s*\{[\s\S]*?width:\s*200px/);
+  assert.doesNotMatch(compiled, /\.brinkwood\.actor\.mask \.mask-sheet__header/);
+});
+
+test("Mask Trait CTA is gated by a configured Mask and uses the shared Trait Card", async () => {
+  const [template, controller, sharedSheet] = await Promise.all([
+    read("templates/mask-sheet.html"),
+    read("module/blades-mask-sheet.js"),
+    read("module/blades-sheet.js"),
+  ]);
+
+  const traitsPanel = template.match(/data-tab="traits"[\s\S]*?<\/section>/)?.[0] ?? "";
+  assert.match(traitsPanel, /\{\{#if canAddMaskTraits\}\}[\s\S]*?class="mask-sheet__trait-add item-add-popup"[\s\S]*?data-item-type="trait"/);
+  assert.match(traitsPanel, /parts\/actor\/trait-card\.html/);
+  assert.ok(traitsPanel.indexOf("mask-sheet__trait-add") < traitsPanel.indexOf("parts/actor/trait-card.html"));
+  assert.doesNotMatch(traitsPanel, /<h2>\{\{localize "BITD\.Traits"\}\}<\/h2>/);
+  assert.doesNotMatch(traitsPanel, /<p class="mask-sheet__empty">\{\{localize "BITD\.Traits"\}\}<\/p>/);
+  assert.match(traitsPanel, /class="mask-sheet__trait-add-content"[\s\S]*?class="mask-sheet__trait-add-icon"[\s\S]*?class="mask-sheet__trait-add-label"/);
+  assert.match(await read("scss/import/mask-sheet.scss"), /\.mask-sheet__trait-add\s*\{[\s\S]*?width:\s*100%;[\s\S]*?min-height:\s*40px;[\s\S]*?border:\s*1px dashed var\(--bw-rule\);[\s\S]*?border-left:\s*5px solid var\(--bw-accent\)/);
+  assert.match(await read("scss/import/mask-sheet.scss"), /\.mask-sheet__trait-add\s*\{[\s\S]*?display:\s*flex;[\s\S]*?align-items:\s*center;[\s\S]*?justify-content:\s*start/);
+  assert.match(await read("scss/import/mask-sheet.scss"), /\.mask-sheet__trait-add-content\s*\{[\s\S]*?display:\s*inline-flex;[\s\S]*?align-items:\s*center;[\s\S]*?height:\s*20px/);
+  assert.match(await read("scss/import/mask-sheet.scss"), /\.mask-sheet__trait-add-icon\s*\{[\s\S]*?&::before,[\s\S]*?&::after[\s\S]*?inset-block-start:\s*50%;[\s\S]*?inset-inline-start:\s*50%/);
+  assert.doesNotMatch(await read("scss/import/mask-sheet.scss"), /\.mask-sheet__trait-add-content\s*\{[\s\S]*?translateY/);
+  assert.match(controller, /context\.maskItem = context\.items\.find\(item => item\.type === "mask"\) \?\? null;/);
+  assert.match(controller, /context\.traits = getMaskTraitsForSource\(context\.items, context\.maskItem\)/);
+  assert.match(controller, /context\.canAddMaskTraits = Boolean\(context\.maskItem\) && context\.editable;/);
+  assert.match(controller, /async _getItemPickerItems\(itemType\)[\s\S]*?getEligibleMaskTraits\(items, this\.actor\.items, maskItem\)/);
+  assert.match(controller, /repairTraitGrantsForSourceIds\(\[itemId\(maskItem\)\], false, traitSourceIds\)/);
+  assert.match(sharedSheet, /async _getItemPickerItems\(itemType\)[\s\S]*?BladesHelpers\.getAllItemsByType\(itemType, game\)/);
 });

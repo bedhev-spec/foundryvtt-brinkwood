@@ -1,16 +1,18 @@
-<aside id="mask-{{_id}}-attributes" class="mask-attributes" aria-label="{{localize maskAttributesLabel}}">
-  <h2>{{localize maskAttributesLabel}}</h2>
+<aside id="mask-{{_id}}-attributes" class="mask-attributes sheet-attribute-presentation" aria-label="{{localize maskAttributesLabel}}">
+  <div class="attributes-exp">
+    <div class="stripe"><h2 class="attribute-label">{{localize maskAttributesLabel}}</h2></div>
+  </div>
   {{#if system.mask_attributes.skills}}
   <div class="mask-attributes__skills">
     {{#each system.mask_attributes.skills as |skill skill_name|}}
-    <section class="mask-skill">
-      <div class="mask-skill__controls" role="group" aria-label="{{localize skill.label}}">
+    <div class="flex-horizontal">
+      <div class="attributes-container mask-skill" role="group" aria-label="{{localize skill.label}}">
         {{#times_from_1 4}}
-        <button type="button" class="dot-value" data-max_value="4" data-value="{{this}}" data-path="attributes.{{../../system.type}}.skills.{{skill_name}}.value" aria-label="{{localize skill.label}} {{this}} of 4" aria-pressed="{{#if (lt skill.value this)}}false{{else}}true{{/if}}"{{#unless ../../editable}} disabled{{/unless}}>{{#if (lt skill.value this)}}○{{else}}●{{/if}}</button>
+        <button type="button" class="dot-value {{#if (lt skill.value this)}}dot-value--empty{{else}}dot-value--filled{{/if}}" data-max_value="4" data-value="{{this}}" data-path="attributes.{{../../system.type}}.skills.{{skill_name}}.value" aria-label="{{localize skill.label}} {{this}} of 4" aria-pressed="{{#if (lt skill.value this)}}false{{else}}true{{/if}}"{{#unless ../../editable}} disabled{{/unless}}>{{#if (lt skill.value this)}}○{{else}}●{{/if}}</button>
         {{/times_from_1}}
-      </div>
       <button type="button" class="attribute-skill-label roll-die-attribute rollable-text" data-roll-attribute-label="{{skill.label}}" data-roll-value="{{skill.value}}" data-roll-attribute="{{skill_name}}" data-tooltip="{{skill.desc}}" data-tooltip-class="brinkwood-tooltip" data-tooltip-direction="RIGHT">{{localize skill.label}}</button>
-    </section>
+      </div>
+    </div>
     {{/each}}
   </div>
   {{else}}

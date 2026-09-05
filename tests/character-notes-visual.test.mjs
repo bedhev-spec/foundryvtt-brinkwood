@@ -7,7 +7,7 @@ const read = file => readFile(new URL(file, root), "utf8");
 
 test("character notes keep rich text readable and inset from their frame", async () => {
   const [source, compiled] = await Promise.all([
-    read("scss/import/character-sheet.scss"),
+    read("scss/import/sheet-notes.scss"),
     read("styles/blades.css"),
   ]);
 

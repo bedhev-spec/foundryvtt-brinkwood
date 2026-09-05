@@ -62,7 +62,6 @@
   min-width: 0;
   margin: 0;
   padding: 0;
-  line-height: 1;
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
@@ -71,29 +70,6 @@
 
 /* The value ends beside the fixed × column; width remains available for
  * multi-line identities rather than being shortened by the action. */
-/* Stable action rows: labels stay fixed while only the circle artwork is optically aligned. */
-.brinkwood.actor.pc.character .attributes .attributes-container {
-  display: grid;
-  grid-template-columns: repeat(4, 28px) minmax(0, 1fr);
-  align-items: center;
-  min-height: 28px;
-}
-
-.brinkwood.actor.pc.character .attributes .attributes-container button.dot-value {
-  align-self: center;
-  transform: none;
-}
-
-.brinkwood.actor.pc.character .attributes .attributes-container button.dot-value::before {
-  transform: translateY(7px);
-}
-
-.brinkwood.actor.pc.character .attributes .attribute-skill-label {
-  align-self: center;
-  min-height: 28px;
-  margin-top: 0;
-}
-
 /* Hide the zero/nullifier glyph while retaining the clock and progress text. */
 .brinkwood.actor.pc.character .character-scars-clock .clock-zero-label,
 .brinkwood.actor.pc.character .character-oath-clock .clock-zero-label {
@@ -189,6 +165,14 @@
   background: #fffdf7;
   color: var(--bw-ink);
   box-shadow: inset 0 1px 2px rgba(33, 27, 29, 0.13);
+}
+
+/* This must follow the inset-shadow compatibility treatment above so every
+ * text field on the Character sheet keeps the Mask Sheet's black focus cue. */
+.brinkwood.actor.pc.character form.actor-sheet input[type="text"]:focus {
+  border-color: #191813;
+  outline: 0;
+  box-shadow: 0 0 0 1px rgba(25, 24, 19, 0.25);
 }
 
 .brinkwood.actor.pc.character form.actor-sheet .character-identity-choices .item-block {

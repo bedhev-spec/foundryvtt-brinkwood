@@ -1,100 +1,59 @@
-# This is a WIP for a Brinkwood games system for Foundry VTT
+# Brinkwood for Foundry VTT
+
+An unofficial, work-in-progress Foundry VTT system for [Brinkwood: The Blood of Tyrants](https://brinkwood.net/), originally based on megastruktur's [Blades in the Dark system](https://github.com/megastruktur/foundryvtt-blades-in-the-dark).
+
+The project is actively migrating its v11-era sheets and behavior to Foundry v13. Expect continued refactoring and occasional breaking changes until the migration is complete.
 
 ## Compatibility
 
-Version 0.6.13 supports Foundry VTT v13, verified through build 13.351.
+- System version: `0.6.13`
+- Minimum Foundry version: `13`
+- Verified Foundry build: `13.351`
 
-Install or update the system with this manifest URL:
+## Installation
 
-`https://raw.githubusercontent.com/bedhev-spec/foundryvtt-brinkwood/integration/v13-follow-up/system.json`
+Install or update the system in Foundry with this manifest URL:
 
-## v0.5 - first "public" release
-This a barebones implementation of Brinkwood its still heavily based on megastrukturs Blades in The Dark and has *waaay* too much leftover/unused logic.
-Be warned, this is not stable and is susceptible to massive overhauls, I will try to implement all changes in a non-game-breaking manner but YOU HAVE BEEN WARNED.
+```text
+https://raw.githubusercontent.com/bedhev-spec/foundryvtt-brinkwood/integration/v13-follow-up/system.json
+```
 
-### v0.5.4
-- [x] Foundry 11: Tooltip styling update
-- [BUG] Mask sheet is now accessible without assigning a character to a player.
-- [x] The biggest annoyance right now are the bonus action scores from the professions/classes - this has to have a new system.
-- - [x] Migrate the old system to the new one
-- [ ] Rebellion record sheet.
-- - [x] Tyranny & Sedition
-- - [x] Aspects 
-- - [ ] Moot decisions
+## Current functionality
 
-### v0.5.3
-- Tooltips changed to the "proper" foundry format, all of the actions (char & Mask), exp triggers and other char traits should have a proper tooltip right now. 
-- Rolls have been prtialy refactored and Essence roll (for doning of the Mask) is now possible form the Mask sheet using the players assigned character oath Score.
-- Other fixes: spelling mistakes, missing langs etc.
+- Character and Mask sheets
+- Action, resistance, and Essence rolls
+- Selectable Upbringings, Professions, Classes, Pacts, and Mask Types
+- Automatic trait loading for supported identity choices
+- Character loadout and capacity tracking
+- Mask actions, abilities, and XP triggers
+- Foundry Item and Active Effect management
+- English localization and sheet tooltips
 
-### v0.5.2
-- Fixed clock actors
-- Added selectable Pacts to the PC sheet
-- Rework of tooltips and most of the basic ones added
+![Brinkwood character sheets](./images/brinkwood_sheets.png)
 
-### v0.5.1 
-- Bonus action scores form classes and professions should work properly now.
-- Downtime action descriptions added to a tab on character sheets.
+## Known work remaining
 
-### So, what works?
-The basics: working sheets for characters and masks. With rollable actions and resistance rolls, all of the upbringings, professions, and mask types should have correct traits/special abilities selectable on the list. Character sheets have additionally a selectable list of all basic items with a proper load calculation.
+- Rebellion record sheet, including Moot decisions
+- Blood alchemy
+- Two-point Mask abilities such as Drink Deep and Multifaceted
+- Fey dossier sheet
+- Custom clocks on sheets
+- Removal of remaining unused Blades in the Dark legacy code
 
+## Developer documentation
 
-#### Screenshots
+- [Sheet design system](./docs/sheet-design-system.md): shared component ownership, geometry, and validation contracts
+- [SCSS ownership and build](./scss/README.md): stylesheet ownership and CSS parity commands
+- [Live Foundry regression matrix](./tests/LIVE-FOUNDRY-REGRESSION-MATRIX.md): checks that require the real Foundry runtime
 
-![image](./images/brinkwood_sheets.png)
+## Contact
 
-### What doesn't?
-Bonus action scores at character creation and Blood Alchemy types - and everything else ;)
+Open an issue on this repository, or contact `quad#8681` on the official Brinkwood or Foundry VTT Discord communities.
 
-### What's next?
+## Credits and license
 
-#### After-session priorities
-- [x] ! Fix clock actors.
-- [x] Pact selection for characters.
-- [x] Better tooltips
-- - [x] Upbringings, Professions, Classes, Pacts
-- - [x] Action descriptions
-- - [x] Exp triggers
-- - [x] Stress usage
-- - [x] Ban usage
-- - [x] Mask actions
-- - [x] Mask XP Triggers
-- [x] Lang for attributes
-- [x] Lang for rolls 
-- [x] Fix typo for Terror.Frighten in langfile
-- [x] Remove labels from template.json
-- [x] Re-organize abilities: move selected to the top, colapse unused on characters (but not on masks).
-- [x] Reimplement the rolling system to use dataset values
-- - [x] Add values to rollable datasets
-- - - [x] Count values for attributes & add them to the sheets
-- - - [x] Add action values to sheets
-- - [x] Update roll function
-- [x] Rollable Essence score.
-- - [x] Backend for rolling with selected character Oath score.
-- - [x] Proper Essence roll chat message.
+Brinkwood is created by Far Horizons Co-op. This project is unofficial and is not associated with Far Horizons Co-op or the Brinkwood authors.
 
-#### TODO (later)
+The global clock overlay adapts the clock-only portion of [Global Progress Clocks](https://github.com/CarlosFdez/global-progress-clocks) by Carlos Fernandez (Supe), with the upstream CSS-clock conversion credited to Lunar-Dawn. The retained MIT terms are in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
 
-- [ ] Blood alchemy
-- [ ] Make tab selection more pretty/usable.
-- [ ] Two-point mask abilities: Drink Deep and Multifaceted (along with crossmask ability selection).
-- [ ] Fay dossier sheet.
-- [ ] Overhauling sheet design.
-- [ ] Custom clocks on sheets.
-- [ ] ???
-
-
-## How to get in touch?
-Make an issue or contact me on the official Brinkwood or Foundry (in forged-in-the-dark) discord (quad#8681).
-
-# Credits & Licence
-
-This is based on megastruktur's Blades in the Dark system, that you can find [here](https://github.com/megastruktur/foundryvtt-blades-in-the-dark)
-
-This is not an official Brinkwood system and is *not* accociated with Far Horizons Co-op or any of the authors (but I hope someday it will!) 
-
-This software contains characters, places and names that are sourced form the Brinkwood table top game by Eric Bernhardt et all. 
-Those parts are *NOT FREE TO USE* and belong to their respecitve authors, for more details checkout https://brinkwood.net and contact the Far Horizons Co-Op.
-
-The code is licenced with GPL3.
+This project is licensed under the [GNU General Public License v3.0](./LICENSE.txt).

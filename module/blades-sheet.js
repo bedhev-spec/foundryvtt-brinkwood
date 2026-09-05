@@ -5,8 +5,8 @@
  */
 
 import { BladesHelpers } from "./blades-helpers.js";
-import { escapeHTML } from "./html-utils.js";
 import { renderItemTooltip } from "./item-tooltip.js";
+import { promptItemPicker } from "./item-picker-dialog.js";
 import { showRollStatistics } from "./roll-statistics.js";
 import { lockSheetFormControls } from "./sheet-dom.js";
 import {
@@ -18,15 +18,7 @@ import {
   restoreSheetViewState,
 } from "./sheet-view-state.js";
 
-/** Read checked item picker inputs from either DialogV2 callback root. */
-export function readItemPickerSelection(button, dialog) {
-  const roots = [button?.form, dialog?.element?.querySelector("form")].filter(Boolean);
-  for (const root of roots) {
-    const selected = root.querySelectorAll(".items-to-add input:checked");
-    if (root.querySelector(".items-to-add")) return Array.from(selected, input => input.value);
-  }
-  return [];
-}
+export { readItemPickerSelection } from "./item-picker-dialog.js";
 
 export class BladesSheet extends foundry.applications.api.HandlebarsApplicationMixin(
   foundry.applications.sheets.ActorSheetV2
@@ -36,6 +28,26 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
     classes: ["brinkwood", "sheet", "actor"],
     form: { submitOnChange: true },
   };
+
+  async _onActorEffectControl(event, action) {
+    const control = event.currentTarget;
+    if (!control || typeof action !== "function" || this._pendingActorEffectControls?.has(control)) return false;
+
+    this._pendingActorEffectControls ??= new WeakSet();
+    this._pendingActorEffectControls.add(control);
+    this._captureSheetViewState();
+
+    try {
+      await action();
+      return true;
+    } catch (error) {
+      ui.notifications?.error?.("Unable to update this Actor effect.");
+      return false;
+    } finally {
+      this._pendingActorEffectControls.delete(control);
+      this._restoreSheetViewState();
+    }
+  }
 
   /* -------------------------------------------- */
 
@@ -189,14 +201,38 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
   async _onItemAddClick(event) {
     event.preventDefault();
     if (!this.isEditable) return;
-    const el        = event.currentTarget;
+    const pickerKey = event.currentTarget.dataset.itemType;
+    this._itemPickerRequests ??= new Map();
+    const existing = this._itemPickerRequests.get(pickerKey);
+    if (existing) {
+      existing.dialog?.bringToFront();
+      return existing.request;
+    }
+
+    const entry = { dialog: null, request: null };
+    const request = this._openItemPicker(event.currentTarget, {
+      onDialog: dialog => { entry.dialog = dialog; },
+    });
+    entry.request = request;
+    this._itemPickerRequests.set(pickerKey, entry);
+    try {
+      return await request;
+    } finally {
+      if (this._itemPickerRequests.get(pickerKey) === entry) {
+        this._itemPickerRequests.delete(pickerKey);
+      }
+    }
+  }
+
+  /** Open one picker request; _onItemAddClick serializes access to this path. */
+  async _openItemPicker(el, { onDialog } = {}) {
     const item_type = el.dataset.itemType;
     const distinct  = el.dataset.distinct;
     const input_type = distinct !== undefined ? "radio" : "checkbox";
 
-    const items = await BladesHelpers.getAllItemsByType(item_type, game);
+    const items = await this._getItemPickerItems(item_type);
 
-    let htmlContent = `<form><div class="items-to-add">`;
+    const pickerRows = [];
     for (const e of items) {
       let addition_price_load = ``;
       if (typeof e.system.load !== "undefined") {
@@ -204,51 +240,53 @@ export class BladesSheet extends foundry.applications.api.HandlebarsApplicationM
       } else if (typeof e.system.price !== "undefined") {
         addition_price_load += `(${e.system.price})`;
       }
-      const itemId = escapeHTML(e._id);
-      const itemName = escapeHTML(game.i18n.localize(e.name));
-      const itemDetails = escapeHTML(addition_price_load);
       const enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
         String(e.system.description ?? ""),
         this.document,
         this.document.isOwner,
       );
-      const itemTooltip = escapeHTML(renderItemTooltip(
-        e,
-        key => game.i18n.localize(key),
-        () => enrichedDescription,
-      ));
-      const itemTooltipLabel = escapeHTML(game.i18n.localize("BITD.ItemDetails"));
-      htmlContent += `<div class="item-picker-row">
-        <input id="select-item-${itemId}" type="${input_type}" name="select_items" value="${itemId}">
-        <label class="flex-horizontal" for="select-item-${itemId}">
-          <span>${itemName}</span><span class="item-picker-row__detail">${itemDetails}</span>
-        </label>
-        <i class="tooltip fas fa-question-circle" tabindex="0" aria-label="${itemTooltipLabel}"
-          data-tooltip-html="${itemTooltip}" data-tooltip-class="brinkwood-item-tooltip-shell"
-          data-tooltip-direction="RIGHT"></i>
-      </div>`;
+      pickerRows.push({
+        id: e._id,
+        name: game.i18n.localize(e.name),
+        details: addition_price_load,
+        tooltipHtml: this._renderItemPickerTooltip(e, enrichedDescription),
+      });
     }
-    htmlContent += `</div></form>`;
 
-    const selectedIds = await foundry.applications.api.DialogV2.prompt({
-      window: { title: `${game.i18n.localize("Add")} ${item_type}` },
-      content: htmlContent,
-      ok: {
-        label: game.i18n.localize("Add"),
-        callback: (_event, button, dialog) => readItemPickerSelection(button, dialog),
-      },
-      rejectClose: false,
+    const selectedIds = await promptItemPicker({
+      rows: pickerRows,
+      inputType: input_type,
+      title: `${game.i18n.localize("Add")} ${item_type}`,
+      addLabel: game.i18n.localize("Add"),
+      tooltipLabel: game.i18n.localize("BITD.ItemDetails"),
+      onDialog,
     });
 
     if (!selectedIds?.length) return;
-    const itemsToAdd = items
-      .filter(item => selectedIds.includes(item._id))
+    const selectedItems = items
+      .filter(item => selectedIds.includes(item._id));
+    const itemsToAdd = selectedItems
       .map(item => {
         const data = foundry.utils.deepClone(item);
         delete data._id;
         return data;
       });
-    await this.document.createEmbeddedDocuments("Item", itemsToAdd);
+    await this._createPickedItems(itemsToAdd, { itemType: item_type, selectedItems });
+  }
+
+  /** Allow sheets to narrow a shared picker without duplicating its DialogV2 UI. */
+  async _getItemPickerItems(itemType) {
+    return BladesHelpers.getAllItemsByType(itemType, game);
+  }
+
+  /** Allow sheets to specialize picker help without duplicating dialog assembly. */
+  _renderItemPickerTooltip(item, enrichedDescription) {
+    return renderItemTooltip(item, key => game.i18n.localize(key), () => enrichedDescription);
+  }
+
+  /** Allow actor-specific sheets to route picker persistence to one command. */
+  async _createPickedItems(items, _options = {}) {
+    return this.document.createEmbeddedDocuments("Item", items);
   }
 
   /* -------------------------------------------- */

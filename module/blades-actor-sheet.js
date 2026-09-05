@@ -10,9 +10,8 @@ import { encumbranceLevelForLoadout, hasMuleAbility } from "./encumbrance.js";
 import { BladesHelpers } from "./blades-helpers.js";
 import { BladesActiveEffect } from "./blades-active-effect.js";
 import { preloadClockImages } from "./clock-utils.js";
-import { escapeHTML } from "./html-utils.js";
 import { renderDescriptionTooltip } from "./item-tooltip.js";
-import { formControlUpdate } from "./sheet-dom.js";
+import { bindRichTextPersistence, formControlUpdate, handleActorNameEnter, persistActorNameChange, persistRichTextChange, queueDocumentPathUpdate } from "./sheet-dom.js";
 
 export { prepareLoadoutCapacity } from "./character/loadout.js";
 
@@ -88,19 +87,35 @@ position: { width: 700, height: 1170 },
 
     this.setAttrLabels(context.system.attributes);
 
-    const identityDescriptionRoots = {
-      upbringing: "Actor.Upbringings",
-      profession: "Actor.Professions",
-      class: "Actor.Classes",
-      pact: "Actor.Pacts",
-    };
+    const identityDefinitions = [
+      { itemType: "upbringing", label: "BITD.Upbringing", descriptionRoot: "Actor.Upbringings" },
+      { itemType: "profession", label: "BITD.Profession", descriptionRoot: "Actor.Professions" },
+      { itemType: "class", label: "BITD.Class", descriptionRoot: "Actor.Classes" },
+      { itemType: "pact", label: "BITD.Pact", descriptionRoot: "Actor.Pacts" },
+    ];
     for (const item of context.items) {
-      const descriptionRoot = identityDescriptionRoots[item.type];
+      const descriptionRoot = identityDefinitions.find(({ itemType }) => itemType === item.type)?.descriptionRoot;
       if (!descriptionRoot) continue;
-      item.identityTooltipHtml = escapeHTML(
-        renderDescriptionTooltip(game.i18n.localize(`${descriptionRoot}.${item.name}`)),
+      const description = game.i18n.localize(`${descriptionRoot}.${item.name}`);
+      const enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+        description,
+        { async: true, relativeTo: this.document, secrets: this.document.isOwner },
+      );
+      item.identityTooltipHtml = renderDescriptionTooltip(
+        description,
+        () => enrichedDescription,
       );
     }
+
+    // The shared identity-row partial renders descriptors rather than scanning
+    // the Actor's entire item collection. Keep all four Character rows present
+    // even when their optional embedded Item has not been selected yet.
+    context.identityRows = identityDefinitions.map(({ itemType, label }) => ({
+      itemType,
+      label,
+      deleteLabel: "BITD.TitleDeleteItem",
+      item: context.items.find(item => item.type === itemType) ?? null,
+    }));
 
     context.traits = context.items
       .filter(i => i.type === "trait")
@@ -166,9 +181,12 @@ position: { width: 700, height: 1170 },
      const listenerOptions = { signal: this._characterSheetListenerController.signal };
      this._bindSheetViewState(html, listenerOptions);
      bindLoadoutControls(this, html, listenerOptions);
+     html.querySelector('input[name="name"]')?.addEventListener(
+       "keydown", handleActorNameEnter, listenerOptions);
      if (!this.isEditable) return;
 
-       html.querySelectorAll('input[name], select[name], textarea[name], prose-mirror[name]').forEach(control => {
+      bindRichTextPersistence(this, html, listenerOptions);
+      html.querySelectorAll('input[name], select[name], textarea[name]').forEach(control => {
         control.addEventListener("change", event => this._persistFormControl(event), listenerOptions);
       });
 
@@ -211,25 +229,26 @@ position: { width: 700, height: 1170 },
     );
 
     // Active effect controls - use data-effect-action to avoid AppV2 action dispatch
- html.querySelectorAll(".effect-control[data-effect-action]").forEach(el =>
- el.addEventListener("click", ev => {
-  this._captureSheetViewState();
-  const action = BladesActiveEffect.onManageActiveEffect(ev, this.actor, { gmOnly: true });
-  Promise.resolve(action).finally(() => this._restoreSheetViewState());
- }, listenerOptions)
- );
+    html.querySelectorAll(".effect-control[data-effect-action]").forEach(el =>
+      el.addEventListener("click", ev => this._onActorEffectControl(
+        ev,
+        () => BladesActiveEffect.onManageActiveEffect(ev, this.actor, { gmOnly: true }),
+      ), listenerOptions)
+    );
   }
 
   async _persistFormControl(event) {
     if (!this.isEditable) return;
     const control = event.currentTarget;
+    if (control.matches('input[name="name"]')) return persistActorNameChange(this, event);
+    if (await persistRichTextChange(this, event)) return;
     // Clock radios have toggle-to-zero semantics in _onClockClick; a later
     // generic focus/change save would otherwise restore the selected segment.
     if (control.matches('select[name="system.selected_load_level"]')) return;
     if (control.matches('input[name="system.scars"], input[name="system.oath"], [data-path]')) return;
     const update = formControlUpdate(control);
     if (update) {
-      await this.document.update(update, { render: control.matches("prose-mirror[name]") });
+      await this.document.update(update);
     }
   }
 
@@ -241,13 +260,15 @@ position: { width: 700, height: 1170 },
 
     let new_value  = Number(dataset.value);
     const max_value = Number(dataset.max_value);
-    const old_value = foundry.utils.getProperty(this.document, dataset.path);
+    await queueDocumentPathUpdate(this.document, dataset.path, async () => {
+      const old_value = foundry.utils.getProperty(this.document, dataset.path);
+      let queuedValue = new_value;
+      if (queuedValue === old_value && queuedValue === 1) queuedValue = 0;
+      if (Number.isFinite(max_value) && queuedValue > max_value) queuedValue = max_value;
 
-    if (new_value === old_value && new_value === 1) new_value = 0;
-    if (Number.isFinite(max_value) && new_value > max_value) new_value = max_value;
-
-    await this.document.update({ [dataset.path]: new_value }, { render: false });
-    this._updateTrackerDisplay(element, new_value);
+      await this.document.update({ [dataset.path]: queuedValue }, { render: false });
+      this._updateTrackerDisplay(element, queuedValue);
+    });
   }
 
   _updateTrackerDisplay(element, value) {
@@ -261,9 +282,11 @@ position: { width: 700, height: 1170 },
 
     event.preventDefault();
     event.stopPropagation();
-    const currentValue = Number(foundry.utils.getProperty(this.document, name));
-    const clockValue = selectedValue === 1 && currentValue === 1 ? 0 : selectedValue;
-    await this.document.update({ [name]: Math.min(4, Math.max(0, clockValue)) });
+    await queueDocumentPathUpdate(this.document, name, async () => {
+      const currentValue = Number(foundry.utils.getProperty(this.document, name));
+      const clockValue = selectedValue === 1 && currentValue === 1 ? 0 : selectedValue;
+      await this.document.update({ [name]: Math.min(4, Math.max(0, clockValue)) });
+    });
   }
 
   /* -------------------------------------------- */

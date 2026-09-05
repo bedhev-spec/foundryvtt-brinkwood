@@ -25,6 +25,25 @@ test("the evolved character sheet is the only registered character sheet", async
   }
 });
 
+test("Character prepares every shared identity row consumed by its template", async () => {
+  const [controller, template] = await Promise.all([
+    read("module/blades-actor-sheet.js"),
+    read("templates/actor-sheet.html"),
+  ]);
+
+  assert.match(template, /\{\{#each identityRows as \|row\|\}\}/);
+  for (const [itemType, label] of [
+    ["upbringing", "BITD.Upbringing"],
+    ["profession", "BITD.Profession"],
+    ["class", "BITD.Class"],
+    ["pact", "BITD.Pact"],
+  ]) {
+    assert.match(controller, new RegExp(`itemType: "${itemType}", label: "${label}"`));
+  }
+  assert.match(controller, /context\.identityRows = identityDefinitions\.map/);
+  assert.match(controller, /item: context\.items\.find\(item => item\.type === itemType\) \?\? null/);
+});
+
 test("Character sheet delegates encumbrance policy to the shared calculation", async () => {
   const controller = await read("module/blades-actor-sheet.js");
 
@@ -34,26 +53,31 @@ test("Character sheet delegates encumbrance policy to the shared calculation", a
   assert.doesNotMatch(controller, /\(C\) Mule/);
 });
 
-test("effect management is grouped and uses markup-independent controls", async () => {
+test("Character and Mask share trait-like Effect cards with markup-independent controls", async () => {
   const [template, manager, sourceStyles, compiledStyles] = await Promise.all([
-    read("templates/parts/active-effects.html"),
+    read("templates/parts/actor-active-effects.html"),
     read("module/blades-active-effect.js"),
-    read("scss/import/general-styles.scss"),
+    read("scss/import/actor-effect-card.scss"),
     read("styles/blades.css"),
   ]);
 
-  assert.match(template, /<section class="effects-category" data-effect-type=/);
-  assert.match(template, /<article class="effect-card/);
-  assert.match(template, /<button type="button" class="effect-control/);
+  assert.match(template, /<section class="actor-effects__category" data-effect-type=/);
+  assert.match(template, /class="effect-control actor-effects__add" data-effect-action="create"/);
+  assert.match(template, /<article class="actor-effect-card bw-ruled-card/);
+  assert.match(template, /class="actor-effect-card__header bw-ruled-card__title-band"/);
+  assert.match(template, /class="actor-effect-card__title bw-ruled-card__title"/);
+  assert.match(template, /data-effect-action="toggle"[\s\S]*?data-effect-action="edit"[\s\S]*?data-effect-action="delete"/);
+  assert.doesNotMatch(template, /type="checkbox"/);
   assert.doesNotMatch(template, /<table|<thead|<tr/);
   assert.match(manager, /closest\("\[data-effect-id\]"\)/);
   assert.match(manager, /closest\("\[data-effect-type\]"\)/);
   assert.match(manager, /suppressed:\s*\{[\s\S]*?canCreate: false/);
   assert.match(template, /\{\{#if section\.canCreate\}\}/);
   assert.match(template, /\{\{#if \.\.\/\.\.\/editable\}\}[\s\S]*?data-effect-action="toggle"[\s\S]*?\{\{\/if\}\}/);
-  assert.match(sourceStyles, /\.effect-card__metadata/);
-  assert.match(sourceStyles, /\.effect-card__metadata\s*\{[\s\S]*?font-size:\s*0\.92rem[\s\S]*?font-weight:\s*600[\s\S]*?opacity:\s*1/);
-  assert.match(compiledStyles, /\.brinkwood \.effect-card__metadata/);
+  assert.match(sourceStyles, /button\.actor-effects__add\s*\{[\s\S]*?border-left:\s*5px solid var\(--bw-accent\)/);
+  assert.match(sourceStyles, /\.actor-effect-card__header\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) auto/);
+  assert.match(sourceStyles, /\.actor-effect-card__summary\s*\{[\s\S]*?border-bottom:\s*1px solid var\(--bw-rule\)/);
+  assert.match(compiledStyles, /\.brinkwood \.actor-effect-card__metadata/);
 });
 
 test("character traits are static purchased cards", async () => {
@@ -99,10 +123,22 @@ test("Bans level two has stable neutral emphasis without row focus coloring", as
   assert.doesNotMatch(styles, /character-bans[\s\S]*?tr:focus-within/);
 });
 
+test("Character text inputs retain the Mask-style black focus cue over compatibility polish", async () => {
+  const [polish, compiled] = await Promise.all([
+    read("scss/import/legacy-character-sheet-polish.scss"),
+    read("styles/blades.css"),
+  ]);
+
+  for (const styles of [polish, compiled]) {
+    assert.match(styles, /\.brinkwood\.actor\.pc\.character form\.actor-sheet input\[type=(?:"text"|text)\]:focus\s*\{[\s\S]*?border-color:\s*#191813;[\s\S]*?outline:\s*0;[\s\S]*?box-shadow:\s*0 0 0 1px rgba\(25, 24, 19, 0\.25\);/);
+  }
+});
+
 test("Character tabs retain a valid selection and contain Downtime within the fixed sheet width", async () => {
-  const [controller, styles, compiled] = await Promise.all([
+  const [controller, styles, tabStyles, compiled] = await Promise.all([
     read("module/blades-actor-sheet.js"),
     read("scss/import/character-sheet.scss"),
+    read("scss/import/sheet-tabs.scss"),
     read("styles/blades.css"),
   ]);
 
@@ -118,9 +154,10 @@ test("Character tabs retain a valid selection and contain Downtime within the fi
   assert.doesNotMatch(styles, /\.tab\.downtime,[\s\S]*?\.downtime-action\s*\{[\s\S]*?border-left/);
   assert.doesNotMatch(styles, /\.downtime-action\s*\{[\s\S]*?(?:padding|font-family|overflow-wrap):/);
   assert.match(styles, /\.window-content\s*\{[^}]*overflow-y:\s*hidden/);
-  assert.match(styles, /character-sheet__workspace > \.tab-content\s*\{[^}]*overflow-y:\s*auto[^}]*scrollbar-gutter:\s*stable[^}]*scrollbar-width:\s*thin/);
+  assert.match(styles, /character-sheet__workspace > \.tab-content\s*\{[^}]*overflow:\s*hidden/);
+  assert.match(tabStyles, /> \.tab\.active\s*\{[^}]*overflow-y:\s*auto[^}]*scrollbar-gutter:\s*stable[^}]*scrollbar-width:\s*thin/);
   assert.match(styles, /form\.actor-sheet\s*\{[\s\S]*?overflow:\s*visible/);
-  assert.match(compiled, /\.brinkwood\.actor\.pc\.character \.character-sheet__workspace > \.tab-content\s*\{[^}]*scrollbar-gutter:\s*stable[^}]*scrollbar-width:\s*thin/);
+  assert.match(compiled, /\.brinkwood \.sheet-tab-content > \.tab\.active\s*\{[^}]*scrollbar-gutter:\s*stable[^}]*scrollbar-width:\s*thin/);
   assert.match(compiled, /\.brinkwood \.bw-ruled-card\s*\{[\s\S]*?border-left:\s*5px solid var\(--bw-accent\)/);
 });
 
@@ -133,7 +170,7 @@ test("Character sheet commits generic controls once and completes tab-panel cont
   assert.match(controller, /control\.addEventListener\("change", event => this\._persistFormControl\(event\), listenerOptions\)/);
   assert.doesNotMatch(controller, /control\.addEventListener\("focusout", event => this\._persistFormControl\(event\), listenerOptions\)/);
   assert.match(controller, /input\[name="system\.scars"\], input\[name="system\.oath"\], \[data-path\]/);
-  assert.match(controller, /control\.matches\("prose-mirror\[name\]"\)/);
+  assert.match(controller, /persistRichTextChange\(this, event\)/);
   assert.match(controller, /this\._bindSheetViewState\(html, listenerOptions\);[\s\S]*?bindLoadoutControls\(this, html, listenerOptions\);[\s\S]*?if \(!this\.isEditable\) return;/);
 
   assert.match(template, /<thead(?:\s+[^>]*)?>\s*<tr>[\s\S]*?<\/tr>\s*<\/thead>/);

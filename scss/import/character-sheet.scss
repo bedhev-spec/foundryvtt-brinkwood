@@ -15,6 +15,13 @@
     padding-right: 0;
   }
 
+  // Create breathing room below Name and Alias without changing the header's
+  // flow height or moving the Attributes/Bans region that follows it.
+  .sheet-identity__details > .sheet-identity__rows,
+  .sheet-identity__trackers > .big-teeth-section {
+    transform: translateY(10px);
+  }
+
   /* The selected value owns an inner action track because its remove control
    * is nested inside the value rather than being a sibling of the outer row. */
   .character-identity-choices .item-block {
@@ -192,7 +199,7 @@
     }
   }
 
-  .item-block {
+  .item-block:not(.sheet-identity__row) {
     align-items: baseline;
     width: 100%;
     min-height: 1.5em;
@@ -330,49 +337,6 @@
     min-width: 0;
   }
 
-nav.tabs {
-    min-height: 36px;
-    margin-bottom: 0;
-    border-top: 1px solid rgba($almost_black, 0.6);
-    border-bottom: 1px solid rgba($almost_black, 0.6);
-
-    .item {
-      flex: 1 1 0;
-      padding: 7px 8px;
-      color: $almost_black;
-      text-align: left;
-      text-shadow: none;
-      white-space: nowrap;
-
-      &.active {
-        background: var(--bw-paper-deep);
-        color: $almost_black;
-        font-weight: bold;
-        text-decoration: none;
-        box-shadow: inset 0 -3px var(--bw-accent);
-      }
-    }
-  }
-
-  nav.tabs button.item {
-    border: 0;
-    background: transparent;
-    font: inherit;
-  }
-
-  .attribute-label,
-  .attribute-skill-label {
-    border: 0;
-    background: transparent;
-    font: inherit;
-    cursor: pointer;
-
-    &:focus-visible {
-      outline: 3px solid var(--bw-focus);
-      outline-offset: 2px;
-    }
-  }
-
   .tab[data-tab] {
     display: none;
     min-height: 0;
@@ -386,82 +350,6 @@ nav.tabs {
   .attributes {
     width: 200px;
     flex: 0 0 200px;
-    color: $almost_black;
-
-    .attribute {
-      margin-bottom: 10px;
-    }
-
-    .stripe {
-      padding-left: 5px;
-      background: $almost_black;
-      color: $almost_white;
-      font-size: 17px;
-    }
-
-    .attribute-label,
-    .attribute-skill-label {
-      color: inherit;
-      font-weight: bold;
-      text-transform: uppercase;
-      text-shadow: none;
-    }
-
-    .attribute-skill-label {
-      margin-top: 0.3em;
-    }
-
-    .attributes-exp {
-      position: relative;
-      margin-top: 1em;
-    }
-
-    .attributes-container {
-      display: flex;
-      align-items: center;
-      margin: 3px 0;
-
-      button.dot-value {
-        display: inline-grid;
-        width: 28px;
-        height: 28px;
-        margin: 0;
-        padding: 0;
-        border: 0;
-        border-radius: 0;
-        background: transparent;
-        color: transparent;
-        cursor: pointer;
-        line-height: 1;
-        place-items: center;
-
-        &::before {
-          width: 13px;
-          height: 13px;
-          border: 2px solid var(--bw-ink-soft);
-          border-radius: 50%;
-          content: "";
-        }
-
-        &.dot-value--filled::before {
-          border-color: var(--bw-ink);
-          background: var(--bw-ink);
-        }
-
-        &:hover:not(:disabled)::before {
-          border-color: var(--bw-accent);
-        }
-
-        &:focus-visible {
-          outline: 3px solid var(--bw-focus);
-          outline-offset: 1px;
-        }
-
-        &:disabled {
-          cursor: default;
-        }
-      }
-    }
   }
 
   .traits,
@@ -533,101 +421,6 @@ nav.tabs {
       gap: 6px;
       min-width: 0;
     }
-
-  .trait-card {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    min-width: 0;
-    min-height: 0;
-    height: auto;
-    align-self: start;
-    align-content: start;
-    overflow: visible;
-  }
-
-    .trait-card__header {
-      display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: start;
-      min-width: 0;
-    }
-
-  .trait-card__title {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-  }
-
-    .trait-card__purchase {
-      flex: 0 0 auto;
-      width: 16px;
-      height: 16px;
-      margin: 2px 0 0;
-      appearance: none !important;
-      -webkit-appearance: none !important;
-      accent-color: auto;
-      box-sizing: border-box;
-      background: #fff;
-      border: 1px solid var(--bw-ink-soft);
-      border-radius: 2px;
-      cursor: pointer;
-
-      &:checked {
-        border-color: var(--bw-ink-soft);
-        background-color: #fff;
-        background-image:
-          linear-gradient(45deg, transparent 45%, var(--bw-ink) 46%, var(--bw-ink) 54%, transparent 55%),
-          linear-gradient(-45deg, transparent 45%, var(--bw-ink) 46%, var(--bw-ink) 54%, transparent 55%);
-      }
-
-      &:disabled {
-        cursor: default;
-        opacity: 0.65;
-      }
-    }
-
-  .trait-card__remove {
-    width: 26px;
-    min-width: 26px;
-    height: 26px;
-    min-height: 26px;
-    margin: -3px -4px -3px 8px;
-    border: 0;
-    border-radius: 3px;
-    background: transparent;
-    color: var(--bw-ink-soft);
-    font-size: 1.35rem;
-    line-height: 1;
-
-    &:hover,
-    &:focus-visible {
-      background: rgba(141, 98, 93, 0.16);
-      color: var(--bw-ink);
-    }
-
-    &:focus-visible {
-      outline: 3px solid var(--bw-focus);
-      outline-offset: 1px;
-    }
-  }
-
-  .trait-card__description {
-    min-width: 0;
-    max-width: 100%;
-    height: auto;
-    max-height: none;
-    color: var(--bw-ink);
-    align-self: start;
-    overflow: visible;
-      overflow-wrap: anywhere;
-    }
-
-    .trait-card__description > * {
-      max-width: 100%;
-    }
   }
 
   .loadout .item-add-popup {
@@ -641,11 +434,6 @@ nav.tabs {
   row-gap: 0;
 }
 
-& .character-sheet__workspace > nav.tabs {
-  grid-column: 1 / -1;
-  width: 100%;
-  box-sizing: border-box;
-}
 
 // The tab workspace and Attribute grid are character-sheet geometry. Keep
 // their wide-screen dimensions here rather than in the late Effects layer.
@@ -658,11 +446,6 @@ nav.tabs {
 & .character-sheet__workspace > .tab-content > .tab[data-tab] {
   margin-top: 0;
   padding-top: 10px;
-}
-
-& .character-sheet__workspace > nav.tabs .item {
-  flex: 1 1 0;
-  min-width: 0;
 }
 
 & .character-attributes {
@@ -753,21 +536,13 @@ nav.tabs {
     margin-block-end: -10px;
   }
 
-  .character-sheet__workspace > nav.tabs {
-    min-height: 0;
-  }
-
   .character-sheet__workspace > .tab-content {
     display: grid;
     grid-template-rows: minmax(0, 1fr);
     min-width: 0;
     min-height: 0;
     height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-gutter: stable;
-    scrollbar-width: thin;
+    overflow: hidden;
   }
 
   .character-sheet__workspace > .tab-content > .tab[data-tab].active {
@@ -819,7 +594,6 @@ nav.tabs {
 
   .big-teeth-section,
   .bans-armor,
-  nav.tabs,
   .label-stripe,
   .stripe {
     border-color: var(--bw-rule);
@@ -831,36 +605,6 @@ nav.tabs {
   .bans-armor th {
     background: var(--bw-ink);
     color: var(--bw-paper);
-  }
-
-  nav.tabs {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    display: flex;
-    gap: 4px;
-    padding: 4px;
-    background: var(--bw-paper-deep);
-
-    .item {
-      min-height: 40px;
-      padding: 10px 12px;
-      color: var(--bw-ink-soft);
-      border-bottom: 3px solid transparent;
-      text-align: center;
-
-      &:hover,
-      &:focus-visible,
-      &.active {
-        color: var(--bw-ink);
-        border-bottom-color: var(--bw-accent);
-      }
-
-      &:focus-visible {
-        outline: 3px solid var(--bw-focus);
-        outline-offset: -3px;
-      }
-    }
   }
 
   .locked {
@@ -910,16 +654,6 @@ nav.tabs {
 
     img.portrait {
       box-shadow: 3px 3px 0 var(--bw-paper-deep);
-    }
-
-    nav.tabs {
-      overflow-x: auto;
-      justify-content: start;
-
-      .item {
-        flex: 0 0 auto;
-        white-space: nowrap;
-      }
     }
 
     > .window-content > form.actor-sheet > .flex-horizontal:last-child {
@@ -1045,42 +779,6 @@ nav.tabs {
     input[type="checkbox"] {
       width: 22px;
       height: 22px;
-    }
-  }
-
-  .tab[data-tab="character-notes"] {
-    .editor,
-    prose-mirror {
-      min-height: 260px;
-      border: 1px solid var(--bw-rule);
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.35);
-    }
-
-    .editor-content,
-    prose-mirror .ProseMirror {
-      box-sizing: border-box;
-      min-inline-size: 0;
-      max-inline-size: 100%;
-      padding-inline: 5px;
-      color: var(--bw-ink);
-    }
-
-    // Rich text can carry pasted or toolbar-authored foreground colors.
-    // Character notes deliberately normalize editor and preview descendants.
-    .editor-content *,
-    prose-mirror .ProseMirror * {
-      max-inline-size: 100%;
-      color: inherit !important;
-      overflow-wrap: anywhere;
-    }
-
-    .editor-edit {
-      display: inline-grid;
-      place-items: center;
-      width: 40px;
-      height: 40px;
-      color: var(--bw-ink);
     }
   }
 

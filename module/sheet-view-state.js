@@ -5,10 +5,10 @@
  */
 
 export function getSheetScrollContainers(root) {
-  const characterViewport = root?.querySelector?.(".character-sheet__workspace > .tab-content");
-  // Character sheets have a fixed header and one explicit tab viewport. Do not
-  // preserve the outer scroll positions: restoring either moves the header.
-  if (characterViewport) return [["tab", characterViewport]];
+  const tabViewport = root?.querySelector?.(".sheet-tab-content > .tab.active");
+  // Bounded actor sheets keep their header and tabs fixed. Their active panel
+  // is the only scroll owner, so restoring outer scroll would move fixed UI.
+  if (tabViewport) return [["tab", tabViewport]];
 
   const form = root?.matches?.("form") || root?.matches?.("form.actor-sheet")
     ? root
@@ -38,9 +38,9 @@ export function restoreSheetViewState(root, state, { setPrimaryTab, activateEffe
     element.scrollTop = position.scrollTop;
     element.scrollLeft = position.scrollLeft;
   }
-  // A character viewport can replace the inner tab pane during a rerender.
+  // A bounded viewport can replace the inner tab pane during a rerender.
   // Ensure stale outer positions cannot shift the fixed header into view.
-  if (root?.querySelector?.(".character-sheet__workspace > .tab-content")) {
+  if (root?.querySelector?.(".sheet-tab-content")) {
     const form = root.matches?.("form.actor-sheet") ? root : root.querySelector?.("form.actor-sheet");
     const windowContent = root.closest?.(".window-content") ?? root.querySelector?.(".window-content");
     for (const element of [form, windowContent]) {

@@ -17,24 +17,29 @@ test("Legacy XP updates and framing remain blue", async () => {
   assert.match(styles, /\.character-xp-section\s*\{[\s\S]*?border-color:\s*#315f82/);
 });
 
-test("Legacy tabs receive their final equal-width layout from the base stylesheet", async () => {
-  const [source, compiled] = await Promise.all([
+test("Shared primary tabs receive their final equal-width layout from the base stylesheet", async () => {
+  const [source, sharedTabs, compiled] = await Promise.all([
     read("scss/import/character-sheet.scss"),
+    read("scss/import/sheet-tabs.scss"),
     read("styles/blades.css")
   ]);
 
-  for (const styles of [source, compiled]) {
-  assert.match(styles, /\.character-sheet__workspace[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
-    assert.match(styles, /nav\.tabs \.item\s*\{[\s\S]*?flex:\s*1 1 0[\s\S]*?min-width:\s*0/);
+  assert.match(source, /\.character-sheet__workspace[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\)/);
+  for (const styles of [sharedTabs, compiled]) {
+    assert.match(styles, /\.sheet-tabs \.item\s*\{[\s\S]*?flex:\s*1 1 0[\s\S]*?min-width:\s*0/);
   }
 });
 
 test("Legacy tall tabs scroll inside the bounded tab viewport", async () => {
- const styles = await read("scss/import/character-sheet.scss");
+ const [styles, tabStyles] = await Promise.all([
+   read("scss/import/character-sheet.scss"),
+   read("scss/import/sheet-tabs.scss"),
+ ]);
 
  assert.match(styles, /form\.actor-sheet\s*\{[\s\S]*?height:\s*100%[\s\S]*?grid-template-rows:\s*auto auto auto auto minmax\(0, 1fr\)[\s\S]*?overflow:\s*hidden/);
  assert.match(styles, /character-sheet__workspace\s*\{[\s\S]*?min-height:\s*0[\s\S]*?grid-template-rows:\s*auto minmax\(0, 1fr\)[\s\S]*?overflow:\s*hidden/);
-  assert.match(styles, /character-sheet__workspace > \.tab-content\s*\{[\s\S]*?min-height:\s*0[\s\S]*?overflow-y:\s*auto[\s\S]*?scrollbar-gutter:\s*stable[\s\S]*?scrollbar-width:\s*thin/);
+  assert.match(styles, /character-sheet__workspace > \.tab-content\s*\{[\s\S]*?min-height:\s*0[\s\S]*?overflow:\s*hidden/);
+  assert.match(tabStyles, /> \.tab\.active\s*\{[\s\S]*?overflow-y:\s*auto[\s\S]*?scrollbar-gutter:\s*stable[\s\S]*?scrollbar-width:\s*thin/);
 });
 
 test("Legacy sheets reset to Traits only when genuinely closed", async () => {

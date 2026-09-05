@@ -97,10 +97,45 @@
   font-style: italic;
 }
 
-.items-to-add {
+.item-picker-dialog {
+  min-height: 180px;
+
+  .window-resize-handle {
+    cursor: ns-resize;
+  }
+
+  .window-content {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .dialog-form {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .dialog-content,
+  .item-picker-content {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .items-to-add {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  box-sizing: border-box;
+  height: 100%;
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding-inline-end: 4px;
 
   input[type="radio"],
   input[type="checkbox"] {
@@ -136,4 +171,5 @@
     font-size: 0.82rem;
   }
 
+  }
 }
