@@ -20,6 +20,7 @@ import { BladesRebelionSheet } from "./blades-rebelion-sheet.js";
 import { showRollStatistics } from "./roll-statistics.js";
 import { clockImagePath, prepareClockLabel } from "./clock-utils.js";
 import { syncOpenActorTrackers } from "./sheet-tracker-sync.js";
+import { registerGlobalClockSystem, startGlobalClockSystem } from "./global-clocks.js";
 
 
 import * as migrations from "./migration.js";
@@ -68,6 +69,7 @@ Hooks.once("init", async function() {
 
   // Register System Settings
   registerSystemSettings();
+  registerGlobalClockSystem();
 
   // Register sheet application classes (ApplicationV2)
   const { DocumentSheetConfig } = foundry.applications.apps;
@@ -241,6 +243,7 @@ Hooks.once("ready", async function() {
   if (game.user.isGM && migrations.isMigrationAuthority()) {
     await migrations.migrateWorld();
   }
+  await startGlobalClockSystem();
 });
 
 /*

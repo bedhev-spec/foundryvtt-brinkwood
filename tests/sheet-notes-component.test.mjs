@@ -20,7 +20,8 @@ test("Character and Mask consume the shared Notes component", async () => {
   assert.match(mask, reference);
   assert.match(character, /class="tab flex-vertical sheet-notes/);
   assert.match(mask, /mask-sheet__notes sheet-notes/);
-  assert.match(partial, /<prose-mirror class="sheet-notes__editor" name="\{\{fieldName\}\}" value="\{\{fieldValue\}\}" data-document-uuid="\{\{documentUuid\}\}" collaborate toggled>/);
+  assert.match(partial, /<prose-mirror class="sheet-notes__editor" name="system\.description" value="\{\{system\.description\}\}" data-document-uuid="\{\{actor\.uuid\}\}" collaborate toggled>/);
+  assert.doesNotMatch(partial, /fieldName|fieldValue|documentUuid|enrichedContent/);
   assert.match(partial, /class="editor editor-content sheet-notes__preview"/);
   assert.match(templates, reference);
 });
@@ -36,8 +37,12 @@ test("the design system owns Notes styling once", async () => {
 
   assert.match(rootStyles, /@import 'sheet-notes\.scss';/);
   assert.match(shared, /\.sheet-notes\s*\{[\s\S]*?> prose-mirror[\s\S]*?min-height:\s*260px/);
+  assert.match(shared, /> prose-mirror\s*\{[\s\S]*?display:\s*flex;[\s\S]*?flex-direction:\s*column/,
+    "the shared Notes component must provide Foundry's flex prose-mirror host layout");
+  assert.match(shared, /> \.sheet-notes__preview\s*\{[\s\S]*?display:\s*block/);
+  assert.doesNotMatch(shared, /> \.editor\s*\{[\s\S]*?display:\s*block/,
+    "the preview rule must not override Foundry's runtime .editor class on prose-mirror");
   assert.match(shared, /prose-mirror \.ProseMirror\s*\{[\s\S]*?min-inline-size:\s*0[\s\S]*?color:\s*var\(--bw-ink\)/);
-  assert.match(shared, /prose-mirror \.ProseMirror\s*\{[\s\S]*?min-block-size:\s*218px[\s\S]*?cursor:\s*text/);
   assert.doesNotMatch(character, /data-tab="character-notes"/);
   assert.doesNotMatch(mask, /mask-sheet__notes[\s\S]*?prose-mirror/);
   assert.doesNotMatch(tabs, /mask-sheet__panel prose-mirror/);
@@ -85,4 +90,35 @@ test("the shared Notes binder owns the prose-mirror change listener", async () =
 
   assert.equal(listeners.get("change").options, listenerOptions);
   assert.deepEqual(events, [event]);
+});
+
+test("the shared Notes binder hydrates Foundry's empty editor value without replacing its enriched preview", () => {
+  const listeners = new Map();
+  const preview = { innerHTML: '<p class="enriched">Existing note</p>' };
+  let value = "";
+  const control = {
+    name: "system.description",
+    open: false,
+    get value() { return value; },
+    set value(nextValue) {
+      value = nextValue;
+      preview.innerHTML = nextValue;
+    },
+    querySelector: selector => selector === ".editor-content" ? preview : null,
+    _setValue: nextValue => { value = nextValue; },
+    _refresh: () => { preview.innerHTML = value; },
+    addEventListener: (type, listener, options) => listeners.set(type, { listener, options }),
+  };
+  const html = { querySelectorAll: () => [control] };
+  const sheet = {
+    document: { system: { description: "<p>Existing note</p>" } },
+    _persistFormControl: () => assert.fail("hydration must not invoke persistence"),
+  };
+
+  bindRichTextPersistence(sheet, html, { signal: {} });
+
+  assert.equal(control.value, "<p>Existing note</p>");
+  assert.equal(preview.innerHTML, '<p class="enriched">Existing note</p>');
+  assert.ok(listeners.has("change"));
+  assert.equal(listeners.get("click").options.capture, true);
 });

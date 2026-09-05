@@ -6,11 +6,24 @@
 
   > .editor,
   > prose-mirror {
-    display: block;
     min-height: 260px;
     border: 1px solid var(--bw-rule);
     border-radius: 6px;
     background: rgba(255, 255, 255, 0.35);
+  }
+
+  // Foundry owns the prose-mirror host layout (`display: flex`). Overriding it
+  // breaks the normal editor while its independently laid-out HTML mode keeps
+  // working. Only the static preview needs an explicit display mode.
+  > prose-mirror {
+    display: flex;
+    flex-direction: column;
+  }
+
+  // `prose-mirror` gains Foundry's `.editor` class at runtime, so this must
+  // target the preview class instead of the generic class.
+  > .sheet-notes__preview {
+    display: block;
   }
 
   .editor-content,
@@ -20,14 +33,6 @@
     max-inline-size: 100%;
     padding-inline: 5px;
     color: var(--bw-ink);
-  }
-
-  // The host keeps the visual frame open, but Foundry's empty editable child
-  // otherwise collapses to a single line. Give the real focus target the
-  // remaining frame height so an empty Notes field is clickable throughout.
-  prose-mirror .ProseMirror {
-    min-block-size: 218px;
-    cursor: text;
   }
 
   .editor-content *,

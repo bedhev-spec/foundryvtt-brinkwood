@@ -60,7 +60,7 @@
       </section>
 
       <section id="mask-{{_id}}-panel-notes" class="tab mask-sheet__panel mask-sheet__notes sheet-notes {{#if (eq tabs.primary "mask-notes")}}active{{/if}}" data-group="primary" data-tab="mask-notes" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-notes">
-        {{> "systems/brinkwood/templates/parts/sheet-notes.html" editable=editable fieldName="system.description" fieldValue=system.description documentUuid=actor.uuid enrichedContent=enrichedDescription}}
+        {{> "systems/brinkwood/templates/parts/sheet-notes.html"}}
       </section>
 
       {{#if isGM}}

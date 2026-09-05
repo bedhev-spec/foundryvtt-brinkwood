@@ -98,8 +98,9 @@ test("each Actor HTML editor has its own enriched context and template target", 
         const enrichedField = field === "notes" ? "enrichedNotes" : "enrichedDescription";
         assert.match(controller, new RegExp(`context\\.${enrichedField}\\s*=\\s*await[\\s\\S]*?enrichHTML`));
         if ((name === "character" || name === "mask") && field === "description") {
-          assert.match(template, new RegExp(`parts/sheet-notes\\.html"[\\s\\S]*?fieldName="system\\.${field}"[\\s\\S]*?fieldValue=system\\.${field}[\\s\\S]*?documentUuid=actor\\.uuid[\\s\\S]*?enrichedContent=${enrichedField}`));
-          assert.match(notesPartial, /<prose-mirror class="sheet-notes__editor" name="\{\{fieldName\}\}" value="\{\{fieldValue\}\}" data-document-uuid="\{\{documentUuid\}\}" collaborate toggled>/);
+          assert.match(template, /parts\/sheet-notes\.html"\s*\}\}/);
+          assert.match(notesPartial, new RegExp(`<prose-mirror class="sheet-notes__editor" name="system\\.${field}" value="\\{\\{system\\.${field}\\}\\}" data-document-uuid="\\{\\{actor\\.uuid\\}\\}" collaborate toggled>`));
+          assert.match(notesPartial, new RegExp(`\\{\\{\\{${enrichedField}\\}\\}\\}`));
         } else {
           assert.match(template, new RegExp(`<prose-mirror name="system\\.${field}" value="\\{\\{system\\.${field}\\}\\}" data-document-uuid="\\{\\{actor\\.uuid\\}\\}" collaborate toggled>`));
           assert.match(template, new RegExp(`\\{\\{\\{${enrichedField}\\}\\}`));

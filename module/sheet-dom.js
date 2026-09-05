@@ -35,13 +35,38 @@ export async function persistRichTextChange(sheet, event) {
 
 /** Bind the shared Notes editor to the sheet's authoritative save handler. */
 export function bindRichTextPersistence(sheet, html, listenerOptions) {
-  html.querySelectorAll("prose-mirror[name]").forEach(control =>
+  html.querySelectorAll("prose-mirror[name]").forEach(control => {
+    // Foundry may normalize the parser-created custom element after _onRender,
+    // clearing its internal raw value while leaving the enriched preview intact.
+    // Hydrate from the authoritative Document before ProseMirror opens.
+    const hydrateValue = () => {
+      const documentValue = control.name
+        ?.split(".")
+        .reduce((value, key) => value?.[key], sheet.document);
+      if (typeof documentValue !== "string" || control.value === documentValue) return;
+      const preview = control.querySelector?.(".editor-content");
+      const enrichedPreview = preview?.innerHTML;
+      // Avoid the public setter's synthetic change event: hydration is not a
+      // user edit and must never enter the persistence path.
+      if (typeof control._setValue === "function") {
+        control._setValue(documentValue);
+        control._refresh?.();
+      } else control.value = documentValue;
+      if (!control.open && preview && enrichedPreview !== undefined) preview.innerHTML = enrichedPreview;
+    };
+
+    hydrateValue();
+    // Foundry can normalize the parser-created custom element after _onRender.
+    // Re-hydrate in capture phase immediately before its pencil handler opens
+    // ProseMirror, guaranteeing the raw value used by normal edit mode.
+    control.addEventListener("click", hydrateValue, { ...listenerOptions, capture: true });
+
     control.addEventListener(
       "change",
       event => sheet._persistFormControl(event),
       listenerOptions,
-    )
-  );
+    );
+  });
 }
 
 
