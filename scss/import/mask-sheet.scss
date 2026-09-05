@@ -256,18 +256,6 @@
     gap: 8px;
   }
 
-  .mask-sheet__notes {
-    .editor,
-    .editor-content,
-    prose-mirror {
-      min-height: 160px;
-      padding: 10px 12px;
-      border: 1px solid var(--bw-rule);
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.3);
-    }
-  }
-
   // The shared Attribute presentation lives beside Mask identity details.
   // This sheet owns only its header-grid placement and responsive stacking.
   .mask-attributes {
@@ -295,15 +283,6 @@
     margin: 10px 0;
     color: var(--bw-ink-soft);
     font-style: italic;
-  }
-
-  .mask-sheet__notes .editor, .mask-sheet__notes .editor-content, .mask-sheet__notes prose-mirror {
-    display: block;
-    min-height: 180px;
-    padding: 10px 12px;
-    border: 1px solid var(--bw-rule);
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.3);
   }
 
   .mask-sheet__panel[data-tab="effects"] .effects-groups,

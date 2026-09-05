@@ -59,18 +59,13 @@
         </div>
       </section>
 
-  <section id="mask-{{_id}}-panel-notes" class="tab mask-sheet__panel mask-sheet__notes {{#if (eq tabs.primary "mask-notes")}}active{{/if}}" data-group="primary" data-tab="mask-notes" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-notes">
-      {{#if editable}}
-      <prose-mirror name="system.description" value="{{system.description}}" data-document-uuid="{{actor.uuid}}" collaborate toggled>{{{enrichedDescription}}}</prose-mirror>
-      {{else}}
-      <div class="editor editor-content">{{{enrichedDescription}}}</div>
-      {{/if}}
+      <section id="mask-{{_id}}-panel-notes" class="tab mask-sheet__panel mask-sheet__notes sheet-notes {{#if (eq tabs.primary "mask-notes")}}active{{/if}}" data-group="primary" data-tab="mask-notes" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-notes">
+        {{> "systems/brinkwood/templates/parts/sheet-notes.html"}}
       </section>
 
       {{#if isGM}}
       <section id="mask-{{_id}}-panel-effects" class="tab mask-sheet__panel effects {{#if (eq tabs.primary "effects")}}active{{/if}}" data-group="primary" data-tab="effects" role="tabpanel" aria-labelledby="mask-{{_id}}-tab-effects">
-        <h2>{{localize "BITD.Effects"}}</h2>
-        {{> "systems/brinkwood/templates/parts/active-effects.html"}}
+        {{> "systems/brinkwood/templates/parts/actor-active-effects.html"}}
       </section>
       {{/if}}
       </div>

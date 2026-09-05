@@ -15,7 +15,9 @@ test("selected identity values use prepared shared HTML tooltips", async () => {
   assert.match(identityRow, /data-tooltip-html="\{\{row\.item\.identityTooltipHtml\}\}"/);
   assert.match(identityRow, /data-tooltip-class="brinkwood-item-tooltip-shell"/);
   assert.match(controller, /identityDefinitions[\s\S]*?itemType: "upbringing"[\s\S]*?descriptionRoot: "Actor\.Upbringings"[\s\S]*?itemType: "profession"[\s\S]*?descriptionRoot: "Actor\.Professions"[\s\S]*?itemType: "class"[\s\S]*?descriptionRoot: "Actor\.Classes"[\s\S]*?itemType: "pact"[\s\S]*?descriptionRoot: "Actor\.Pacts"/);
-  assert.match(controller, /identityTooltipHtml = renderDescriptionTooltip\(/);
+  assert.match(controller, /const description = game\.i18n\.localize\(`\$\{descriptionRoot\}\.\$\{item\.name\}`\);/);
+  assert.match(controller, /const enrichedDescription = await foundry\.applications\.ux\.TextEditor\.implementation\.enrichHTML\([\s\S]*?async: true,[\s\S]*?relativeTo: this\.document,[\s\S]*?secrets: this\.document\.isOwner/);
+  assert.match(controller, /identityTooltipHtml = renderDescriptionTooltip\([\s\S]*?description,[\s\S]*?\(\) => enrichedDescription,/);
   assert.doesNotMatch(controller, /identityTooltipHtml = escapeHTML/);
 });
 

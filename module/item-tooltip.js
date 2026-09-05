@@ -43,6 +43,7 @@ export function renderItemTooltip(
   item,
   localize = key => key,
   enrichDescription = escapeHTML,
+  { includeStats = true } = {},
 ) {
   const system = item?.system ?? {};
   const fields = [
@@ -52,11 +53,11 @@ export function renderItemTooltip(
     ["BITD.Class", system.class]
   ].filter(([, value]) => value !== undefined && value !== null && value !== "");
 
-  const rows = fields.map(([label, value]) => `
+  const rows = includeStats ? fields.map(([label, value]) => `
     <div class="brinkwood-item-tooltip__stat">
       <span>${escapeHTML(localize(label))}</span>
       <strong>${escapeHTML(value)}</strong>
-    </div>`).join("");
+    </div>`).join("") : "";
   const additionalInfo = String(system.additional_info ?? "").trim();
   const description = renderTooltipDescriptionBlock(system.description, enrichDescription);
 

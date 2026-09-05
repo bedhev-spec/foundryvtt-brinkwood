@@ -79,7 +79,9 @@ test("item sheets opt into compact active-effect cards without changing shared s
   assert.doesNotMatch(defaultCard, /effect-card--compact/);
   for (const template of [item, simple, trait, klass]) {
     assert.match(template, /active-effects\.html" compact=true/);
+    assert.doesNotMatch(template, /actor-active-effects\.html/);
   }
+  assert.match(partial, /\{\{#if section\.canCreate\}\}\s*\{\{#unless \(eq section\.type "inactive"\)\}\}[\s\S]*?data-effect-action="create"[\s\S]*?\{\{\/unless\}\}/);
   assert.match(styles, /\.effect-card--compact\s*\{[\s\S]*?\.effect-card__image\s*\{[\s\S]*?width:\s*28px/);
   assert.match(styles, /\.effect-card--compact\s*\{[\s\S]*?button\.effect-control\s*\{[\s\S]*?block-size:\s*28px !important/);
   assert.match(styles, /\.effect-card--compact\s*\{[\s\S]*?inline-size:\s*fit-content[\s\S]*?justify-self:\s*end/);

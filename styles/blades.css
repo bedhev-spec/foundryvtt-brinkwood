@@ -1045,6 +1045,318 @@
 .brinkwood .trait-card__description > * {
   max-width: 100%;
 }
+.brinkwood .actor-effects {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  container-type: inline-size;
+}
+.brinkwood .actor-effects__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 8px;
+  padding: 4px;
+  border: 1px solid var(--bw-rule);
+  background: var(--bw-paper-deep);
+}
+.brinkwood button.actor-effects__tab {
+  flex: 1 1 8rem;
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 34px;
+  margin: 0;
+  padding: 6px 9px;
+  border: 1px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--bw-ink-soft);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  text-align: center;
+  transition: color var(--bw-tab-transition), background-color var(--bw-tab-transition), border-color var(--bw-tab-transition);
+}
+.brinkwood button.actor-effects__tab:hover, .brinkwood button.actor-effects__tab:focus-visible, .brinkwood button.actor-effects__tab.active {
+  color: var(--bw-ink);
+  border-color: var(--bw-rule);
+  border-bottom-color: var(--bw-accent);
+}
+.brinkwood button.actor-effects__tab.active {
+  background: rgba(255, 255, 255, 0.42);
+}
+.brinkwood button.actor-effects__tab:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 1px;
+}
+.brinkwood .actor-effects__category {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-content: stretch;
+  width: 100%;
+  min-width: 0;
+}
+.brinkwood .actor-effects__category[hidden] {
+  display: none;
+}
+.brinkwood .actor-effects__list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  align-content: start;
+}
+.brinkwood button.actor-effects__add {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px dashed var(--bw-rule);
+  border-left: 5px solid var(--bw-accent);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--bw-ink);
+  font-family: "Crimson Text", serif;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  text-align: left;
+}
+.brinkwood button.actor-effects__add:hover, .brinkwood button.actor-effects__add:focus-visible {
+  background: rgba(141, 98, 93, 0.14);
+  color: var(--bw-ink);
+}
+.brinkwood button.actor-effects__add:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 1px;
+}
+.brinkwood button.actor-effects__add i {
+  flex: 0 0 20px;
+  width: 20px;
+  text-align: center;
+}
+.brinkwood .actor-effect-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: visible;
+  align-self: start;
+}
+.brinkwood .actor-effect-card:focus-within {
+  border-color: var(--bw-accent);
+}
+.brinkwood .actor-effect-card--disabled {
+  color: var(--bw-ink-soft);
+}
+.brinkwood .actor-effect-card--disabled .actor-effect-card__image {
+  filter: grayscale(1);
+  opacity: 0.65;
+}
+.brinkwood .actor-effect-card__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  background: #e0d7c5;
+}
+.brinkwood .actor-effect-card__title {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.brinkwood .actor-effect-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  box-sizing: border-box;
+  gap: 0;
+  margin: -3px -4px -3px 8px;
+  padding: 1px;
+  border: 1px solid var(--bw-rule);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.3);
+}
+.brinkwood .actor-effect-card__actions button.effect-control {
+  display: inline-grid;
+  flex: 0 0 30px;
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  min-height: 30px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--bw-ink);
+  place-items: center;
+}
+.brinkwood .actor-effect-card__actions button.effect-control + button.effect-control {
+  border-left: 1px solid var(--bw-rule);
+}
+.brinkwood .actor-effect-card__actions button.effect-control:hover, .brinkwood .actor-effect-card__actions button.effect-control:focus-visible {
+  background: rgba(141, 98, 93, 0.16);
+}
+.brinkwood .actor-effect-card__actions button.effect-control:focus-visible {
+  outline: 3px solid var(--bw-focus);
+  outline-offset: 1px;
+}
+.brinkwood .actor-effect-card__actions .actor-effect-card__delete:hover,
+.brinkwood .actor-effect-card__actions .actor-effect-card__delete:focus-visible {
+  color: var(--bw-accent);
+}
+.brinkwood .actor-effect-card__body {
+  display: grid;
+  min-width: 0;
+}
+.brinkwood .actor-effect-card__summary {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--bw-rule);
+}
+.brinkwood .actor-effect-card__image {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--bw-rule);
+  border-radius: 4px;
+  object-fit: cover;
+}
+.brinkwood .actor-effect-card__metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  min-width: 0;
+  margin: 0;
+  color: var(--bw-ink);
+  font-family: Georgia, "Bitstream Charter", "Times New Roman", serif;
+  font-size: 0.86rem;
+  font-weight: 500;
+  line-height: 1.25;
+  text-shadow: none;
+}
+.brinkwood .actor-effect-card__metadata div {
+  display: flex;
+  min-width: 0;
+  gap: 4px;
+}
+.brinkwood .actor-effect-card__metadata dt {
+  color: var(--bw-ink);
+  font-weight: 700;
+}
+.brinkwood .actor-effect-card__metadata dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--bw-ink-soft);
+  overflow-wrap: anywhere;
+}
+.brinkwood .actor-effect-card__details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px 16px;
+  min-width: 0;
+  padding-top: 10px;
+}
+.brinkwood .actor-effect-card__detail-group,
+.brinkwood .actor-effect-card__empty-details {
+  flex: 1 1 220px;
+  min-width: 0;
+  margin: 0;
+}
+.brinkwood .actor-effect-card__detail-group h5 {
+  margin: 0 0 5px;
+  color: var(--bw-ink-soft);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.brinkwood .actor-effect-card__status-group,
+.brinkwood .actor-effect-card__description {
+  flex-basis: 100%;
+  max-width: 100%;
+}
+.brinkwood .actor-effect-card__statuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.brinkwood .actor-effect-card__statuses li {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  min-block-size: 28px;
+  padding: 4px 9px;
+  border: 1px solid var(--bw-ink-soft);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.48);
+  color: var(--bw-ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.brinkwood .actor-effect-card__description,
+.brinkwood .actor-effect-card__description > * {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.brinkwood .actor-effect-card__description > :last-child {
+  margin-bottom: 0;
+}
+.brinkwood .actor-effect-card__empty-details {
+  color: var(--bw-ink-soft);
+  font-style: italic;
+}
+@container (max-width: 420px) {
+  .brinkwood .actor-effect-card__header {
+    align-items: start;
+  }
+  .brinkwood .actor-effect-card__actions {
+    margin-left: 4px;
+  }
+  .brinkwood .actor-effect-card__metadata {
+    flex-direction: column;
+    gap: 3px;
+  }
+}
+@container (max-width: 410px) {
+  .brinkwood button.actor-effects__tab {
+    flex-basis: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brinkwood button.actor-effects__tab {
+    transition-duration: 0.01ms;
+  }
+}
 .brinkwood {
   /* Shared tab and panel visual language. Geometry stays with each sheet. */
 }
@@ -1125,33 +1437,6 @@
   border: 0;
   font: inherit;
 }
-.brinkwood {
-  /* The legacy character sheet shares the same effect-tab state language. */
-}
-.brinkwood.actor.pc.character .effects-tabs {
-  border: 1px solid var(--bw-rule);
-  background: var(--bw-paper-deep);
-}
-.brinkwood.actor.pc.character .effects-tab {
-  color: var(--bw-ink-soft);
-  background: transparent;
-  cursor: pointer;
-  font: inherit;
-  font-weight: 700;
-  transition: color var(--bw-tab-transition), background-color var(--bw-tab-transition), border-color var(--bw-tab-transition);
-}
-.brinkwood.actor.pc.character .effects-tab:hover, .brinkwood.actor.pc.character .effects-tab:focus-visible, .brinkwood.actor.pc.character .effects-tab.active {
-  color: var(--bw-ink);
-  border-color: var(--bw-rule);
-  border-bottom-color: var(--bw-accent);
-}
-.brinkwood.actor.pc.character .effects-tab.active {
-  background: rgba(255, 255, 255, 0.42);
-}
-.brinkwood.actor.pc.character .effects-tab:focus-visible {
-  outline: 3px solid var(--bw-focus);
-  outline-offset: 1px;
-}
 .brinkwood .sheet-panel {
   background: rgba(255, 255, 255, 0.16);
   border: 1px solid rgba(141, 98, 93, 0.46);
@@ -1166,26 +1451,6 @@
   font-size: 1rem;
   line-height: 1.2;
 }
-.brinkwood.actor.mask .mask-sheet__panel .editor-content, .brinkwood.actor.mask .mask-sheet__panel prose-mirror {
-  min-height: 160px;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.16);
-}
-.brinkwood.actor.mask .mask-sheet__panel .effects-tabs {
-  padding: 4px;
-  background: var(--bw-paper-deep);
-  border-bottom: 1px solid var(--bw-rule);
-}
-.brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab {
-  color: var(--bw-ink-soft);
-  background: transparent;
-  border-bottom: 2px solid transparent;
-  transition: color var(--bw-tab-transition), border-color var(--bw-tab-transition);
-}
-.brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab:hover, .brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab:focus-visible, .brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab.active {
-  color: var(--bw-ink);
-  border-bottom-color: var(--bw-accent);
-}
 .brinkwood.actor.mask .mask-sheet__panel .effects-category[data-effect-panel] {
   border: 0;
   border-radius: 0;
@@ -1198,9 +1463,48 @@
   background: var(--bw-ink);
 }
 @media (prefers-reduced-motion: reduce) {
-  .brinkwood .sheet-tabs .item, .brinkwood.actor.pc.character .effects-tab, .brinkwood.actor.mask .mask-sheet__panel .effects-tabs .effects-tab {
+  .brinkwood .sheet-tabs .item {
     transition-duration: 0.01ms;
   }
+}
+.brinkwood .sheet-notes {
+  min-width: 0;
+  min-height: 0;
+}
+.brinkwood .sheet-notes > .editor,
+.brinkwood .sheet-notes > prose-mirror {
+  min-height: 260px;
+  border: 1px solid var(--bw-rule);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.35);
+}
+.brinkwood .sheet-notes > prose-mirror {
+  display: flex;
+  flex-direction: column;
+}
+.brinkwood .sheet-notes > .sheet-notes__preview {
+  display: block;
+}
+.brinkwood .sheet-notes .editor-content,
+.brinkwood .sheet-notes prose-mirror .ProseMirror {
+  box-sizing: border-box;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  padding-inline: 5px;
+  color: var(--bw-ink);
+}
+.brinkwood .sheet-notes .editor-content *,
+.brinkwood .sheet-notes prose-mirror .ProseMirror * {
+  max-inline-size: 100%;
+  color: inherit !important;
+  overflow-wrap: anywhere;
+}
+.brinkwood .sheet-notes .editor-edit {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: var(--bw-ink);
 }
 .brinkwood.actor.pc.character {
   /*
@@ -2192,34 +2496,6 @@
   width: 22px;
   height: 22px;
 }
-.brinkwood.actor.pc.character .tab[data-tab=character-notes] .editor,
-.brinkwood.actor.pc.character .tab[data-tab=character-notes] prose-mirror {
-  min-height: 260px;
-  border: 1px solid var(--bw-rule);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.35);
-}
-.brinkwood.actor.pc.character .tab[data-tab=character-notes] .editor-content,
-.brinkwood.actor.pc.character .tab[data-tab=character-notes] prose-mirror .ProseMirror {
-  box-sizing: border-box;
-  min-inline-size: 0;
-  max-inline-size: 100%;
-  padding-inline: 5px;
-  color: var(--bw-ink);
-}
-.brinkwood.actor.pc.character .tab[data-tab=character-notes] .editor-content *,
-.brinkwood.actor.pc.character .tab[data-tab=character-notes] prose-mirror .ProseMirror * {
-  max-inline-size: 100%;
-  color: inherit !important;
-  overflow-wrap: anywhere;
-}
-.brinkwood.actor.pc.character .tab[data-tab=character-notes] .editor-edit {
-  display: inline-grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  color: var(--bw-ink);
-}
 .brinkwood.actor.pc.character .downtime-actions {
   display: grid;
   width: 100%;
@@ -2530,15 +2806,6 @@
   display: grid;
   gap: 8px;
 }
-.brinkwood.actor.mask .mask-sheet__notes .editor,
-.brinkwood.actor.mask .mask-sheet__notes .editor-content,
-.brinkwood.actor.mask .mask-sheet__notes prose-mirror {
-  min-height: 160px;
-  padding: 10px 12px;
-  border: 1px solid var(--bw-rule);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.3);
-}
 .brinkwood.actor.mask .mask-attributes {
   align-self: start;
   min-width: 0;
@@ -2560,14 +2827,6 @@
   margin: 10px 0;
   color: var(--bw-ink-soft);
   font-style: italic;
-}
-.brinkwood.actor.mask .mask-sheet__notes .editor, .brinkwood.actor.mask .mask-sheet__notes .editor-content, .brinkwood.actor.mask .mask-sheet__notes prose-mirror {
-  display: block;
-  min-height: 180px;
-  padding: 10px 12px;
-  border: 1px solid var(--bw-rule);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.3);
 }
 .brinkwood.actor.mask .mask-sheet__panel[data-tab=effects] .effects-groups,
 .brinkwood.actor.mask .mask-sheet__panel[data-tab=effects] .effects-category {
@@ -4033,6 +4292,179 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   border-top: 1px solid rgba(247, 244, 237, 0.2);
 }
 
+/*
+ * CSS clock concept adapted from Global Progress Clocks by Carlos Fernandez
+ * (Supe), copyright 2023, MIT. See THIRD_PARTY_NOTICES.md.
+ * Lunar-Dawn is credited upstream for converting the clock artwork to CSS.
+ */
+#brinkwood-global-clock-overlay {
+  --global-clock-size: 36px;
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  max-width: 290px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: max(var(--ui-fade-opacity), 0.92);
+}
+#brinkwood-global-clock-overlay[data-location=topRight] {
+  margin-left: auto;
+}
+
+.global-clock-display {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 190px;
+  max-height: 100%;
+}
+.global-clock-display.top {
+  padding-top: var(--vertical-offset);
+}
+.global-clock-display.bottom {
+  justify-content: flex-end;
+  padding-bottom: var(--vertical-offset);
+}
+
+.global-clock-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden auto;
+  pointer-events: auto;
+  scrollbar-gutter: stable;
+}
+
+.global-clock-entry {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--global-clock-size);
+  grid-template-rows: var(--global-clock-size);
+  align-items: center;
+  min-width: 190px;
+  max-width: 285px;
+  border: 1px solid var(--control-border-color);
+  border-radius: calc(var(--global-clock-size) / 2);
+  background: var(--control-bg-color);
+  color: var(--control-icon-color);
+  pointer-events: auto;
+}
+.global-clock-entry.private {
+  border-color: #8a50ff;
+  box-shadow: 0 0 4px #8a50ff;
+}
+
+.global-clock__name {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  min-width: 0;
+  padding: 0 8px 0 12px;
+}
+.global-clock__name span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.global-clock__controls {
+  position: absolute;
+  inset: 0 var(--global-clock-size) 0 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding-left: 8px;
+  border-radius: calc(var(--global-clock-size) / 2) 0 0 calc(var(--global-clock-size) / 2);
+  background: var(--control-bg-color);
+  opacity: 0;
+  pointer-events: none;
+}
+.global-clock__controls button {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+
+.global-clock-entry:hover .global-clock__controls,
+.global-clock-entry:focus-within .global-clock__controls {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.global-clock__visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (hover: none) {
+  .global-clock__controls {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+.global-clock__face {
+  position: relative;
+  align-self: stretch;
+  width: var(--global-clock-size);
+  min-width: var(--global-clock-size);
+  height: var(--global-clock-size);
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid #000;
+  border-radius: 50%;
+  background: conic-gradient(var(--clock-color) calc(var(--clock-filled) / var(--clock-max) * 1turn), var(--clock-background) 0);
+  cursor: pointer;
+}
+.global-clock__face:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.global-clock__spoke {
+  --spoke-width: 2px;
+  position: absolute;
+  top: calc(-0.5 * var(--spoke-width));
+  right: calc(50% - var(--spoke-width) / 2);
+  width: var(--spoke-width);
+  height: calc(50% + 0.5 * var(--spoke-width));
+  background: #000;
+  transform: rotate(calc(var(--clock-index) / var(--clock-max) * 1turn));
+  transform-origin: center bottom;
+}
+
+.global-clock__progress {
+  position: absolute;
+  right: 42px;
+  bottom: 1px;
+  font-size: 0.7rem;
+  opacity: 0.78;
+}
+
+.global-clock__add {
+  align-self: flex-start;
+  pointer-events: auto;
+}
+
+.brinkwood-global-clock-dialog .window-content .global-clock-dialog__content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.brinkwood-global-clock-dialog .window-content color-picker {
+  width: 100%;
+}
+
 /* Final character-sheet layout corrections. Emitted before the effects layer. */
 /* Keep identity rows stable whether their optional item is empty or selected. */
 .brinkwood.actor.pc.character .character-identity-choices {
@@ -4239,25 +4671,7 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.48), 0 1px 2px rgba(33, 27, 29, 0.08);
 }
 
-/* Legacy character sheet only; V2 owns a separate Effects layout. */
-.brinkwood.actor.pc.character .effects-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: 8px;
-  padding: 4px;
-}
-
-.brinkwood.actor.pc.character .effects-tab {
-  flex: 1 1 8rem;
-  min-height: 34px;
-  margin: 0;
-  padding: 6px 9px;
-  border: 1px solid transparent;
-  border-bottom: 3px solid transparent;
-  border-radius: 3px;
-}
-
+/* Legacy character sheet compatibility outside the shared Actor Effect component. */
 .brinkwood.actor.pc.character .effects-category__add:focus-visible {
   outline: 3px solid var(--bw-focus);
   outline-offset: 1px;
@@ -4476,10 +4890,4 @@ aside#tooltip.brinkwood-item-tooltip-shell {
   padding: 0;
   line-height: 1;
   place-items: center;
-}
-
-@container (max-width: 410px) {
-  .brinkwood.actor.pc.character .effects-tab {
-    flex-basis: 100%;
-  }
 }

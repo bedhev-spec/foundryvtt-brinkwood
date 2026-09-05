@@ -54,4 +54,6 @@ Open an issue on this repository, or contact `quad#8681` on the official Brinkwo
 
 Brinkwood is created by Far Horizons Co-op. This project is unofficial and is not associated with Far Horizons Co-op or the Brinkwood authors.
 
+The global clock overlay adapts the clock-only portion of [Global Progress Clocks](https://github.com/CarlosFdez/global-progress-clocks) by Carlos Fernandez (Supe), with the upstream CSS-clock conversion credited to Lunar-Dawn. The retained MIT terms are in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
+
 This project is licensed under the [GNU General Public License v3.0](./LICENSE.txt).

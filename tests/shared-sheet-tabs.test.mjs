@@ -34,9 +34,10 @@ function assertPrimaryTabContract(nav, path) {
 }
 
 test("shared tab component is the only primary tabbar visual and responsive owner", async () => {
-  const [component, generalStyles, characterSheet, maskSheet, characterTemplate, maskTemplate,
+  const [component, actorEffects, generalStyles, characterSheet, maskSheet, characterTemplate, maskTemplate,
     legacyEffects, legacyPolish] = await Promise.all([
     read("scss/import/sheet-tabs.scss"),
+    read("scss/import/actor-effect-card.scss"),
     read("scss/import/general-styles.scss"),
     read("scss/import/character-sheet.scss"),
     read("scss/import/mask-sheet.scss"),
@@ -75,11 +76,12 @@ test("shared tab component is the only primary tabbar visual and responsive owne
 
   assert.match(component, /\.sheet-tab-workspace\s*\{[\s\S]*?grid-template-rows:\s*auto minmax\(0, 1fr\)/);
   assert.match(component, /\.sheet-tab-content[\s\S]*?> \.tab\.active[\s\S]*?overflow-y:\s*auto/);
-  assert.match(component, /\.effects-tab\s*\{[\s\S]*?transition:/);
-  assert.match(component, /\.effects-tab[\s\S]*?&\.active\s*\{[\s\S]*?background:/);
-  assert.match(component, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.doesNotMatch(component, /\.effects-tabs|\.effects-tab/);
+  assert.match(actorEffects, /button\.actor-effects__tab\s*\{[\s\S]*?transition:/);
+  assert.match(actorEffects, /button\.actor-effects__tab[\s\S]*?&\.active\s*\{[\s\S]*?background:/);
+  assert.match(actorEffects, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(component, /\.effects-category\[data-effect-panel\]/);
   assert.doesNotMatch(component, /grid-template-columns/);
-  assert.doesNotMatch(legacyEffects, /\.effects-tab(?::hover|:focus-visible|\.active)/);
+  assert.doesNotMatch(legacyEffects, /\.effects-tabs|\.effects-tab/);
   assert.doesNotMatch(legacyPolish, /character-sheet__workspace nav\.tabs \.item\.active/);
 });

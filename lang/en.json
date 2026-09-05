@@ -131,7 +131,16 @@
 		}
 	},
 	"Mask": {
-    "XP": {
+		"Descriptions": {
+			"Terror": "Turns fear and pain into righteous strength, shielding the oppressed by terrifying their oppressors.",
+			"Violence": "A relentless instrument that never negotiates, acting and protecting until the last vampire falls.",
+			"Lies": "The oldest Mask - both teacher and deceiver - knowing when lies heal and when truth cuts.",
+			"Riot": "The voice of the unheard, urging people toward action and justice.",
+			"Torment": "Embodies agony and relief, using necessary pain to protect, mend, and heal.",
+			"Judgement": "Pursues truth and reconciliation, striking the wicked, sparing the penitent, and strengthening the oppressed.",
+			"Ruin": "Represents slow decay and inevitable destruction through which rebirth becomes possible."
+		},
+		"XP": {
 			"Tooltip": "At the end of each session, mark 1 Mask XP (or 2 if performed multiple times)...<ul><li>If you fulfilled your oath.</li><li>If you defeated a vampire of a higher tier than your highest aspect.</li><li>If you fulfilled the condition unique to your mask.</li>",
 			"Lies": "<li>You taught someone else something or learned something important.</li></ul>",
 			"Ruin": "<li>You strengthened or reinforced an ally.</li></ul>",
@@ -594,5 +603,29 @@
   "BITD.SlyFriends": "Sly Friends",
   "BITD.ShrewdFriends": "Shrewd Friends",
   "BITD.DarkServants": "Dark Servants",
-  "BITD.StrangeFriends": "Strange Friends"
+  "BITD.StrangeFriends": "Strange Friends",
+  "BITD.GlobalClock.Add": "Add clock",
+  "BITD.GlobalClock.Name": "Name",
+  "BITD.GlobalClock.Value": "Progress",
+  "BITD.GlobalClock.Size": "Segments",
+  "BITD.GlobalClock.Color": "Color",
+  "BITD.GlobalClock.Private": "GM only",
+  "BITD.GlobalClock.Hide": "Hide clock from players",
+  "BITD.GlobalClock.Show": "Show clock to players",
+  "BITD.GlobalClock.Edit": "Edit clock",
+  "BITD.GlobalClock.Delete": "Delete clock",
+  "BITD.GlobalClock.ControlsLabel": "Clock actions",
+  "BITD.GlobalClock.ListLabel": "Global progress clocks",
+  "BITD.GlobalClock.DialogCreate": "Add global clock",
+  "BITD.GlobalClock.DialogEdit": "Edit global clock",
+  "BITD.GlobalClock.DeleteTitle": "Delete global clock",
+  "BITD.GlobalClock.DeleteMessage": "Delete {name}?",
+  "BITD.GlobalClock.NameRequired": "A clock name is required.",
+  "BITD.GlobalClock.MaxSize": "Maximum {max} segments",
+  "BITD.GlobalClock.LocationName": "Global clock location",
+  "BITD.GlobalClock.LocationHint": "Choose where global clocks appear on the Foundry interface.",
+  "BITD.GlobalClock.LocationBottomLeft": "Above the player list",
+  "BITD.GlobalClock.LocationTopRight": "Top right",
+  "BITD.GlobalClock.OffsetName": "Global clock offset",
+  "BITD.GlobalClock.OffsetHint": "Additional vertical spacing in pixels."
 }

@@ -21,6 +21,7 @@ Reuse complete shared components. A sheet may change a component's data, behavio
 | Trait card | `templates/parts/actor/trait-card.html` | Item identity and purchase/delete state |
 | Effect card | Active-effect partials and effect SCSS | Prepared effect category data and its controls |
 | Attributes list / Attribute / Skill | Attribute partials | Prepared actor attribute and rating data |
+| Notes | `templates/parts/sheet-notes.html`, `scss/import/sheet-notes.scss`, `module/sheet-dom.js` | Actor `system.description`, its enriched preview, Foundry ProseMirror editing, and one shared rich-text persistence path |
 
 Each visual concern has one owner. Shared SCSS owns repeated controls and component states; sheet SCSS owns only sheet-level placement, scrolling, and variables.
 

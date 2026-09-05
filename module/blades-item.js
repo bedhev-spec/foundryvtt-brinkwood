@@ -10,7 +10,10 @@ export class BladesItem extends foundry.documents.Item {
   async _preCreate( data, options, user ) {
     await super._preCreate( data, options, user );
     let removeItems = [];
-    if( user.id === game.user.id ) {
+    // Mask configuration is an actor-level create -> grant -> remove command.
+    // Let it retire the old Mask only after the replacement is committed.
+    const isMaskConfiguration = data.type === "mask" && options?.brinkwoodConfigureMask;
+    if( !isMaskConfiguration && user.id === game.user.id ) {
       let actor = this.parent ? this.parent : null;
       if( actor?.documentName === "Actor" ) {
         removeItems = BladesHelpers.removeDuplicatedItemType( data, actor );

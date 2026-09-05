@@ -478,7 +478,11 @@ export class BladesActor extends foundry.documents.Actor {
 
       let created;
       try {
-        [created] = await this.createEmbeddedDocuments("Item", [requested]);
+        [created] = await this.createEmbeddedDocuments("Item", [requested], {
+          // BladesItem's legacy distinct-item hook must not remove the old
+          // Mask during this create. This command owns replacement ordering.
+          brinkwoodConfigureMask: true,
+        });
         if (!created) throw new Error("Mask configuration did not create a Mask item.");
         await this.syncTraitGrantsForSources([created]);
 

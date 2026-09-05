@@ -2,7 +2,7 @@
   "id": "brinkwood",
   "title": "Brinkwood",
   "description": "Brinkwood game system.",
-  "version": "0.6.13",
+  "version": "0.6.14",
   "compatibility": {
     "minimum": "13",
     "verified": "13.351",
@@ -10,7 +10,7 @@
   },
   "url": "https://github.com/bedhev-spec/foundryvtt-brinkwood",
   "manifest": "https://raw.githubusercontent.com/bedhev-spec/foundryvtt-brinkwood/integration/v13-follow-up/system.json",
-  "download": "https://github.com/bedhev-spec/foundryvtt-brinkwood/archive/refs/tags/v0.6.13.zip",
+  "download": "https://github.com/bedhev-spec/foundryvtt-brinkwood/archive/refs/tags/v0.6.14.zip",
   "authors": [
     {
       "name": "quad",

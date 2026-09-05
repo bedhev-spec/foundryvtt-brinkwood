@@ -50,7 +50,8 @@ function configuredActor({ failRepair = false } = {}) {
   actor.system = { experience: { value: 6 }, essence: { value: 3 } };
   actor._modActionPoints = async () => {};
   let createCount = 0;
-  actor.createEmbeddedDocuments = async (_type, [data]) => {
+  actor.createEmbeddedDocuments = async (_type, [data], operation) => {
+    assert.equal(operation?.brinkwoodConfigureMask, true);
     createCount += 1;
     const source = { ...data, id: `mask-new-${createCount}` };
     actor.items.push(source, grantFor(`trait-new-${createCount}`, source.id, "New automatic trait"));

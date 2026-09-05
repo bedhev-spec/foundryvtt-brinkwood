@@ -84,6 +84,7 @@ test("Simple Roll uses a close-safe native DialogV2 form contract", async () => 
 });
 
 test("each Actor HTML editor has its own enriched context and template target", async t => {
+  const notesPartial = await read("templates/parts/sheet-notes.html");
   const contracts = [
     ["character", "module/blades-actor-sheet.js", "templates/actor-sheet.html", ["description"]],
     ["mask", "module/blades-mask-sheet.js", "templates/mask-sheet.html", ["description"]],
@@ -94,10 +95,16 @@ test("each Actor HTML editor has its own enriched context and template target", 
     await t.test(name, async () => {
       const [controller, template] = await Promise.all([read(controllerPath), read(templatePath)]);
       for (const field of fields) {
-      const enrichedField = field === "notes" ? "enrichedNotes" : "enrichedDescription";
-      assert.match(controller, new RegExp(`context\\.${enrichedField}\\s*=\\s*await[\\s\\S]*?enrichHTML`));
-      assert.match(template, new RegExp(`<prose-mirror name="system\\.${field}" value="\\{\\{system\\.${field}\\}\\}" data-document-uuid="\\{\\{actor\\.uuid\\}\\}" collaborate toggled>`));
-      assert.match(template, new RegExp(`\\{\\{\\{${enrichedField}\\}\\}`));
+        const enrichedField = field === "notes" ? "enrichedNotes" : "enrichedDescription";
+        assert.match(controller, new RegExp(`context\\.${enrichedField}\\s*=\\s*await[\\s\\S]*?enrichHTML`));
+        if ((name === "character" || name === "mask") && field === "description") {
+          assert.match(template, /parts\/sheet-notes\.html"\s*\}\}/);
+          assert.match(notesPartial, new RegExp(`<prose-mirror class="sheet-notes__editor" name="system\\.${field}" value="\\{\\{system\\.${field}\\}\\}" data-document-uuid="\\{\\{actor\\.uuid\\}\\}" collaborate toggled>`));
+          assert.match(notesPartial, new RegExp(`\\{\\{\\{${enrichedField}\\}\\}\\}`));
+        } else {
+          assert.match(template, new RegExp(`<prose-mirror name="system\\.${field}" value="\\{\\{system\\.${field}\\}\\}" data-document-uuid="\\{\\{actor\\.uuid\\}\\}" collaborate toggled>`));
+          assert.match(template, new RegExp(`\\{\\{\\{${enrichedField}\\}\\}`));
+        }
       assert.doesNotMatch(template, /\{\{editor\b/);
       }
       assert.match(controller, /relativeTo:\s*this\.document/);

@@ -782,42 +782,6 @@
     }
   }
 
-  .tab[data-tab="character-notes"] {
-    .editor,
-    prose-mirror {
-      min-height: 260px;
-      border: 1px solid var(--bw-rule);
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.35);
-    }
-
-    .editor-content,
-    prose-mirror .ProseMirror {
-      box-sizing: border-box;
-      min-inline-size: 0;
-      max-inline-size: 100%;
-      padding-inline: 5px;
-      color: var(--bw-ink);
-    }
-
-    // Rich text can carry pasted or toolbar-authored foreground colors.
-    // Character notes deliberately normalize editor and preview descendants.
-    .editor-content *,
-    prose-mirror .ProseMirror * {
-      max-inline-size: 100%;
-      color: inherit !important;
-      overflow-wrap: anywhere;
-    }
-
-    .editor-edit {
-      display: inline-grid;
-      place-items: center;
-      width: 40px;
-      height: 40px;
-      color: var(--bw-ink);
-    }
-  }
-
   .downtime-actions {
     display: grid;
     width: 100%;

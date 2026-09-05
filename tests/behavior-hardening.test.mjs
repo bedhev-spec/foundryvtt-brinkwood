@@ -81,8 +81,8 @@ test("Mask primary tabs default to Traits and preserve valid remembered selectio
 
 test("Mask Type availability resizes only on transitions and preserves manual sizing during configured rerenders", async () => {
   assert.equal(MASK_SHEET_DEFAULT_WIDTH, 700);
-  assert.equal(maskSheetWidthForAttributes(700, undefined), 760);
-  assert.equal(maskSheetWidthForAttributes(700, 880), 760);
+  assert.equal(maskSheetWidthForAttributes(700, undefined), 780);
+  assert.equal(maskSheetWidthForAttributes(700, 880), 780);
   assert.equal(maskSheetWidthForAttributes(980, 880), 980);
 
   const positions = [];
@@ -107,30 +107,30 @@ test("Mask Type availability resizes only on transitions and preserves manual si
   assert.deepEqual(transitionOptions, []);
 
   await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, true);
-  assert.deepEqual(positions, [{ width: 760 }]);
+  assert.deepEqual(positions, [{ width: 780 }]);
   assert.deepEqual(transitionOptions, [{ attributesEntering: true }]);
 
   // A user can make the configured sheet narrower or wider. Re-renders must
   // preserve both instead of restoring the automatic target width.
-  sheet.position.width = 760;
+  sheet.position.width = 780;
   await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, true);
-  assert.deepEqual(positions, [{ width: 760 }]);
+  assert.deepEqual(positions, [{ width: 780 }]);
 
   sheet.position.width = 980;
   await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, true);
-  assert.deepEqual(positions, [{ width: 760 }]);
+  assert.deepEqual(positions, [{ width: 780 }]);
 
   await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, false);
-  assert.deepEqual(positions, [{ width: 760 }, { width: 700 }]);
+  assert.deepEqual(positions, [{ width: 780 }, { width: 700 }]);
   assert.deepEqual(transitionOptions.at(-1), { attributesEntering: false });
   assert.equal(sheet.position.width, 700);
 
   // A newly selected Mask Type may expand again after removal.
   await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, true);
-  assert.deepEqual(positions, [{ width: 760 }, { width: 700 }, { width: 760 }]);
+  assert.deepEqual(positions, [{ width: 780 }, { width: 700 }, { width: 780 }]);
 
   await BladesMaskSheet.prototype._syncMaskAttributeAvailability.call(sheet, false);
-  assert.deepEqual(positions, [{ width: 760 }, { width: 700 }, { width: 760 }, { width: 700 }]);
+  assert.deepEqual(positions, [{ width: 780 }, { width: 700 }, { width: 780 }, { width: 700 }]);
 });
 
 test("Mask Traits stay scoped to their source while picker offers every missing Trait", () => {

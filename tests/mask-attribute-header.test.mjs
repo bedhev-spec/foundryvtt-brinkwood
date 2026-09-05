@@ -26,7 +26,7 @@ test("Mask Attributes live in the identity header and share Character presentati
   assert.match(sharedStyles, /\.sheet-attribute-presentation\s*\{[\s\S]*?--bw-attribute-header-height:\s*34px;[\s\S]*?--bw-attribute-header-font-family:\s*"Crimson Text", serif;[\s\S]*?--bw-attribute-row-height:\s*28px;[\s\S]*?--bw-attribute-dot-track:\s*26px;[\s\S]*?\.stripe\s*\{[\s\S]*?display:\s*flex;[\s\S]*?align-items:\s*center;[\s\S]*?min-height:\s*var\(--bw-attribute-header-height\);[\s\S]*?\.attribute-skill-label\s*\{[\s\S]*?font-family:\s*var\(--bw-attribute-row-font-family\);[\s\S]*?\.attributes-container\s*\{[\s\S]*?grid-template-columns:\s*repeat\(4, var\(--bw-attribute-dot-track\)\) minmax\(0, 1fr\)[\s\S]*?button\.dot-value\s*\{[\s\S]*?font-size:\s*var\(--bw-attribute-row-font-size\);[\s\S]*?transform:\s*translateY\(7px\)[\s\S]*?\.dot-value--filled::before/);
 
   assert.match(controller, /MASK_SHEET_DEFAULT_WIDTH\s*=\s*700/);
-  assert.match(controller, /MASK_SHEET_ATTRIBUTES_WIDTH\s*=\s*760/);
+  assert.match(controller, /MASK_SHEET_ATTRIBUTES_WIDTH\s*=\s*780/);
   assert.match(controller, /position:\s*\{\s*width:\s*MASK_SHEET_DEFAULT_WIDTH,\s*height:\s*840\s*\}/);
   assert.match(controller, /async _syncMaskAttributeAvailability\(hasMaskType\)[\s\S]*?const becameAvailable = available && !this\._maskAttributesAvailable;[\s\S]*?if \(becameAvailable\) await this\._expandForMaskAttributes\(\);[\s\S]*?else if \(!available && wasAvailable\) await this\._shrinkForMaskAttributes\(\);/);
   assert.match(controller, /await this\._syncMaskAttributeAvailability\(Boolean\(context\.maskItem\)\);/);
@@ -77,12 +77,12 @@ test("configured Mask Attribute column matches one default Character Attribute c
     read("scss/import/mask-sheet.scss"),
   ]);
   const characterColumnWidth = (700 - (20 * 2) - (12 * 2)) / 3;
-  const configuredMaskContentWidth = 760 - (16 * 2);
+  const configuredMaskContentWidth = 780 - (16 * 2);
   const compactMaskContentWidth = 700 - (16 * 2);
   const maskHeaderMinimumWidth = 150 + 230 + characterColumnWidth + (20 * 2);
 
   assert.equal(characterColumnWidth, 212);
-  assert.equal(configuredMaskContentWidth, 728);
+  assert.equal(configuredMaskContentWidth, 748);
   assert.equal(compactMaskContentWidth, 668);
   assert.equal(maskHeaderMinimumWidth, 632);
   assert.ok(configuredMaskContentWidth > maskHeaderMinimumWidth);
